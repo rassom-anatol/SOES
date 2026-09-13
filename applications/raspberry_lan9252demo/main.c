@@ -71,7 +71,7 @@ int main_run (void * arg)
 {
    static esc_cfg_t config =
    {
-      .user_arg = "rpi3,cs0",
+      .user_arg = "rpi4,cs0",
       .use_interrupt = 0,
       .watchdog_cnt = 150,
       .set_defaults_hook = NULL,

@@ -47,8 +47,8 @@
 #define ESC_PRAM_CMD_ABORT       0x40000000
 #define ESC_PRAM_CMD_AVAIL       0x00000001
 #define ESC_PRAM_CMD_CNT(x)      (((x) >> 8) & 0x1F)
-#define ESC_PRAM_SIZE(x)         ((x) << 16)
-#define ESC_PRAM_ADDR(x)         ((x) << 0)
+#define ESC_PRAM_SIZE(x)         ((uint32_t)(x) << 16)
+#define ESC_PRAM_ADDR(x)         ((uint32_t)(x) << 0)
 
 #define ESC_CSR_DATA_REG         0x0300
 #define ESC_CSR_CMD_REG          0x0304
@@ -63,13 +63,13 @@ static void bcm2835_spi_write_32 (uint16_t address, uint32_t val)
 {
    char data[7];
 
-   data[0] = ESC_CMD_SERIAL_WRITE;
-   data[1] = ((address >> 8) & 0xFF);
-   data[2] = (address & 0xFF);
-   data[3] = (val & 0xFF);
-   data[4] = ((val >> 8) & 0xFF);
-   data[5] = ((val >> 16) & 0xFF);
-   data[6] = ((val >> 24) & 0xFF);
+   data[0] = (char)ESC_CMD_SERIAL_WRITE;
+   data[1] = (char)((address >> 8) & 0xFF);
+   data[2] = (char)(address & 0xFF);
+   data[3] = (char)(val & 0xFF);
+   data[4] = (char)((val >> 8) & 0xFF);
+   data[5] = (char)((val >> 16) & 0xFF);
+   data[6] = (char)((val >> 24) & 0xFF);
 
    /* Write data */
    bcm2835_spi_transfern(data, 7);
@@ -80,17 +80,17 @@ static uint32_t bcm2835_spi_read_32 (uint16_t address)
 {
    char data[7];
 
-   data[0] = ESC_CMD_SERIAL_READ;
-   data[1] = ((address >> 8) & 0xFF);
-   data[2] = (address & 0xFF);
+   data[0] = (char)ESC_CMD_SERIAL_READ;
+   data[1] = (char)((address >> 8) & 0xFF);
+   data[2] = (char)(address & 0xFF);
 
    /* Read data */
    bcm2835_spi_transfern(data, 7);
 
-   return ((data[6] << 24) |
-           (data[5] << 16) |
-           (data[4] << 8) |
-           data[3]);
+   return (((uint32_t)(uint8_t)data[6] << 24) |
+           ((uint32_t)(uint8_t)data[5] << 16) |
+           ((uint32_t)(uint8_t)data[4] << 8) |
+            (uint32_t)(uint8_t)data[3]);
 }
 
 /* ESC read CSR function */
@@ -157,19 +157,19 @@ static void ESC_read_pram (uint16_t address, void *buf, uint16_t len)
       /* Wait for read availabiliy */
       if (byte_offset > 0)
       {
-         quotient = len/4;
-         remainder = len - quotient*4;
+         quotient = (uint16_t)(len/4);
+         remainder = (uint16_t)(len - quotient*4);
       }
       else
       {
-         quotient = (len + first_byte_position)/4;
-         remainder = (len + first_byte_position) - quotient*4;
+         quotient = (uint16_t)((len + first_byte_position)/4);
+         remainder = (uint16_t)((len + first_byte_position) - quotient*4);
       }
       if (remainder != 0)
       {
          quotient++;
       }
-      fifo_range = MIN(quotient,16);
+      fifo_range = (uint8_t)MIN(quotient,16);
       do
       {
          value = bcm2835_spi_read_32(ESC_PRAM_RD_CMD_REG);
@@ -182,33 +182,34 @@ static void ESC_read_pram (uint16_t address, void *buf, uint16_t len)
       size = 3+4*fifo_size;
 
       /* Allocate buffer */
-      buffer = (uint8_t *)realloc(buffer, size);
+      buffer = (uint8_t *)realloc(buffer, (size_t)size);
 
       /* Reset fifo count */
       fifo_cnt = fifo_size;
 
       /* Reset buffer */
-      memset(buffer,0,size);
+      memset(buffer,0,(size_t)size);
       buffer[0] = ESC_CMD_SERIAL_READ;
       buffer[1] = ((ESC_PRAM_RD_FIFO_REG >>8) & 0xFF);
       buffer[2] = ( ESC_PRAM_RD_FIFO_REG & 0xFF);
 
       /* Transfer batch of data */
-      bcm2835_spi_transfern((char *)buffer, size);
+      bcm2835_spi_transfern((char *)buffer, (uint32_t)size);
 
       i = 3;
       while (fifo_cnt > 0 && len > 0)
       {
-         value = buffer[i] | (buffer[i+1] << 8) | (buffer[i+2] << 16) | (buffer[i+3] << 24);
+         value = (uint32_t)buffer[i] | ((uint32_t)buffer[i+1] << 8) |
+                 ((uint32_t)buffer[i+2] << 16) | ((uint32_t)buffer[i+3] << 24);
 
          if (byte_offset > 0)
          {
-            temp_len = (len > 4) ? 4: len;
+            temp_len = (uint8_t)((len > 4) ? 4 : len);
             memcpy(temp_buf + byte_offset ,&value, temp_len);
          }
          else
          {
-            temp_len = (len > (4 - first_byte_position)) ? (4 - first_byte_position) : len;
+            temp_len = (uint8_t)((len > (4 - first_byte_position)) ? (4 - first_byte_position) : len);
             memcpy(temp_buf ,((uint8_t *)&value + first_byte_position), temp_len);
          }
 
@@ -252,19 +253,19 @@ static void ESC_write_pram (uint16_t address, void *buf, uint16_t len)
       /* Wait for write availabiliy */
       if (byte_offset > 0)
       {
-         quotient = len/4;
-         remainder = len - quotient*4;
+         quotient = (uint16_t)(len/4);
+         remainder = (uint16_t)(len - quotient*4);
       }
       else
       {
-         quotient = (len + first_byte_position)/4;
-         remainder = (len + first_byte_position) - quotient*4;
+         quotient = (uint16_t)((len + first_byte_position)/4);
+         remainder = (uint16_t)((len + first_byte_position) - quotient*4);
       }
       if (remainder != 0)
       {
          quotient++;
       }
-      fifo_range = MIN(quotient,16);
+      fifo_range = (uint8_t)MIN(quotient,16);
       do
       {
          value = bcm2835_spi_read_32(ESC_PRAM_WR_CMD_REG);
@@ -277,13 +278,13 @@ static void ESC_write_pram (uint16_t address, void *buf, uint16_t len)
       size = 3+4*fifo_size;
 
       /* Allocate buffer */
-      buffer = (uint8_t *)realloc(buffer, size);
+      buffer = (uint8_t *)realloc(buffer, (size_t)size);
 
       /* Reset fifo count */
       fifo_cnt = fifo_size;
 
       /* Reset buffer */
-      memset(buffer,0,size);
+      memset(buffer,0,(size_t)size);
       buffer[0] = ESC_CMD_SERIAL_WRITE;
       buffer[1] = ((ESC_PRAM_WR_FIFO_REG >> 8) & 0xFF);
       buffer[2] = (ESC_PRAM_WR_FIFO_REG & 0xFF);
@@ -294,19 +295,19 @@ static void ESC_write_pram (uint16_t address, void *buf, uint16_t len)
          value = 0;
          if (byte_offset > 0)
          {
-            temp_len = (len > 4) ? 4: len;
+            temp_len = (uint8_t)((len > 4) ? 4 : len);
             memcpy(&value, (temp_buf + byte_offset), temp_len);
          }
          else
          {
-            temp_len = (len > (4 - first_byte_position)) ? (4 - first_byte_position) : len;
+            temp_len = (uint8_t)((len > (4 - first_byte_position)) ? (4 - first_byte_position) : len);
             memcpy(((uint8_t *)&value + first_byte_position), temp_buf, temp_len);
          }
 
-         buffer[i] = (value & 0xFF);
-         buffer[i+1] = ((value >> 8) & 0xFF);
-         buffer[i+2] = ((value >> 16) & 0xFF);
-         buffer[i+3] = ((value >> 24) & 0xFF);
+         buffer[i] = (uint8_t)(value & 0xFF);
+         buffer[i+1] = (uint8_t)((value >> 8) & 0xFF);
+         buffer[i+2] = (uint8_t)((value >> 16) & 0xFF);
+         buffer[i+3] = (uint8_t)((value >> 24) & 0xFF);
 
          i += 4;
          fifo_cnt--;
@@ -315,7 +316,7 @@ static void ESC_write_pram (uint16_t address, void *buf, uint16_t len)
       }
 
       /* Transfer batch of data */
-      bcm2835_spi_transfern((char *)buffer, size);
+      bcm2835_spi_transfern((char *)buffer, (uint32_t)size);
    }
    free(buffer);
 }
