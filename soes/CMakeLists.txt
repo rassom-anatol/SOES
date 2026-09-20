@@ -20,6 +20,7 @@ add_library (soes
 include_directories(${HAL_INCLUDES})
 
 target_compile_options (soes PRIVATE ${SOES_WARNING_FLAGS})
+target_compile_definitions (soes PUBLIC ${SOES_DEFINITIONS})
 
 install (TARGETS soes DESTINATION lib)
 install (FILES

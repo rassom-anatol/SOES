@@ -65,4 +65,19 @@ void ESC_interrupt_disable (uint32_t mask);
  */
 int  ESC_hw_faulted (void);
 
+/** Read a LAN9252 *system* register directly over SPI.
+ *
+ * System registers (BYTE_TEST 0x0064, ID_REV 0x0050, HW_CFG 0x0074, the reset
+ * and PRAM control registers) live in the LAN9252's own address space and are
+ * read with a plain serial-read command. They are NOT reachable through
+ * ESC_read, which performs the EtherCAT CSR indirection via 0x0300/0x0304 and
+ * therefore addresses the EtherCAT core's register space instead.
+ *
+ * Intended for bring-up diagnostics.
+ */
+uint32_t ESC_hw_sys_read32 (uint16_t address);
+
+/** Write a LAN9252 system register directly over SPI. See ESC_hw_sys_read32. */
+void ESC_hw_sys_write32 (uint16_t address, uint32_t value);
+
 #endif

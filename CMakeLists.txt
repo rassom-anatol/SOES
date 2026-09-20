@@ -10,6 +10,13 @@ project (SOES C)
 # -Werror into its own sources.
 set (SOES_WARNING_FLAGS -Wall -Wextra -Wconversion -Wno-unused-parameter -Werror)
 
+# DPRINT in soes/include/sys/gcc/cc.h compiles to nothing unless ESC_DEBUG is
+# defined, which silences the stack's own diagnostics. Off by default.
+option (SOES_DEBUG "Enable SOES DPRINT diagnostics" OFF)
+if (SOES_DEBUG)
+  set (SOES_DEFINITIONS ESC_DEBUG)
+endif()
+
 # Include paths
 include_directories(
   ${SOES_SOURCE_DIR}

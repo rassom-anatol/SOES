@@ -173,7 +173,7 @@ This becomes the regression harness for every later phase — it measures its ow
 ### 1.5 Ubuntu 26.04 specifics
 
 - `/boot/firmware/config.txt`: add `dtoverlay=spi1-1cs,cs0_pin=16`. Leave `dtparam=spi=on` alone — cmc needs spidev0. Verify `/dev/spidev1.0` appears after reboot and that GPIO17 and GPIO18 are *not* claimed (`gpioinfo`, or `cat /sys/kernel/debug/gpio`); if the driver grabbed them, the overlay ignored `cs0_pin`.
-- **Do not assume `dialout`.** That group governs tty/serial nodes. Ubuntu Pi images assign `/dev/spidev*` to `spi` and `/dev/gpiochip*` to `gpio` via `99-com.rules`. Run `stat -c '%U %G %a' /dev/spidev1.0 /dev/gpiochip0` and `getent group spi gpio` on the target, then add the user to whatever actually owns the nodes; add a udev rule if the image ships none for spidev1.
+- **Group ownership is `dialout`, not `spi`.** Measured on the target: `/dev/spidev*` and `/dev/gpiochip0` are both `root:dialout` on this Ubuntu 26.04 arm64 image, contrary to the `99-com.rules` convention that assigns them to `spi` and `gpio`. Check with `stat -c '%U %G %a' /dev/spidev1.0 /dev/gpiochip0` rather than assuming either way, and add the user to whichever group actually owns the nodes.
 - `cat /sys/module/spidev/parameters/bufsiz` — 4096 by default, ample for the 131-byte PRAM burst.
 
 ### 1.6 Verification
@@ -182,7 +182,7 @@ This becomes the regression harness for every later phase — it measures its ow
 2. INIT → PREOP → SAFEOP → OP, no AL status code. A `SMRESULT_ERRSM2/3` means `ecat_options.h` and the SII/ESI disagree.
 3. Loopback: incrementing pattern echoed with zero mismatches over 10 minutes.
 4. Unplug the cable in OP → SAFEOP+ERROR with `ALERR_WATCHDOG`; the safe-state hook fires.
-5. Logic-analyse the first SPI transaction after boot: `0x40` written to 0x1F8 and the readback bit clears — proves the reset fix landed.
+5. **Reset — verified in software, no logic analyser needed.** `lan9252_diag reset` dirties a register, writes `BIT(6)`, then samples BYTE_TEST hard: a genuine reset makes the device stop returning `0x87654321` for a few hundred microseconds and then recover. Observed on hardware. Note that IRQ_CFG survives the reset and that is correct — `BIT(6)` is ETHERCAT_RST, which resets the EtherCAT core only, while the host interface block is outside that domain. That scoping is the reason for preferring it over a full digital reset, which would re-latch the SPI mode strapping.
 6. Point `.spidev` at a nonexistent node → init returns non-zero with a diagnostic, does not hang.
 7. Yank LAN9252 power mid-OP → the process degrades, does not spin a core at 100%.
 8. `grep -ri bcm2835 .` at the repo root returns nothing.
@@ -313,7 +313,7 @@ The cost is **ioctls, not bits**. One CSR access is three SPI transactions (writ
 
 1. **Collapse each CSR access into one `SPI_IOC_MESSAGE`** carrying an array of `spi_ioc_transfer` with `cs_change`. Three ioctls → one. Biggest structural win, no semantic risk.
 2. **Merge the ALEVENT tail into the same `SPI_IOC_MESSAGE`** rather than deleting it — costs 7 bytes, saves ~60 µs, and avoids auditing every place in `esc.c` that assumes `ESCvar.ALevent` freshness.
-3. **Raise the clock** to 20 MHz (the LAN9252 tops out at 30 MHz in the plain serial mode this HAL uses); validate with the byte-test register reading `0x87654321` at 20 and 25 MHz first.
+3. **Raise the clock to 30 MHz.** Verified on hardware: a byte-test sweep from 8 to 30 MHz all returned `0x87654321`, and 40 MHz failed cleanly on the timeout path. 30 MHz is the datasheet ceiling for the plain serial mode this HAL uses, so there is no headroom above it. Re-validate on the CM4 carrier, since signal integrity on a designed PCB differs from the bring-up rig.
 4. Use LAN9252 **fast-read (0x0B)** for PRAM bursts.
 
 After 1–3, expect `DIG_process` in the **200-400 µs** range for a 24-byte PDO pair. That is the SPI cost alone; scheduling latency is additive and must be measured on the target rather than assumed.

@@ -95,6 +95,28 @@ int ESC_hw_faulted (void)
    return hw_fault;
 }
 
+/* Forward declarations; defined with the SPI primitives below. */
+static uint32_t lan9252_read_32 (uint16_t address);
+static void lan9252_write_32 (uint16_t address, uint32_t val);
+
+uint32_t ESC_hw_sys_read32 (uint16_t address)
+{
+   if (hw_fault || spi_fd < 0)
+   {
+      return 0;
+   }
+   return lan9252_read_32 (address);
+}
+
+void ESC_hw_sys_write32 (uint16_t address, uint32_t value)
+{
+   if (hw_fault || spi_fd < 0)
+   {
+      return;
+   }
+   lan9252_write_32 (address, value);
+}
+
 /* ---------------------------------------------------------------- deadlines */
 
 static void deadline_set (struct timespec * d, uint32_t ms)
