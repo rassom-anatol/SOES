@@ -45,9 +45,12 @@ typedef struct
    uint8_t     spi_mode;
    /** GPIO chardev, e.g. "/dev/gpiochip0". NULL disables both GPIO lines. */
    const char *gpiochip;
-   /** Offset of the line wired to the LAN9252 IRQ pin, or -1 if unused.
-    *  Consumed in Phase 3; ignored while running polled. */
+   /** Offset of the line wired to the LAN9252 IRQ pin, or -1 if unused. */
    int         irq_line;
+   /** Offset of the line wired to the LAN9252 SYNC0 output, or -1 if unused.
+    *  Waiting on this edge directly lets the cyclic thread skip the AL event
+    *  register read that would otherwise be needed to discover why IRQ fired. */
+   int         sync0_line;
    /** Offset of the line wired to the LAN9252 reset pin, or -1 if unused.
     *  May be shared with other devices' reset inputs, in which case the pulse
     *  width below must satisfy whichever device requires the longest. */
@@ -83,6 +86,30 @@ int  ESC_hw_faulted (void);
  * Intended for bring-up diagnostics.
  */
 uint32_t ESC_hw_sys_read32 (uint16_t address);
+
+/** Request a GPIO line for rising-edge events.
+ *
+ * Uses the kernel GPIO character device v2 interface directly rather than a
+ * wrapper library, so the returned descriptor can be waited on from the
+ * real-time thread itself with no intermediate thread, queue or sort.
+ *
+ * @param gpiochip  chardev path, e.g. "/dev/gpiochip0"
+ * @param line      line offset (BCM numbering on a Raspberry Pi)
+ * @return line-request file descriptor, or -1
+ */
+int ESC_hw_edge_open (const char * gpiochip, int line);
+
+/** Wait for a rising edge on a descriptor from ESC_hw_edge_open.
+ *
+ * @param fd            line-request descriptor
+ * @param timeout_ns    maximum wait; 0 polls without blocking
+ * @param timestamp_ns  if non-NULL, receives the kernel's event timestamp
+ * @param coalesced     if non-NULL, receives how many further events were
+ *                      already queued -- non-zero means the caller fell behind
+ * @return 1 on edge, 0 on timeout, -1 on error
+ */
+int ESC_hw_edge_wait (int fd, uint64_t timeout_ns, uint64_t * timestamp_ns,
+                      int * coalesced);
 
 /** Write a LAN9252 system register directly over SPI. See ESC_hw_sys_read32. */
 void ESC_hw_sys_write32 (uint16_t address, uint32_t value);

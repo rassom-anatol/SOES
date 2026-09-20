@@ -14,6 +14,11 @@
  * dependence of the original.
  */
 
+/* ppoll() is a GNU extension; must be defined before any libc header. */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include "esc.h"
 #include "esc_hw.h"
 
@@ -23,6 +28,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <poll.h>
 #include <linux/gpio.h>
 #include <linux/spi/spidev.h>
 
@@ -622,6 +628,94 @@ static int gpio_request_output (const char * chip, int offset, uint8_t value)
 
    close (chip_fd);
    return req.fd;
+}
+
+int ESC_hw_edge_open (const char * gpiochip, int line)
+{
+   struct gpio_v2_line_request req;
+   int chip_fd;
+
+   if (gpiochip == NULL || line < 0)
+   {
+      return -1;
+   }
+
+   chip_fd = open (gpiochip, O_RDONLY | O_CLOEXEC);
+   if (chip_fd < 0)
+   {
+      DPRINT ("lan9252: cannot open %s\n", gpiochip);
+      return -1;
+   }
+
+   memset (&req, 0, sizeof (req));
+   req.offsets[0]   = (uint32_t)line;
+   req.num_lines    = 1;
+   req.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_EDGE_RISING;
+   strncpy (req.consumer, "lan9252-edge", sizeof (req.consumer) - 1);
+
+   if (ioctl (chip_fd, GPIO_V2_GET_LINE_IOCTL, &req) < 0)
+   {
+      DPRINT ("lan9252: cannot request edge events on %s line %d\n",
+              gpiochip, line);
+      close (chip_fd);
+      return -1;
+   }
+
+   close (chip_fd);
+   return req.fd;
+}
+
+int ESC_hw_edge_wait (int fd, uint64_t timeout_ns, uint64_t * timestamp_ns,
+                      int * coalesced)
+{
+   struct gpio_v2_line_event ev[8];
+   struct timespec ts;
+   struct pollfd pfd;
+   ssize_t n;
+   int rc, events;
+
+   if (fd < 0)
+   {
+      return -1;
+   }
+
+   pfd.fd      = fd;
+   pfd.events  = POLLIN;
+   pfd.revents = 0;
+
+   ts.tv_sec  = (time_t)(timeout_ns / 1000000000ull);
+   ts.tv_nsec = (long)(timeout_ns % 1000000000ull);
+
+   rc = ppoll (&pfd, 1, &ts, NULL);
+   if (rc < 0)
+   {
+      return -1;
+   }
+   if (rc == 0)
+   {
+      return 0;
+   }
+
+   n = read (fd, ev, sizeof (ev));
+   if (n < (ssize_t)sizeof (ev[0]))
+   {
+      return -1;
+   }
+   events = (int)(n / (ssize_t)sizeof (ev[0]));
+
+   /* More than one event already queued means the caller did not keep up with
+    * the edge rate. Report the excess rather than hiding it: under DC this is
+    * the signal that the cycle is being missed.
+    */
+   if (coalesced != NULL)
+   {
+      *coalesced = events - 1;
+   }
+   if (timestamp_ns != NULL)
+   {
+      *timestamp_ns = ev[events - 1].timestamp_ns;
+   }
+   return 1;
 }
 
 static void gpio_set (int fd, uint8_t value)

@@ -26,6 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <inttypes.h>
 
 #include "esc.h"
 #include "esc_hw.h"
@@ -53,6 +54,7 @@ static esc_hw_cfg_t hw_cfg =
    .spi_mode      = 0,
    .gpiochip      = "/dev/gpiochip0",
    .irq_line      = 17,     /* LAN9252 IRQ */
+   .sync0_line    = 18,     /* LAN9252 SYNC0 */
    .reset_line    = 25,     /* shared with the TMC4671 reset / cmc CTRL_RST */
    .reset_pulse_us = 500,   /* >= LAN9252 minimum of 200 us; confirm against
                              * the TMC4671 minimum, which shares this line */
@@ -262,9 +264,133 @@ static int dlstatus_test (void)
    return 0;
 }
 
+/* ESC DC registers not already named in esc.h. */
+#define ESCREG_CYCLIC_UNIT_CTRL  0x0980
+#define ESCREG_SYNC0_START_TIME  0x0990
+
+/* Validate the IRQ and SYNC0 wiring without a master.
+ *
+ * The ESC's own distributed-clock unit can generate SYNC0 from its free
+ * running local time, so the slave can provoke the very edges it needs to
+ * observe. Unmasking DC_SYNC0 in the AL event mask makes the same event drive
+ * the IRQ pin, so one mechanism exercises both lines.
+ *
+ * Kernel edge timestamps come from the GPIO chardev, so the interval spread
+ * reported here is measured at the kernel, not in userspace.
+ */
+static int edge_test (uint32_t period_us, uint32_t seconds)
+{
+   int irq_fd, sync_fd;
+   uint64_t now = 0, start;
+   uint32_t period_ns = period_us * 1000u;
+   uint8_t act;
+   uint64_t t_prev = 0, t_now;
+   uint64_t n_sync = 0, n_irq = 0;
+   uint64_t min_iv = ~0ull, max_iv = 0, sum_iv = 0, n_iv = 0;
+   int coalesced, total_coalesced = 0;
+   struct timespec t_end, t_cur;
+
+   printf ("edge test: SYNC0 %u us for %u s\n", period_us, seconds);
+
+   if (ESC_init (&config) != 0)
+   {
+      printf ("FAIL: ESC_init returned non-zero\n");
+      return 1;
+   }
+
+   irq_fd  = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.irq_line);
+   sync_fd = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.sync0_line);
+   printf ("  IRQ   line %d: %s\n", hw_cfg.irq_line,
+           irq_fd >= 0 ? "requested" : "FAILED");
+   printf ("  SYNC0 line %d: %s\n", hw_cfg.sync0_line,
+           sync_fd >= 0 ? "requested" : "FAILED");
+   if (irq_fd < 0 || sync_fd < 0)
+   {
+      return 1;
+   }
+
+   /* Route the sync-out unit to EtherCAT control, set the period, and start
+    * one cycle from now plus a margin so the start time is not already past. */
+   act = 0;
+   ESC_write (ESCREG_CYCLIC_UNIT_CTRL, &act, sizeof (act));
+   ESC_write (ESCREG_SYNC0_CYCLE_TIME, &period_ns, sizeof (period_ns));
+
+   ESC_read (ESCREG_LOCALTIME, &now, sizeof (now));
+   start = now + 10000000ull;            /* 10 ms from now */
+   ESC_write (ESCREG_SYNC0_START_TIME, &start, sizeof (start));
+
+   act = ESCREG_SYNC_ACT_ACTIVATED | ESCREG_SYNC_SYNC0_EN;
+   ESC_write (ESCREG_SYNC_ACT, &act, sizeof (act));
+
+   /* Let the same event reach the IRQ pin. */
+   ESC_interrupt_enable (ESCREG_ALEVENT_DC_SYNC0);
+
+   clock_gettime (CLOCK_MONOTONIC, &t_end);
+   t_end.tv_sec += (time_t)seconds;
+
+   for (;;)
+   {
+      clock_gettime (CLOCK_MONOTONIC, &t_cur);
+      if (t_cur.tv_sec > t_end.tv_sec ||
+          (t_cur.tv_sec == t_end.tv_sec && t_cur.tv_nsec >= t_end.tv_nsec))
+      {
+         break;
+      }
+
+      coalesced = 0;
+      if (ESC_hw_edge_wait (sync_fd, 200000000ull, &t_now, &coalesced) == 1)
+      {
+         n_sync++;
+         total_coalesced += coalesced;
+         if (t_prev != 0)
+         {
+            uint64_t iv = t_now - t_prev;
+            if (iv < min_iv) min_iv = iv;
+            if (iv > max_iv) max_iv = iv;
+            sum_iv += iv;
+            n_iv++;
+         }
+         t_prev = t_now;
+      }
+
+      /* Drain IRQ without blocking; it should track SYNC0 one-for-one. */
+      while (ESC_hw_edge_wait (irq_fd, 0, NULL, NULL) == 1)
+      {
+         n_irq++;
+      }
+   }
+
+   act = 0;
+   ESC_write (ESCREG_SYNC_ACT, &act, sizeof (act));
+   ESC_interrupt_disable (ESCREG_ALEVENT_DC_SYNC0);
+
+   printf ("  SYNC0 edges %llu (expected ~%llu)\n",
+           (unsigned long long)n_sync,
+           (unsigned long long)((uint64_t)seconds * 1000000ull / period_us));
+   printf ("  IRQ   edges %llu\n", (unsigned long long)n_irq);
+   printf ("  coalesced   %d (non-zero means we fell behind)\n", total_coalesced);
+   if (n_iv > 0)
+   {
+      printf ("  interval    min %.3f ms  mean %.3f ms  max %.3f ms\n",
+              (double)min_iv / 1e6, (double)sum_iv / (double)n_iv / 1e6,
+              (double)max_iv / 1e6);
+   }
+
+   close (irq_fd);
+   close (sync_fd);
+
+   if (n_sync == 0)
+   {
+      printf ("FAIL: no SYNC0 edges -- check wiring or DC configuration\n");
+      return 1;
+   }
+   printf ("PASS\n");
+   return 0;
+}
+
 static void usage (const char * argv0)
 {
-   printf ("usage: %s [probe|reset|dlstatus|run] [spidev] [speed_hz]\n", argv0);
+   printf ("usage: %s [probe|reset|dlstatus|edges|run] [spidev] [speed_hz] [period_us] [seconds] [spidev] [speed_hz]\n", argv0);
 }
 
 int main (int argc, char * argv[])
@@ -283,6 +409,12 @@ int main (int argc, char * argv[])
    if (strcmp (mode, "probe") == 0)
    {
       return probe ();
+   }
+
+   if (strcmp (mode, "edges") == 0)
+   {
+      return edge_test ((argc > 4) ? (uint32_t)strtoul (argv[4], NULL, 0) : 1000u,
+                        (argc > 5) ? (uint32_t)strtoul (argv[5], NULL, 0) : 3u);
    }
 
    if (strcmp (mode, "dlstatus") == 0)
