@@ -1,19 +1,14 @@
 # CMakeLists files in this project can
 # refer to the root source directory of the project as ${SOES_SOURCE_DIR} and
 # to the root binary directory of the project as ${SOES_BINARY_DIR}.
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.22)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-project (SOES)
+project (SOES C)
 
-set (SOES_VERSION_MAJOR 3)
-set (SOES_VERSION_MINOR 0)
-set (SOES_VERSION_PATCH 0)
-
-# Generate version numbers
-configure_file (
-  ${SOES_SOURCE_DIR}/version.h.in
-  ${SOES_SOURCE_DIR}/soes/version.h
-  )
+# Warning flags applied per target rather than globally, so that a consumer
+# embedding this tree (see docs/cia402-roadmap.md, Phase 5) does not inherit
+# -Werror into its own sources.
+set (SOES_WARNING_FLAGS -Wall -Wextra -Wconversion -Wno-unused-parameter -Werror)
 
 # Include paths
 include_directories(
@@ -28,13 +23,4 @@ include(${CMAKE_SYSTEM_NAME} OPTIONAL)
 add_subdirectory (soes)
 add_subdirectory (${SOES_DEMO})
 
-
 message (STATUS "Building for ${CMAKE_SYSTEM_NAME}")
-
-include (InstallRequiredSystemLibraries)
-set (CPACK_RESOURCE_FILE_LICENSE "${SOES_SOURCE_DIR}/LICENSE")
-set (CPACK_PACKAGE_VERSION_MAJOR "${SOES_VERSION_MAJOR}")
-set (CPACK_PACKAGE_VERSION_MINOR "${SOES_VERSION_MINOR}")
-set (CPACK_PACKAGE_VERSION_PATCH "${SOES_VERSION_MINOR}")
-set (CPACK_PACKAGE_CONTACT info.ethercat@rt-labs.com)
-include (CPack)

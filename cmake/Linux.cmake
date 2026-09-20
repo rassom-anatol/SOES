@@ -16,5 +16,3 @@ include_directories(
   ${SOES_SOURCE_DIR}/${SOES_DEMO}
   )
 
-# Common compile flags
-add_compile_options(-Wall -Wextra -Wconversion -Wno-unused-parameter -Werror)

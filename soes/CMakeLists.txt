@@ -19,7 +19,9 @@ add_library (soes
 
 include_directories(${HAL_INCLUDES})
 
-install (TARGETS soes DESTINATION bin)
+target_compile_options (soes PRIVATE ${SOES_WARNING_FLAGS})
+
+install (TARGETS soes DESTINATION lib)
 install (FILES
   esc.h
   esc_coe.h
