@@ -341,6 +341,18 @@ static int edge_test (uint32_t period_us, uint32_t seconds)
       printf ("  0x0910 local time %llu (start %s)\n",
               (unsigned long long)r_time,
               (r_time < r_start) ? "still ahead, good" : "ALREADY PAST");
+
+      /* Control: AL Status (0x0130) is PDI-writable. If this lands while the
+       * DC registers above do not, the write path is fine and the DC block is
+       * simply not writable from the PDI -- i.e. it is master-owned.
+       */
+      {
+         uint16_t al_w = 0x0001, al_r = 0;
+         ESC_write (ESCREG_ALSTATUS, &al_w, sizeof (al_w));
+         ESC_read (ESCREG_ALSTATUS, &al_r, sizeof (al_r));
+         printf ("  0x0130 AL status  0x%04X (wrote 0x0001) -- write path %s\n",
+                 al_r, (al_r == al_w) ? "WORKS" : "also failing");
+      }
    }
 
    /* Let the same event reach the IRQ pin. */
