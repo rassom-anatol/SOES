@@ -77,11 +77,32 @@ GPIO18 is also PWM0 / PCM_CLK; nothing in cmc or this roadmap uses either, so it
 - [`cmake/Linux.cmake`](../cmake/Linux.cmake) — delete the `RPI_VARIANT` branch; move `-Werror` off directory-global `add_compile_options` onto `target_compile_options(soes PRIVATE ...)`. This is what would otherwise leak into cmc's C++ in Phase 5.
 - [`soes/CMakeLists.txt`](../soes/CMakeLists.txt) — `install(TARGETS soes DESTINATION bin)` → `lib`.
 
-### 1.2 Prune the fork
+### 1.2 Retention policy
 
-**First, copy to a scratch reference:** `applications/rtl_xmc4_dynpdo/slave_objectlist.c` (the 0x10F1 / 0x1C32 definitions) and its `main.c:20-56` (`dc_checker`, `cb_state_change`). These are the only in-tree DC examples and Phases 3–4 depend on them.
+**XMC4 and AM335x are kept.** Both are plausible future targets for this stack, so their HALs and demo applications stay in the tree and are maintained through the Phase 2 rename.
 
-Then delete: all of `soes/hal/` except the new HAL; `drivers/`; all of `applications/` except the new one; `cmake/toolchain/` and `cmake/Platform/`. Git history retains everything.
+Keep:
+
+| Path | Reason |
+|---|---|
+| `soes/hal/xmc4/`, `soes/hal/rt-kernel-xmc4/` | XMC4 target; the rt-kernel variant is also the only correct in-tree DC/interrupt example (Phase 3.2) |
+| `soes/hal/tiesc/` | TI ESC, used by AM335x and K2G |
+| `applications/rtl_xmc4_dynpdo/` | Only in-tree example of dynamic PDO mapping and of `dc_checker` / 0x10F1 / 0x1C32 — Phases 3 and 4 both reference it |
+| `applications/xmc4300_slavedemo/`, `applications/tiesc_am335x/`, `applications/tiesc_k2gice/` | Target demos |
+| `cmake/toolchain/rt-kernel-xmc4.cmake`, `cmake/Platform/rt-kernel.cmake` | Needed to build the above |
+
+Remove only what the new HAL genuinely supersedes:
+
+| Path | Reason |
+|---|---|
+| `soes/hal/raspberrypi-lan9252/` | Replaced by `linux-lan9252-spidev`; bcm2835 must go for licensing |
+| `soes/hal/linux-lan9252/` | Superseded; also polls the wrong register after reset (0x304 instead of 0x1F8) |
+| `drivers/linux/lan9252/` | Out-of-tree kernel module serving only the HAL above |
+| `applications/raspberry_lan9252demo/`, `applications/linux_lan9252demo/` | Superseded by `lan9252_diag` |
+
+`soes/hal/rt-kernel-twrk60/`, `applications/rtl_slavedemo/` and `applications/rtl_lwip_eoe/` are neither superseded nor named as future targets — leave them alone unless a reason to remove them comes up.
+
+**Verification gap to accept.** The XMC4 and TI toolchains are not available on the development machine, so code in those HALs cannot be compiled here and the Phase 2 rename cannot be verified against them. The rename is mechanical and greppable, which makes this tolerable, but treat those edits as unproven until someone builds for the target. This cost is the price of keeping the targets, and it is worth stating rather than discovering later.
 
 ### 1.3 New HAL — `soes/hal/linux-lan9252-spidev/`
 
@@ -193,7 +214,7 @@ Rename the stack-internal functions too — `TXPDO_update()` and `cb_update_txpd
 
 **Call sites:** [`soes/ecat_slv.h`](../soes/ecat_slv.h) (15, 20, 28, 29), [`soes/ecat_slv.c`](../soes/ecat_slv.c) (134-150, 162-178, 218-251, 343-344), [`soes/esc.h`](../soes/esc.h) (320, 445, 741), [`soes/esc.c`](../soes/esc.c) (922, 930, 1354), plus the new HAL and application.
 
-**This phase follows 1.2, not precedes it** — pruning first drops roughly 30 call sites to 20 and removes every file that can no longer be compiled.
+Because the XMC4 and TI HALs are retained (§1.2), the rename must reach them too — roughly 30 call sites across the tree rather than the 20 in the core alone. Those edits cannot be compile-checked locally; see the verification gap in §1.2.
 
 **Verification:** grep for every old name returns nothing; then re-run the entire 1.6 checklist. A pure rename must produce bit-identical loopback numbers.
 
@@ -217,7 +238,7 @@ Rising edge is correct as the code stands, because `ESC_interrupt_enable` config
 
 ### 3.2 Two threads, and the flag split
 
-Model on `soes/hal/rt-kernel-xmc4/esc_hw.c:214-262`, the only correct in-tree example (copy it to the scratch reference in 1.2 before pruning). Translate its two ISRs into one RT loop:
+Model on [`soes/hal/rt-kernel-xmc4/esc_hw.c:214-262`](../soes/hal/rt-kernel-xmc4/esc_hw.c#L214-L262), the only correct in-tree example — one reason that HAL is retained. Translate its two ISRs into one RT loop:
 
 ```
 loop:
@@ -245,6 +266,30 @@ Copy `dc_checker()` from the scratch reference (`rtl_xmc4_dynpdo/main.c:48-56`):
 
 Objects to add: **0x10F1** (ErrorSettings; `:02` SyncErrorCounterLimit), **0x1C32** and **0x1C33** (SM2/SM3 sync parameters — `:01` sync mode, `:02` cycle time, `:05` minimum cycle time, `:0B` SMEventMissedCnt, `:20` SyncError).
 
+### 3.3.1 Sync error counting — replace SOES's semantics with ETG.1020
+
+**The new HAL implements ETG.1020 semantics. SOES's existing behaviour is not carried over.**
+
+What SOES does today, in [`soes/hal/rt-kernel-xmc4/esc_hw.c`](../soes/hal/rt-kernel-xmc4/esc_hw.c), is maintain a signed balance between two event sources: `synccounter += 1` on each SM2/SM3 AL event ([line 259](../soes/hal/rt-kernel-xmc4/esc_hw.c#L259)), `-= 1` on each SYNC0 edge ([line 219](../soes/hal/rt-kernel-xmc4/esc_hw.c#L219)), both guarded by `APPSTATE_OUTPUT`, tripping to SAFEOP+ERROR when the absolute value exceeds the limit ([lines 222-223](../soes/hal/rt-kernel-xmc4/esc_hw.c#L222-L223)). `ESC_checkDC` zeroes it when DC is activated ([`esc.c:291`](../soes/esc.c#L291)).
+
+That counter's value is exactly `(frames received) − (SYNC0 pulses)` since the last reset. It has **no decay**: a missed frame costs −1 permanently, while a good cycle contributes +1 against the next SYNC0's −1 and nets zero. A drive losing one frame an hour and otherwise perfect therefore accumulates monotonically and trips after `limit` hours. It is a lifetime-total policy where a drive needs a rate policy.
+
+The decisive objection is interoperability rather than the flaw itself: **0x10F1:02 is a standardised object**, and a master writes it expecting ETG semantics. Implementing something else makes the configured value mean something different — and far stricter — than the master intends. This would show up first against TwinCAT.
+
+**Implementation in `linux-lan9252-spidev`:**
+
+| Condition | Action |
+|---|---|
+| SYNC0 fires and no SM2 event arrived since the previous SYNC0 | `sync_error_counter += 3`; increment 0x1C32:0B `SMEventMissedCnt` |
+| SYNC0 fires and the SM2 event did arrive | `sync_error_counter -= 1`, floored at 0 |
+| `sync_error_counter > SyncErrorCounterLimit` (0x10F1:02) | Set 0x1C32:20 `SyncError`; `ESC_ALstatusgotoerror(ESCsafeop \| ESCerror, ALERR_SYNCERROR)`; reset the counter |
+
+The 3:1 weighting gives the limit a concrete meaning worth stating: the counter only grows when the **error rate exceeds 25%**, and the limit then controls how long a burst above that rate is tolerated before dropping to SAFEOP. Below 25% the counter drains to zero and the drive runs indefinitely.
+
+Widen `ESCvar.synccounter` from `int8_t` to `int16_t` ([`esc.h:510`](../soes/esc.h#L510)); `synccounterlimit` is already `uint16_t` ([`esc.h:476`](../soes/esc.h#L476)). With `+3` weighting an `int8_t` overflows at a limit of only 42. This is a pure widening and is compatible with how the retained XMC4 and TI HALs use the field, but it does touch a shared struct those HALs cannot be compile-checked against here (§1.2).
+
+The XMC4 HAL keeps its existing balance-counter logic — only the field's type changes.
+
 ### 3.4 Achievable cycle time
 
 The cost is **ioctls, not bits**. One CSR access is three SPI transactions (write CMD / poll / read DATA) plus the unconditional ALEVENT tail read = **six `SPI_IOC_MESSAGE` ioctls per register read**. At roughly 15-30 µs of syscall and DMA setup each on a Pi 4, a 2-byte register read costs about 100-180 µs; the 7 payload bytes at 12.5 MHz (~4.5 µs) are noise.
@@ -258,7 +303,11 @@ The cost is **ioctls, not bits**. One CSR access is three SPI transactions (writ
 
 After 1–3, expect `DIG_process` in the **200-400 µs** range for a 24-byte PDO pair. Then add OS latency: without PREEMPT_RT (currently blocked by the Ubuntu 26.04 tryboot A/B bug documented in cmc), `SCHED_FIFO` on a mainline kernel gives roughly 50-150 µs wakeup latency with 1-3 ms tail excursions under load.
 
-**Target SYNC0 = 2 ms with `SyncErrorCounterLimit` = 4.** cmc's entire control cadence today is a single 20 ms wall timer, so 2 ms is already a 10× improvement and nothing downstream needs 1 ms. Revisit when PREEMPT_RT unblocks.
+**Target SYNC0 = 1 ms.** This is the cycle time a CiA402 drive in cyclic synchronous position, velocity or torque mode is expected to sustain — a conservative figure, given that commercial servo drives commonly run at 250 µs or below. The target comes from the profile, not from any downstream consumer. The period itself is set by the master, so it is configurable by construction; the slave's obligations are to publish an honest floor in 0x1C32:05 and to size `SyncErrorCounterLimit` for the period actually in use.
+
+1 ms is reachable only once optimisations 1–3 land, leaving roughly 600-800 µs of the period for OS scheduling after `DIG_process` costs 200-400 µs. The risk is concentrated in the tail: without PREEMPT_RT, `SCHED_FIFO` excursions of 1-3 ms exceed a whole period, so at 1 ms the sync error counter stops being a formality and becomes the mechanism deciding whether those excursions drop the drive to SAFEOP. Size the limit against a measured `cyclictest` histogram (§3.6), not an assumption.
+
+2 ms is an acceptable fallback if the measured tail cannot be brought inside budget at 1 ms. Revisit both when PREEMPT_RT unblocks.
 
 ### 3.5 Real-time setup
 
@@ -270,7 +319,7 @@ Run non-root via `/etc/security/limits.d/99-cmc-rt.conf` (`rtprio 90`, `memlock 
 
 ### 3.6 Verification
 
-Inter-edge histogram on `esc_hw_irq_wait` alone (p99.9 under 200 µs deviation at 2 ms); OP with DC enabled and `ESCvar.dcsync == 1` confirmed; `synccounter` bounded over an hour; master killed mid-OP → `ALERR_SYNCERROR` or `ALERR_WATCHDOG` and the safe-state hook fires; `cyclictest -p 60 -t1 -m -i 2000 -a 3` under `stress-ng --cpu 4` (this number decides 1 ms vs 2 ms); `/proc/<pid>/status` `VmLck` non-zero and `maps` stable, proving no runtime allocation.
+Inter-edge histogram on `esc_hw_irq_wait` alone (p99.9 under 100 µs deviation at 1 ms); OP with DC enabled and `ESCvar.dcsync == 1` confirmed; the sync error counter drains to zero and stays there over an hour; master killed mid-OP → `ALERR_SYNCERROR` or `ALERR_WATCHDOG` and the safe-state hook fires; `cyclictest -p 60 -t1 -m -i 1000 -a 3` under `stress-ng --cpu 4` (this number decides whether 1 ms holds or 2 ms is needed); `/proc/<pid>/status` `VmLck` non-zero and `maps` stable, proving no runtime allocation.
 
 ---
 
@@ -379,7 +428,16 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 
 `DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
 
-**Transport arbitration** — last-writer-wins is unacceptable for a drive. Fixed priority **EtherCAT-in-OP > CANopen-operational > DDS**, via `Cia402Core::SetCommandOwner(TransportId)`. Lower-priority transports keep read access in observer mode. Publish the active owner in telemetry so an operator can see why a command did nothing.
+**Exactly one transport, fixed at configuration.** WebSocket, ROS 2 DDS, EtherCAT or CANopen is selected when the device is configured and started, and does not change for the life of the run. This is a decided constraint on the cmc architecture and it removes a great deal: no priority ladder, no arbitration between concurrent commanders, no observer mode, and no handover path that would otherwise have to pass through a safe state to avoid a step discontinuity in the setpoint.
+
+`Cia402Core` therefore holds a single `Transport*`, resolved at startup from configuration. The unselected transports need not be constructed at all, which is simpler than building them and leaving them idle.
+
+**An EtherCAT build contains no ROS.** No `rclcpp::init`, no `Axis` ROS node, no publishers, no 20 ms wall timer. This is the structurally significant consequence, and it dictates the shape of the refactor: `Axis` today (`cmc/include/axis/Axis.cpp`, ~916 lines) is simultaneously the ROS node *and* the drive logic, so the drive logic has to come out of it first. `Cia402Core`, `DriveInterface`, `Tmc`, `Controller` and `GateDriver` must all be ROS-free — most already are; `Axis` is the exception.
+
+Practical consequences to plan for:
+
+- **Telemetry.** ROS topics do not exist in an EtherCAT build, so anything an operator needs must be reachable as TxPDO entries or SDO-readable objects. Decide what moves into the object dictionary before Phase 4 fixes the PDO layout, since retrofitting entries means re-deriving the SM arithmetic (§4.3).
+- **Extraction order.** Splitting the drive logic out of the ROS node is its own commit, landing before `EtherCatTransport` is wired up — alongside the SPI ownership change in §5.4.
 
 `safe_state_override` **must not be NULL here** — wire it to `Cia402Core::ForceSafeState()` → Switch On Disabled plus `ctrl_.Disable()`. This is the most safety-relevant line in the integration.
 
@@ -387,9 +445,15 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 
 **No mutex on the hot path.** A `SCHED_FIFO`-60 thread blocking on a mutex held by a `SCHED_OTHER` ROS thread is unbounded priority inversion. The payload is under 64 bytes, so use a **seqlock** (`std::atomic<uint32_t> seq_` plus a double buffer; the writer bumps to odd then even, the reader retries on odd-or-changed) — one per direction. Lock-free, no syscall, no inversion, and no page fault under lock thanks to the Phase 1 `realloc` removal plus `mlockall`.
 
-**The real integration hazard is SPI ownership, and it warrants its own commit.** `Tmc` has a `spi_mutex_`, and `Axis::TimerCB` (`cmc/include/axis/Axis.cpp:361-378`) does TMC4671 SPI reads (`GetPhaseCurrents`, `GetRPM`) from the 20 ms ROS timer on `/dev/spidev0.0`. If the EtherCAT thread also drives the TMC4671 each cycle, it contends on that mutex — priority inversion on the hot path, defeating the seqlock.
+**SPI ownership.** `Tmc` has a `spi_mutex_`, and `Axis::TimerCB` (`cmc/include/axis/Axis.cpp:361-378`) currently does TMC4671 SPI reads (`GetPhaseCurrents`, `GetRPM`) from the 20 ms ROS timer on `/dev/spidev0.0`. If the EtherCAT thread also drives the TMC4671 each cycle while that timer is running, the two contend on that mutex — priority inversion on the hot path, defeating the seqlock.
 
-**Once EtherCAT is in OP, the `SCHED_FIFO` thread becomes the sole owner of TMC SPI.** `Axis::TimerCB` stops doing SPI and reads the latest published snapshot instead. This refactors `TimerCB`, `GetPhaseCurrents`, `GetRPM` and `PublishTelemetry`, and should land *before* `EtherCatTransport` is wired up. Side benefit: telemetry becomes cycle-accurate rather than sampled at an unrelated 20 ms. `bsp_.PetWatchdog()` stays on the ROS timer — different chip, different bus, and 20 ms is well inside the watchdog window.
+**This concern disappears entirely in an EtherCAT build.** With no ROS, there is no 20 ms timer and no second SPI user: the `SCHED_FIFO` thread is the sole owner of TMC SPI by construction, and `spi_mutex_` is uncontended on the hot path. The seqlock is then only needed if a non-RT thread reads drive state — which, in a ROS-free build, may be nothing at all.
+
+What remains is the extraction work, not an arbitration problem: `GetPhaseCurrents` and `GetRPM` must be callable from the cyclic thread rather than from `Axis::TimerCB`, which is part of lifting the drive logic out of the ROS node (§5.3).
+
+**The hardware watchdog is a hard requirement, not an open question.** `bsp_.PetWatchdog()` exists *only* on the 20 ms ROS timer (`cmc/include/axis/Axis.cpp:363`). Remove ROS and nothing pets it, so the board resets after the 625 ms window — an EtherCAT build would reboot in under a second with no other symptom. Give it an explicit owner before `EtherCatTransport` runs on hardware.
+
+The natural owner is the cyclic thread itself, gated on elapsed time exactly as `Bsp::PetWatchdog` already does internally: at 1 ms SYNC0 the thread wakes far more often than the 625 ms window needs, the check is a timestamp comparison plus an occasional GPIO toggle, and it ties the watchdog to the liveness of the thread that actually matters. The alternative — a separate low-priority timer thread — keeps the RT path pure but will happily go on petting the watchdog while the cyclic thread is wedged, which is the failure the watchdog exists to catch.
 
 ### 5.5 Verification
 
@@ -409,11 +473,16 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 
 ---
 
-## Open decisions
+## Settled decisions
 
-These are not yet settled and may change the phases above:
+- **Object dictionary tooling** — YAML source plus a Python generator (§4.1).
+- **Sync error semantics** — ETG.1020, replacing SOES's balance counter (§3.3.1).
+- **Cycle time** — 1 ms SYNC0 target, 2 ms acceptable fallback (§3.4).
+- **Retention** — XMC4 and AM335x/TI HALs and demos are kept (§1.2).
+- **Transport** — exactly one, fixed at configuration; no ROS in an EtherCAT build (§5.3).
 
-- **Phase 4 generator** — whether the YAML-plus-generator approach is worth roughly 400 lines of new tooling including SII binary generation, versus hand-maintaining the ESI XML.
-- **Phase 3.4 cycle time** — the 2 ms SYNC0 target rests on an estimate of 15-30 µs per spidev ioctl on a Pi 4. A measurement on real hardware supersedes it.
-- **Phase 1.2 pruning scope** — whether to delete all other HALs and demo applications, or retain some (xmc4, TI) as reference.
-- **Phase 5.4 SPI ownership** — the only item that refactors working cmc code rather than adding to it, and therefore the one carrying the most risk to a running system.
+## Open questions
+
+- **`SyncErrorCounterLimit` value** — to be derived from a measured `cyclictest` histogram at the chosen cycle time, against the ETG.1020 semantics in §3.3.1.
+- **Telemetry in a ROS-free build** — which quantities must become TxPDO entries or SDO-readable objects. This has to be answered before Phase 4 fixes the PDO layout, since adding entries later means re-deriving the SM arithmetic (§4.3).
+- **Transport selection mechanism** — compile-time build variants or a runtime configuration switch. "No ROS in an EtherCAT build" is achievable either way, but the choice affects how `main()` and the CMake targets are structured.
