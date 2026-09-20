@@ -439,7 +439,7 @@ void ESC_reset (void)
 
 }
 
-void ESC_init (const esc_cfg_t * config)
+int ESC_init (const esc_cfg_t * config)
 {
    bool rpi4 = false, cs1 = false;
    uint32_t value;
@@ -564,6 +564,8 @@ void ESC_init (const esc_cfg_t * config)
    {
       DPRINT("bcm2835_init failed. Are you running as root?\n");
    }
+
+   return 0;
 }
 
 void ESC_interrupt_enable (uint32_t mask)

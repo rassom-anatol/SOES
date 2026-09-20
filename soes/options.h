@@ -123,6 +123,14 @@
 #define SM3_act          1
 #endif
 
+/* Bound on the ESC start-up poll in ecat_slv_init, in iterations rather than
+   time so that it stays portable across HALs with no clock. Each iteration is
+   one ESC_read of DLSTATUS, so the wall-clock duration is HAL dependent:
+   roughly 100 us per poll over spidev, far less on a memory mapped ESC. */
+#ifndef DLSTATUS_WAIT_RETRIES
+#define DLSTATUS_WAIT_RETRIES 100000
+#endif
+
 /* Max number of dynamically mapped objects in SM2. May be 0 to
    disable dynamic processdata. */
 #ifndef MAX_MAPPINGS_SM2

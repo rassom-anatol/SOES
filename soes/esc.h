@@ -734,7 +734,10 @@ void ESC_sm_act_event (void);
 /* From hardware file */
 void ESC_read (uint16_t address, void *buf, uint16_t len);
 void ESC_write (uint16_t address, void *buf, uint16_t len);
-void ESC_init (const esc_cfg_t * cfg);
+/* Returns 0 on success, non-zero if the hardware could not be brought up.
+ * A HAL that cannot reach its device must report it here: the caller has no
+ * other way to distinguish a dead bus from a link that is merely down. */
+int ESC_init (const esc_cfg_t * cfg);
 void ESC_reset (void);
 
 /* From application */

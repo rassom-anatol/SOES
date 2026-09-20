@@ -16,15 +16,16 @@
  *
  *   run     Enter the normal cyclic slave loop. Needs a master.
  *
- * Deliberately does not call ecat_slv_init() in probe mode: ESC_init still
- * returns void, so a failed initialisation would otherwise be followed by an
- * unbounded DLSTATUS spin inside ecat_slv_init with no diagnostic.
+ * Probe mode calls ESC_init directly rather than ecat_slv_init, so that it
+ * exercises the transport without needing a link: ecat_slv_init additionally
+ * waits for the ESC to report one, which cannot happen with no cable.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "esc.h"
 #include "esc_hw.h"
@@ -227,9 +228,41 @@ static int reset_test (void)
    return 0;
 }
 
+/* Time individual DLSTATUS polls, the loop ecat_slv_init sits in.
+ * Reports the value, the elapsed time and whether the HAL has latched a fault,
+ * which together distinguish "slow but working" from "timing out every call".
+ */
+static int dlstatus_test (void)
+{
+   struct timespec a, b;
+   uint16_t dls;
+   int i;
+
+   printf ("dlstatus timing on %s\n", hw_cfg.spidev);
+   if (ESC_init (&config) != 0)
+   {
+      printf ("FAIL: ESC_init returned non-zero\n");
+      return 1;
+   }
+
+   for (i = 0; i < 10; i++)
+   {
+      dls = 0;
+      clock_gettime (CLOCK_MONOTONIC, &a);
+      ESC_read (ESCREG_DLSTATUS, &dls, sizeof (dls));
+      clock_gettime (CLOCK_MONOTONIC, &b);
+      printf ("  poll %2d: DLstatus 0x%04X  %8.3f ms  hw_fault=%d\n",
+              i, etohs (dls),
+              (double)(b.tv_sec - a.tv_sec) * 1000.0 +
+              (double)(b.tv_nsec - a.tv_nsec) / 1000000.0,
+              ESC_hw_faulted ());
+   }
+   return 0;
+}
+
 static void usage (const char * argv0)
 {
-   printf ("usage: %s [probe|reset|run] [spidev] [speed_hz]\n", argv0);
+   printf ("usage: %s [probe|reset|dlstatus|run] [spidev] [speed_hz]\n", argv0);
 }
 
 int main (int argc, char * argv[])
@@ -250,6 +283,11 @@ int main (int argc, char * argv[])
       return probe ();
    }
 
+   if (strcmp (mode, "dlstatus") == 0)
+   {
+      return dlstatus_test ();
+   }
+
    if (strcmp (mode, "reset") == 0)
    {
       return reset_test ();
@@ -257,7 +295,12 @@ int main (int argc, char * argv[])
 
    if (strcmp (mode, "run") == 0)
    {
-      ecat_slv_init (&config);
+      if (ecat_slv_init (&config) != 0)
+      {
+         printf ("FAIL: stack init failed\n");
+         return 1;
+      }
+      printf ("stack init OK, entering cyclic loop\n");
       for (;;)
       {
          ecat_slv ();

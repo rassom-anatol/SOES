@@ -312,7 +312,7 @@ static void isr_run(void * arg)
  *
  * @param[in]   arg     = esc_cfg provided by the application
  */
-void ESC_init (const esc_cfg_t * config)
+int ESC_init (const esc_cfg_t * config)
 {
    eep_config_t ecat_config;
 
@@ -367,6 +367,8 @@ void ESC_init (const esc_cfg_t * config)
       /* Let the stack decide when to enable */
       int_disable(cfg.irq);
    }
+
+   return 0;
 }
 
 

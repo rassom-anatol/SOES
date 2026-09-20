@@ -120,9 +120,11 @@ void ESC_reset (void)
    DPRINT("esc_reset_ended\n");
 }
 
-void ESC_init (const esc_cfg_t * config)
+int ESC_init (const esc_cfg_t * config)
 {
    const char * spi_name = (char *)config->user_arg;
    et1100 = open (spi_name, O_RDWR, 0);
    read_termination[MAX_READ_SIZE - 1] = 0xFF;
+
+   return 0;
 }

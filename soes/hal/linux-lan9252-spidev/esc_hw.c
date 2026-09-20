@@ -660,7 +660,7 @@ void ESC_reset (void)
    hw_reset_pulse ();
 }
 
-void ESC_init (const esc_cfg_t * config)
+int ESC_init (const esc_cfg_t * config)
 {
    const esc_hw_cfg_t * hw = (const esc_hw_cfg_t *)config->user_arg;
    uint8_t  bits = 8;
@@ -674,7 +674,7 @@ void ESC_init (const esc_cfg_t * config)
    {
       DPRINT ("lan9252: user_arg must point at an esc_hw_cfg_t with a spidev path\n");
       hw_fault = 1;
-      return;
+      return -1;
    }
 
    timeout_ms = (hw->op_timeout_ms != 0) ? hw->op_timeout_ms : DEFAULT_TIMEOUT_MS;
@@ -686,7 +686,7 @@ void ESC_init (const esc_cfg_t * config)
    {
       DPRINT ("lan9252: cannot open %s\n", hw->spidev);
       hw_fault = 1;
-      return;
+      return -1;
    }
 
    if (ioctl (spi_fd, SPI_IOC_WR_MODE, &mode) < 0 ||
@@ -697,7 +697,7 @@ void ESC_init (const esc_cfg_t * config)
       close (spi_fd);
       spi_fd = -1;
       hw_fault = 1;
-      return;
+      return -1;
    }
 
    /* Optional hardware reset line, released high before talking SPI. */
@@ -724,7 +724,7 @@ void ESC_init (const esc_cfg_t * config)
    if (hw_fault)
    {
       DPRINT ("lan9252: initialisation failed on %s\n", hw->spidev);
-      return;
+      return -1;
    }
 
    value = lan9252_read_32 (ESC_CMD_ID_REV);
@@ -737,6 +737,8 @@ void ESC_init (const esc_cfg_t * config)
             ESCREG_ALEVENT_SM0 |
             ESCREG_ALEVENT_SM1);
    ESC_ALeventmaskwrite (value);
+
+   return 0;
 }
 
 /* ------------------------------------------------------------------ interrupts */

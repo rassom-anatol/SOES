@@ -347,8 +347,10 @@ void ecat_slv (void)
 /*
  * Initialize the slave stack.
  */
-void ecat_slv_init (esc_cfg_t * config)
+int ecat_slv_init (esc_cfg_t * config)
 {
+   uint32_t retries;
+
    DPRINT ("Slave stack init started\n");
 
    /* Init watchdog */
@@ -357,11 +359,23 @@ void ecat_slv_init (esc_cfg_t * config)
    /* Call stack configuration */
    ESC_config (config);
    /* Call HW init */
-   ESC_init (config);
+   if (ESC_init (config) != 0)
+   {
+      DPRINT ("ESC_init failed, aborting stack init\n");
+      return -1;
+   }
 
-   /*  wait until ESC is started up */
+   /*  wait until ESC is started up, bounded so that an ESC which never
+    *  reports a link does not spin here forever with no diagnostic */
+   retries = DLSTATUS_WAIT_RETRIES;
    while ((ESCvar.DLstatus & 0x0001) == 0)
    {
+      if (retries-- == 0)
+      {
+         DPRINT ("timeout waiting for ESC start-up, DLstatus 0x%04x\n",
+                 ESCvar.DLstatus);
+         return -1;
+      }
       ESC_read (ESCREG_DLSTATUS, (void *) &ESCvar.DLstatus,
                 sizeof (ESCvar.DLstatus));
       ESCvar.DLstatus = etohs (ESCvar.DLstatus);
@@ -385,4 +399,6 @@ void ecat_slv_init (esc_cfg_t * config)
    ESC_stopoutput ();
    /* Init Object Dictionary default values */
    COE_initDefaultValues ();
+
+   return 0;
 }

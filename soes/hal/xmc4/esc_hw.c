@@ -311,7 +311,7 @@ void ESC_reset (void)
   EEP_init();
 }
 
-void ESC_init (const esc_cfg_t * cfg)
+int ESC_init (const esc_cfg_t * cfg)
 {
   XMC_ECAT_CONFIG_t ecat_config;
 
@@ -370,5 +370,7 @@ void ESC_init (const esc_cfg_t * cfg)
   XMC_GPIO_SetHardwareControl(ECAT_MDO, AF_ECAT0_MDO);
 
   init_output_soft(ECAT_PHY_RESET, AF_ECAT0_PHY_RESET);
+
+   return 0;
 }
 

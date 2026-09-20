@@ -314,7 +314,7 @@ void PDI_Isr(void)
  *
  * @param[in]   arg     = esc_cfg provided by the application
  */
-void ESC_init (const esc_cfg_t * config)
+int ESC_init (const esc_cfg_t * config)
 {
     escHwPruIcssHandle = pruIcss1Handle;
     bsp_set_sm_properties(escHwPruIcssHandle, 0, MBX0_sma, MBX0_sml);
@@ -323,6 +323,8 @@ void ESC_init (const esc_cfg_t * config)
     bsp_set_sm_properties(escHwPruIcssHandle, 3, SM3_sma, MAX_TXPDO_SIZE * 3);
 
     bsp_write_dword(escHwPruIcssHandle, 0 , ESCREG_ALEVENTMASK);
+
+   return 0;
 }
 
 

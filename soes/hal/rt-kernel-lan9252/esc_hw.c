@@ -389,7 +389,7 @@ void ESC_reset (void)
 
 }
 
-void ESC_init (const esc_cfg_t * config)
+int ESC_init (const esc_cfg_t * config)
 {
    uint32_t value;
    const char * spi_name = (char *)config->user_arg;
@@ -406,4 +406,5 @@ void ESC_init (const esc_cfg_t * config)
 
 
 
+   return 0;
 }

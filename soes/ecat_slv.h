@@ -63,7 +63,11 @@ void ecat_slv (void);
  * Initialize the slave stack
  *
  * @param[in]   config     = User input how to configure the stack
+ * @return 0 on success, non-zero if the hardware could not be initialised or
+ *         the ESC did not report a link within DLSTATUS_WAIT_RETRIES polls.
+ *         Callers must check: entering the cyclic loop after a failed init
+ *         leaves the stack talking to nothing.
  */
-void ecat_slv_init (esc_cfg_t * config);
+int ecat_slv_init (esc_cfg_t * config);
 
 #endif /* __ECAT_SLV_H__ */
