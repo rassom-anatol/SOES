@@ -54,11 +54,16 @@ The EtherCAT NIC is the workstation's wired adapter (`enp4s0` under Linux), cabl
 | SCLK | GPIO21 | 40 | |
 | CS | GPIO16 | 36 | CE2 position, remapped to chip select 0 → `/dev/spidev1.0` |
 | **IRQ** | GPIO17 | 11 | CE1 position, plain GPIO — edge-monitored from the RT thread (Phase 3) |
-| **RESET** | GPIO18 | 12 | CE0 position, plain GPIO — optional ESC hard reset |
+| **SYNC0** | GPIO18 | 12 | CE0 position, plain GPIO — lets the RT thread wait on the DC edge directly |
+| **RESET** | GPIO25 | 22 | **shared with the TMC4671 reset** (cmc `CTRL_RST`) |
 
 **Overlay: `dtoverlay=spi1-1cs,cs0_pin=16`.** The `spi-bcm2835aux` driver declares its chip selects as `cs-gpios` rather than using the AUX peripheral's native CS, so any pin can serve — GPIO18 was never a hardware chip select in the Linux path either, making the move to GPIO16 functionally identical rather than a downgrade. The node stays `/dev/spidev1.0` (chip-select *index* 0), not `spidev1.2`. Cost is one GPIO write per transfer inside the driver, negligible against the ioctl cost analysed in Phase 3.4.
 
-The only free GPIO on this board are the three SPI1 CE positions (GPIO16/17/18) plus GPIO4/TXD3 and GPIO5/RXD3. All three CE pins are consumed here — one as the real chip select, two as plain GPIO — which keeps every LAN9252 signal in one physical group and leaves **GPIO4/GPIO5 available for UART3**. This forecloses a second SPI1 chip select, acceptable since the LAN9252 is the only device on the bus.
+All three SPI1 CE positions are consumed — one as the real chip select, two as plain GPIO — which keeps the bus signals in one physical group and leaves **GPIO4/GPIO5 available for UART3**. This forecloses a second SPI1 chip select, acceptable since the LAN9252 is the only device on the bus.
+
+**The reset line is shared with the TMC4671.** Both devices' reset inputs are init and recovery paths, not part of normal operation: a drive fault is cleared through the CiA402 state machine via Fault Reset in controlword bit 7, never by asserting a reset pin. Sharing therefore matches how both are actually used, and it keeps a pin free. The one constraint it imposes is on pulse width — the assert time must satisfy whichever device needs longest. The LAN9252 requires 200 us; `esc_hw_cfg_t.reset_pulse_us` carries the value (default 500 us) so it can be raised without touching code once the TMC4671 minimum is confirmed.
+
+**SYNC0 on GPIO18 is an optimisation, not a dependency.** Waiting on the DC edge directly lets the RT thread skip the ALEVENT read — six SPI transfers, roughly 100-180 us — on the DC path each cycle, which is a meaningful share of a 1 ms budget. Phase 3 works without it by waiting on IRQ and reading ALEVENT to discover the cause.
 
 Before committing the board layout, confirm on the target that the Ubuntu 26.04 overlay set supports the parameter: `dtoverlay -h spi1-1cs` should list `cs0_pin`. If it does not, fall back to stock `dtoverlay=spi1-1cs` with CS on GPIO18 and RESET on GPIO16 — a pin-role swap only, no change elsewhere.
 

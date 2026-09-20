@@ -51,9 +51,11 @@ static esc_hw_cfg_t hw_cfg =
    .spidev        = "/dev/spidev1.0",
    .spi_speed_hz  = 12000000,
    .spi_mode      = 0,
-   .gpiochip      = NULL,   /* no reset line wired yet */
-   .irq_line      = -1,
-   .reset_line    = -1,
+   .gpiochip      = "/dev/gpiochip0",
+   .irq_line      = 17,     /* LAN9252 IRQ */
+   .reset_line    = 25,     /* shared with the TMC4671 reset / cmc CTRL_RST */
+   .reset_pulse_us = 500,   /* >= LAN9252 minimum of 200 us; confirm against
+                             * the TMC4671 minimum, which shares this line */
    .op_timeout_ms = 100,
 };
 

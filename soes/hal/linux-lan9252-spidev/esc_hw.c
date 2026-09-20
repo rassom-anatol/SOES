@@ -82,6 +82,7 @@
 
 static int      spi_fd   = -1;
 static int      reset_fd = -1;
+static uint32_t reset_pulse_us = 500;
 static uint32_t timeout_ms = DEFAULT_TIMEOUT_MS;
 
 /* Latched once any hardware wait loop exceeds its deadline. Every busy-wait
@@ -648,8 +649,10 @@ static void hw_reset_pulse (void)
       return;
    }
    gpio_set (reset_fd, 0);
-   usleep (200);
+   usleep (reset_pulse_us);
    gpio_set (reset_fd, 1);
+   /* Let the 10k/0.1uF network settle and the core come out of reset before
+    * the first SPI transaction. */
    usleep (1000);
 }
 
@@ -678,6 +681,7 @@ int ESC_init (const esc_cfg_t * config)
    }
 
    timeout_ms = (hw->op_timeout_ms != 0) ? hw->op_timeout_ms : DEFAULT_TIMEOUT_MS;
+   reset_pulse_us = (hw->reset_pulse_us != 0) ? hw->reset_pulse_us : 500u;
    mode  = hw->spi_mode;
    speed = hw->spi_speed_hz;
 

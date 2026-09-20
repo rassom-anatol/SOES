@@ -48,8 +48,15 @@ typedef struct
    /** Offset of the line wired to the LAN9252 IRQ pin, or -1 if unused.
     *  Consumed in Phase 3; ignored while running polled. */
    int         irq_line;
-   /** Offset of the line wired to the LAN9252 reset pin, or -1 if unused. */
+   /** Offset of the line wired to the LAN9252 reset pin, or -1 if unused.
+    *  May be shared with other devices' reset inputs, in which case the pulse
+    *  width below must satisfy whichever device requires the longest. */
    int         reset_line;
+   /** Reset assert time in microseconds. The LAN9252 requires at least 200 us;
+    *  a shared line must honour the longest minimum among the devices on it.
+    *  0 selects a 500 us default, which is above the LAN9252 minimum with
+    *  margin but is not a substitute for checking any device sharing the net. */
+   uint32_t    reset_pulse_us;
    /** Deadline applied to each hardware wait loop, in milliseconds.
     *  Every busy-wait in this HAL is bounded by it; 0 selects a 100 ms default. */
    uint32_t    op_timeout_ms;
