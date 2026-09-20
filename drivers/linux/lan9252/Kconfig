@@ -1,4 +1,0 @@
-config LAN9252
-	tristate "Microchip LAN9252(ethercat slave controller) support"
-	help
-	  SPI driver for Microchip LAN9252 ethercat slave controller interface.

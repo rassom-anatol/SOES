@@ -86,32 +86,15 @@ GPIO18 is also PWM0 / PCM_CLK; nothing in cmc or this roadmap uses either, so it
 - [`cmake/Linux.cmake`](../cmake/Linux.cmake) — delete the `RPI_VARIANT` branch; move `-Werror` off directory-global `add_compile_options` onto `target_compile_options(soes PRIVATE ...)`. This is what would otherwise leak into cmc's C++ in Phase 5.
 - [`soes/CMakeLists.txt`](../soes/CMakeLists.txt) — `install(TARGETS soes DESTINATION bin)` → `lib`.
 
-### 1.2 Retention policy
+### 1.2 Prune to one target
 
-**XMC4 and AM335x are kept.** Both are plausible future targets for this stack, so their HALs and demo applications stay in the tree and are maintained through the Phase 2 rename.
+The tree now carries **one HAL and one application**. `cmake -B build -S .` needs no variant flag.
 
-Keep:
+Removed: the XMC4, TI ESC, TWR-K60 and rt-kernel LAN9252 HALs; the bcm2835-based `raspberrypi-lan9252` HAL, which carried the licence problem; the char-driver `linux-lan9252` HAL and its out-of-tree kernel module under `drivers/`; the seven demo applications targeting those platforms; and `cmake/toolchain/` and `cmake/Platform/`.
 
-| Path | Reason |
-|---|---|
-| `soes/hal/xmc4/`, `soes/hal/rt-kernel-xmc4/` | XMC4 target; the rt-kernel variant is also the only correct in-tree DC/interrupt example (Phase 3.2) |
-| `soes/hal/tiesc/` | TI ESC, used by AM335x and K2G |
-| `applications/rtl_xmc4_dynpdo/` | Only in-tree example of dynamic PDO mapping and of `dc_checker` / 0x10F1 / 0x1C32 — Phases 3 and 4 both reference it |
-| `applications/xmc4300_slavedemo/`, `applications/tiesc_am335x/`, `applications/tiesc_k2gice/` | Target demos |
-| `cmake/toolchain/rt-kernel-xmc4.cmake`, `cmake/Platform/rt-kernel.cmake` | Needed to build the above |
+The XMC4 and TI targets were initially kept on the grounds that they might be needed later. They were dropped once they began imposing a real cost: they cannot be compiled on the development machine, so every cross-cutting change to a shared header — the `ESC_init` signature change, and the Phase 2 rename — produced edits in them that could not be verified. Git history retains all of it, and a target can be restored from there if one is needed again.
 
-Remove only what the new HAL genuinely supersedes:
-
-| Path | Reason |
-|---|---|
-| `soes/hal/raspberrypi-lan9252/` | Replaced by `linux-lan9252-spidev`; bcm2835 must go for licensing |
-| `soes/hal/linux-lan9252/` | Superseded; also polls the wrong register after reset (0x304 instead of 0x1F8) |
-| `drivers/linux/lan9252/` | Out-of-tree kernel module serving only the HAL above |
-| `applications/raspberry_lan9252demo/`, `applications/linux_lan9252demo/` | Superseded by `lan9252_diag` |
-
-`soes/hal/rt-kernel-twrk60/`, `applications/rtl_slavedemo/` and `applications/rtl_lwip_eoe/` are neither superseded nor named as future targets — leave them alone unless a reason to remove them comes up.
-
-**Verification gap to accept.** The XMC4 and TI toolchains are not available on the development machine, so code in those HALs cannot be compiled here and the Phase 2 rename cannot be verified against them. The rename is mechanical and greppable, which makes this tolerable, but treat those edits as unproven until someone builds for the target. This cost is the price of keeping the targets, and it is worth stating rather than discovering later.
+**`applications/rtl_xmc4_dynpdo` is kept as reference and is not built.** It is the only in-tree example of dynamic PDO mapping (0x1C12/0x1C13 as `ATYPE_RWpre` with backing storage) and of Distributed Clocks configuration (`dc_checker`, the initial TxPDO write in `cb_state_change`), both of which Phase 3 depends on. Its own README records why it is there.
 
 ### 1.3 New HAL — `soes/hal/linux-lan9252-spidev/`
 
