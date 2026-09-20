@@ -362,13 +362,36 @@ Author `od.yaml` from **ETG.6010** (*Implementation Directive for CiA402 Drive P
 
 No third-party EDS or reference implementation is used as input. GPL-licensed CiA402 implementations are deliberately excluded — reading them in order to reimplement is the pattern that creates derivative-work exposure, which defeats the point of keeping this tree free of licence encumbrances.
 
-### 4.2 Minimum v1 object set (CSP / CSV / CST)
+### 4.2 Fixed process image and the v1 object set
 
-0x6040 Controlword, 0x6041 Statusword, 0x6060/0x6061 Modes of operation and display, 0x6064 Position actual, 0x606C Velocity actual, 0x6077 Torque actual, 0x607A Target position, 0x60FF Target velocity, 0x6071 Target torque, 0x603F Error code, 0x605A Quick stop option code, 0x6502 Supported drive modes, plus 0x1600/0x1A00, 0x1C12/0x1C13 and Phase 3's 0x10F1/0x1C32/0x1C33.
+**The process image is fixed, not master-configurable.** A fixed-function drive gains nothing from dynamic mapping, and avoiding it removes the PREOP remapping protocol, the sub-index-0 zeroing dance and a class of configuration failure. 0x1600, 0x1A00, 0x1C12 and 0x1C13 are therefore all `ATYPE_RO` with constant values.
 
-RxPDO = 13 bytes (pad to 14); TxPDO = 15 bytes (pad to 16).
+This departs from what the vendor survey shows Beckhoff doing, and the departure is deliberate. A survey of the ELM72xx and EL72xx ESI files (23 CiA402 devices, via [`tools/esi_survey.py`](../tools/esi_survey.py)) found **93% of their 3,633 PDOs carry exactly one object** — 0x1610 Controlword, 0x1611 Target position, 0x1612 Target velocity and so on — with only 575 pre-bound to a SyncManager and the rest assembled by the master through 0x1C12/0x1C13. That granularity exists so one firmware can serve any process image a customer asks for. A single-purpose drive has no such requirement.
 
-Generator invariants that make hand-error impossible: ascending index order; the `{0xffff,0xff,0xff,0xff,NULL,NULL}` sentinel; sub 0x00 first as `DTYPE_UNSIGNED8/8/ATYPE_RO/maxsub`; mapping words as `(index<<16)|(sub<<8)|bitlength` with index 0 / sub 0 meaning padding; and `ATYPE_RWpre` on 0x1C12/0x1C13/0x160x/0x1A0x so the master can reconfigure PDOs in PREOP, which TwinCAT and SOEM both do.
+**Zero-copy was considered and rejected.** Setting `MAX_MAPPINGS_SM2`/`_SM3` to 0 makes `rxpdo`/`txpdo` extern symbols the application supplies ([`soes/ecat_slv.c:25-35`](../soes/ecat_slv.c#L25-L35)), so the stack skips `COE_pdoPack`/`Unpack` and reads process data straight into the application struct — the `xmc4300_slavedemo` model. It saves a few microseconds of bit-slicing per cycle, which is noise beside the 200-400 µs of SPI in §3.4, and it buys that with silent fragility: the C struct layout must match the wire layout exactly, and CiA402's mixed widths (u16, i8, i32, i16) produce natural padding unless packed, while packing invites unaligned accesses on ARM. A layout error corrupts data rather than failing to compile. **Keep `MAX_MAPPINGS` non-zero**, sized to the actual entry count rather than the default 16.
+
+#### v1 object set (CSP / CSV / CST)
+
+Mapped: 0x6040 Controlword, 0x6041 Statusword, 0x6060/0x6061 Modes of operation and display, 0x6064 Position actual, 0x606C Velocity actual, 0x6077 Torque actual, 0x607A Target position, 0x60FF Target velocity, 0x6071 Target torque, 0x603F Error code, **0x6072 Max torque** and **0x60F4 Following error actual**.
+
+The last two come from the survey: both are mapped by **100%** of the CiA402 devices examined, at a cost of 2 and 4 bytes. Universal adoption suggests masters expect them. Also present in every device surveyed but omitted here as Beckhoff-specific: 0x603E and 0x60EA.
+
+Unmapped but present in the dictionary: 0x605A Quick stop option code, 0x6502 Supported drive modes, plus 0x1600/0x1A00, 0x1C12/0x1C13 and Phase 3's 0x10F1/0x1C32/0x1C33.
+
+Deferred to v2, with survey support if wanted later: the touch-probe group 0x60B8-0x60BD (87% of devices) and the offsets 0x60B1/0x60B2 (65%).
+
+Resulting image, with 0x6072 and 0x60F4 included:
+
+| | Objects | Bytes |
+|---|---|---|
+| **RxPDO 0x1600** | 0x6040 (2) + 0x6060 (1) + 0x607A (4) + 0x60FF (4) + 0x6071 (2) + 0x6072 (2) | 15, pad to **16** |
+| **TxPDO 0x1A00** | 0x6041 (2) + 0x6061 (1) + 0x6064 (4) + 0x606C (4) + 0x6077 (2) + 0x603F (2) + 0x60F4 (4) | 19, pad to **20** |
+
+Both sit far inside the 64-byte budget in §4.3, so the SM layout there needs no change.
+
+Generator invariants that make hand-error impossible: ascending index order; the `{0xffff,0xff,0xff,0xff,NULL,NULL}` sentinel; sub 0x00 first as `DTYPE_UNSIGNED8/8/ATYPE_RO/maxsub`; mapping words as `(index<<16)|(sub<<8)|bitlength` with index 0 / sub 0 meaning padding; and `ATYPE_RO` throughout the mapping and assignment objects, since the image is fixed.
+
+**The cost of a fixed image is that it must be right before the ESI ships**, because changing it later means regenerating firmware, ESI and SII together and re-scanning in TwinCAT. That is what makes the open telemetry question blocking rather than incidental.
 
 ### 4.3 SM layout
 
@@ -394,7 +417,7 @@ Ship single-axis and prove OP first. Then axis *n* is `index + n*0x800` (axis 0 
 
 ### 4.5 Verification
 
-Generator idempotent under a CI diff check; the master's PDO map byte-for-byte matches `od.yaml` including padding; SDO read/write of every RW object and a full SDO-Info OD list (which validates `MBXSIZE 256`); master reconfigures 0x1C12/0x1600 in PREOP with a reduced map and SAFEOP still succeeds; `xmllint --schema EtherCATInfo.xsd` on the ESI. **If a `SMRESULT_ERRSM2/3` appears, fix the generator, never the output.**
+Generator idempotent under a CI diff check; the master's PDO map byte-for-byte matches `od.yaml` including padding; SDO read/write of every RW object and a full SDO-Info OD list (which validates `MBXSIZE 256`); a master write to 0x1C12 or 0x1600 is rejected, confirming the mapping really is read-only; `xmllint --schema EtherCATInfo.xsd` on the ESI. **If a `SMRESULT_ERRSM2/3` appears, fix the generator, never the output.**
 
 ---
 
@@ -498,6 +521,7 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 - **Platform** — EtherCAT builds require the CM4 carrier; ROS 2 builds run on a stock Pi 4 or the carrier. PREEMPT_RT is present on the target.
 - **SM watchdog** — TwinCAT default, 100 ms.
 - **Retention** — XMC4 and AM335x/TI HALs and demos are kept (§1.2).
+- **Process image** — fixed, not master-configurable; `ATYPE_RO` mapping objects, dynamic machinery retained (§4.2).
 - **Transport** — exactly one, selected at **compile time** as separate executable targets; no ROS in an EtherCAT build (§5.3).
 
 ## Open questions
