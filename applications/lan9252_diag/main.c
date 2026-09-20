@@ -309,9 +309,9 @@ static int edge_test (uint32_t period_us, uint32_t seconds)
       return 1;
    }
 
-   /* Route the sync-out unit to EtherCAT control, set the period, and start
-    * one cycle from now plus a margin so the start time is not already past. */
-   act = 0;
+   /* Hand the sync-out unit to the PDI. With no master on the wire, nothing
+    * would otherwise be driving it. */
+   act = 0x01;
    ESC_write (ESCREG_CYCLIC_UNIT_CTRL, &act, sizeof (act));
    ESC_write (ESCREG_SYNC0_CYCLE_TIME, &period_ns, sizeof (period_ns));
 
@@ -321,6 +321,27 @@ static int edge_test (uint32_t period_us, uint32_t seconds)
 
    act = ESCREG_SYNC_ACT_ACTIVATED | ESCREG_SYNC_SYNC0_EN;
    ESC_write (ESCREG_SYNC_ACT, &act, sizeof (act));
+
+   /* Read everything back: a silent write is the likeliest failure here. */
+   {
+      uint8_t  r_unit = 0, r_act = 0;
+      uint32_t r_cycle = 0;
+      uint64_t r_start = 0, r_time = 0;
+      ESC_read (ESCREG_CYCLIC_UNIT_CTRL, &r_unit, sizeof (r_unit));
+      ESC_read (ESCREG_SYNC_ACT, &r_act, sizeof (r_act));
+      ESC_read (ESCREG_SYNC0_CYCLE_TIME, &r_cycle, sizeof (r_cycle));
+      ESC_read (ESCREG_SYNC0_START_TIME, &r_start, sizeof (r_start));
+      ESC_read (ESCREG_LOCALTIME, &r_time, sizeof (r_time));
+      printf ("  0x0980 unit ctrl  0x%02X (wrote 0x01)\n", r_unit);
+      printf ("  0x0981 activation 0x%02X (wrote 0x%02X)\n", r_act,
+              (unsigned)(ESCREG_SYNC_ACT_ACTIVATED | ESCREG_SYNC_SYNC0_EN));
+      printf ("  0x09A0 cycle time %u ns (wrote %u)\n",
+              (unsigned)r_cycle, (unsigned)period_ns);
+      printf ("  0x0990 start time %llu\n", (unsigned long long)r_start);
+      printf ("  0x0910 local time %llu (start %s)\n",
+              (unsigned long long)r_time,
+              (r_time < r_start) ? "still ahead, good" : "ALREADY PAST");
+   }
 
    /* Let the same event reach the IRQ pin. */
    ESC_interrupt_enable (ESCREG_ALEVENT_DC_SYNC0);
@@ -340,7 +361,8 @@ static int edge_test (uint32_t period_us, uint32_t seconds)
       coalesced = 0;
       if (ESC_hw_edge_wait (sync_fd, 200000000ull, &t_now, &coalesced) == 1)
       {
-         n_sync++;
+         /* One call drains up to eight queued events, so count them all. */
+         n_sync += 1u + (uint64_t)coalesced;
          total_coalesced += coalesced;
          if (t_prev != 0)
          {
@@ -379,12 +401,24 @@ static int edge_test (uint32_t period_us, uint32_t seconds)
    close (irq_fd);
    close (sync_fd);
 
-   if (n_sync == 0)
    {
-      printf ("FAIL: no SYNC0 edges -- check wiring or DC configuration\n");
-      return 1;
+      uint64_t expected = (uint64_t)seconds * 1000000ull / period_us;
+      if (n_sync == 0)
+      {
+         printf ("FAIL: no SYNC0 edges -- wiring or DC configuration\n");
+         return 1;
+      }
+      /* Require most of the expected edges. A handful proves the line is
+       * connected but not that the DC unit is running. */
+      if (n_sync * 10ull < expected * 9ull)
+      {
+         printf ("FAIL: only %llu of ~%llu expected edges -- DC unit is not\n"
+                 "      running continuously\n",
+                 (unsigned long long)n_sync, (unsigned long long)expected);
+         return 1;
+      }
+      printf ("PASS\n");
    }
-   printf ("PASS\n");
    return 0;
 }
 
