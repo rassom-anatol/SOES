@@ -370,50 +370,99 @@ This departs from what the vendor survey shows Beckhoff doing, and the departure
 
 **Zero-copy was considered and rejected.** Setting `MAX_MAPPINGS_SM2`/`_SM3` to 0 makes `rxpdo`/`txpdo` extern symbols the application supplies ([`soes/ecat_slv.c:25-35`](../soes/ecat_slv.c#L25-L35)), so the stack skips `COE_pdoPack`/`Unpack` and reads process data straight into the application struct — the `xmc4300_slavedemo` model. It saves a few microseconds of bit-slicing per cycle, which is noise beside the 200-400 µs of SPI in §3.4, and it buys that with silent fragility: the C struct layout must match the wire layout exactly, and CiA402's mixed widths (u16, i8, i32, i16) produce natural padding unless packed, while packing invites unaligned accesses on ARM. A layout error corrupts data rather than failing to compile. **Keep `MAX_MAPPINGS` non-zero**, sized to the actual entry count rather than the default 16.
 
-#### v1 object set (CSP / CSV / CST)
+#### v1 object set (CSP / CSV / CST), single axis
 
-Mapped: 0x6040 Controlword, 0x6041 Statusword, 0x6060/0x6061 Modes of operation and display, 0x6064 Position actual, 0x606C Velocity actual, 0x6077 Torque actual, 0x607A Target position, 0x60FF Target velocity, 0x6071 Target torque, 0x603F Error code, **0x6072 Max torque** and **0x60F4 Following error actual**.
+**Mapped into the cyclic image.** Fields are ordered widest-first so every 32-bit value lands naturally aligned — the alternative, listing them in index order, puts each `int32` on an odd offset because `0x6060` is a single byte. Nothing in the protocol requires this; the master reads the order from 0x1600/0x1A00. It costs nothing and removes a class of unaligned-access problem on ARM. Note the consequence: **controlword and statusword are not at offset 0**, which may surprise someone reading the ESI who expects the conventional layout.
 
-The last two come from the survey: both are mapped by **100%** of the CiA402 devices examined, at a cost of 2 and 4 bytes. Universal adoption suggests masters expect them. Also present in every device surveyed but omitted here as Beckhoff-specific: 0x603E and 0x60EA.
+**RxPDO 0x1600 — master to drive**
 
-Unmapped but present in the dictionary: 0x605A Quick stop option code, 0x6502 Supported drive modes, plus 0x1600/0x1A00, 0x1C12/0x1C13 and Phase 3's 0x10F1/0x1C32/0x1C33.
+| Offset | Bytes | Object | Type | Meaning |
+|---|---|---|---|---|
+| 0 | 4 | 0x607A | i32 | Target position |
+| 4 | 4 | 0x60FF | i32 | Target velocity |
+| 8 | 2 | 0x6040 | u16 | Controlword |
+| 10 | 2 | 0x6071 | i16 | Target torque |
+| 12 | 2 | 0x6072 | u16 | Max torque |
+| 14 | 1 | 0x6060 | i8 | Modes of operation |
+| 15 | 1 | — | — | padding |
+
+**TxPDO 0x1A00 — drive to master**
+
+| Offset | Bytes | Object | Type | Meaning |
+|---|---|---|---|---|
+| 0 | 4 | 0x6064 | i32 | Position actual |
+| 4 | 4 | 0x606C | i32 | Velocity actual |
+| 8 | 4 | 0x60F4 | i32 | Following error actual |
+| 12 | 4 | 0x2000:01 | u32 | Vendor status and fault flags |
+| 16 | 2 | 0x6041 | u16 | Statusword |
+| 18 | 2 | 0x6077 | i16 | Torque actual |
+| 20 | 2 | 0x603F | u16 | Error code |
+| 22 | 1 | 0x6061 | i8 | Modes of operation display |
+| 23 | 1 | — | — | padding |
+
+**16 bytes out, 24 bytes in**, per axis.
+
+0x6072 and 0x60F4 come from the ESI survey: both are mapped by **100%** of the CiA402 devices examined, at 2 and 4 bytes. Universal adoption suggests masters expect them. Also universal but omitted as Beckhoff-specific: 0x603E and 0x60EA.
+
+**SDO-readable, not mapped.** 0x605A Quick stop option code, 0x6502 Supported drive modes, the mapping and assignment objects 0x1600/0x1A00 and 0x1C12/0x1C13, and Phase 3's 0x10F1/0x1C32/0x1C33.
+
+**Scaling objects — SDO-only, required for master-side unit conversion.** Without these a master cannot turn encoder increments into user units, which TwinCAT NC needs:
+
+| Object | Type | Purpose |
+|---|---|---|
+| 0x608F | record | Position encoder resolution — `:01` increments, `:02` motor revolutions |
+| 0x6091 | record | Gear ratio — `:01` motor revolutions, `:02` shaft revolutions |
+| 0x6092 | record | Feed constant — `:01` feed, `:02` shaft revolutions |
+| 0x6076 | u32 | Motor rated torque, mNm — also the reference for the torque scaling in §5.3 |
 
 Deferred to v2, with survey support if wanted later: the touch-probe group 0x60B8-0x60BD (87% of devices) and the offsets 0x60B1/0x60B2 (65%).
 
-Resulting image, with 0x6072 and 0x60F4 included:
+#### Vendor objects (0x2000-0x5FFF)
 
-| | Objects | Bytes |
-|---|---|---|
-| **RxPDO 0x1600** | 0x6040 (2) + 0x6060 (1) + 0x607A (4) + 0x60FF (4) + 0x6071 (2) + 0x6072 (2) | 15, pad to **16** |
-| **TxPDO 0x1A00** | 0x6041 (2) + 0x6061 (1) + 0x6064 (4) + 0x606C (4) + 0x6077 (2) + 0x603F (2) + 0x60F4 (4) | 19, pad to **20** |
+An EtherCAT build has no ROS topics, so everything an operator needs must come through the object dictionary. The manufacturer-specific range carries it, mirroring what cmc's six telemetry message types publish today (board, analog, control, digital, feedback, states):
 
-Both sit far inside the 64-byte budget in §4.3, so the SM layout there needs no change.
+- **0x2000:01 Drive status and fault flags** (u32) is **PDO-mapped**, since a fault must reach the master in the cycle it occurs rather than on the next SDO poll. It is the only vendor object in the cyclic image.
+- Everything else — DC bus voltage, board and MOSFET temperatures, phase currents, gate driver fault detail, hall and encoder raw values — is **SDO-readable only**. These cost dictionary space but no frame bytes, and an operator polling them at human rates loses nothing.
+
+Populate the bit assignments of 0x2000:01 from cmc's existing fault and status sources, principally `Bsp`'s `DRV_FAULT` and `CTRL_STA` inputs and the TMC6200 fault register.
+
+#### Identity
+
+The demo ships rt-labs' Vendor ID 0x1337 with Product Code 1234, which must not go out on a product. Use an identity from the **ETG-designated evaluation range** for bench work — confirm the exact value from ETG documentation rather than copying one from another device — and keep Vendor ID, Product Code and Revision as three loudly-marked fields in `od.yaml` so replacing them is a one-line change in one file. Obtaining an assigned ETG Vendor ID is a prerequisite before any unit ships, because the identity is baked into both the ESI and the SII image and masters match on it.
 
 Generator invariants that make hand-error impossible: ascending index order; the `{0xffff,0xff,0xff,0xff,NULL,NULL}` sentinel; sub 0x00 first as `DTYPE_UNSIGNED8/8/ATYPE_RO/maxsub`; mapping words as `(index<<16)|(sub<<8)|bitlength` with index 0 / sub 0 meaning padding; and `ATYPE_RO` throughout the mapping and assignment objects, since the image is fixed.
 
-**The cost of a fixed image is that it must be right before the ESI ships**, because changing it later means regenerating firmware, ESI and SII together and re-scanning in TwinCAT. That is what makes the open telemetry question blocking rather than incidental.
+**The cost of a fixed image is that it must be right before the ESI ships**, because changing it later means regenerating firmware, ESI and SII together and re-scanning in TwinCAT.
 
 ### 4.3 SM layout
 
 The binding constraint is `SM2_sma + 3*SM_length <= SM3_sma` ([`soes/esc.c:752-757`](../soes/esc.c#L752-L757)) — note it uses the **runtime** length the master configured, not `MAX_RXPDO_SIZE`.
 
+**Size the layout for the eventual axis count, not for v1.** SM addresses live in the ESI and the SII image, so enlarging them later breaks the ESI and forces a re-scan in TwinCAT. Reserving the space now costs only DPRAM, of which the LAN9252 has 4 KB and this design uses a fraction.
+
+At 16 bytes out and 24 bytes in per axis (§4.2), reserving for **four axes** gives 64 and 96:
+
 ```
-MBXSIZE          256     /* up from 128: SDO-Info over a 67-object dict needs room */
+MBXSIZE          256     /* up from 128: SDO-Info over a large dictionary needs room */
 MBX0_sma         0x1000
 MBX1_sma         0x1100
 SM2_sma          0x1200
-MAX_RXPDO_SIZE   64
+MAX_RXPDO_SIZE   64      /* 4 axes x 16 bytes */
 SM3_sma          0x1300  /* = 0x1200 + 3*64 */
-MAX_TXPDO_SIZE   64      /* top = 0x1440 < 0x2000 */
-MAX_MAPPINGS_SM2 16      /* stack default; 5 used at one axis */
-MAX_MAPPINGS_SM3 16
+MAX_TXPDO_SIZE   96      /* 4 axes x 24 bytes; top = 0x1300 + 3*96 = 0x1420 < 0x2000 */
+MAX_MAPPINGS_SM2 32      /* 6 entries per axis at 4 axes, plus headroom */
+MAX_MAPPINGS_SM3 32      /* 8 entries per axis at 4 axes, plus headroom */
 ```
 
-64 bytes rather than 14/16 leaves headroom for 0x60B0/0x60B2 offsets, 0x6078, 0x60FD or a second axis without re-deriving the map. 2.9 KB of the LAN9252's 4 KB DPRAM stays spare.
+**Four is a placeholder and needs confirming.** It is the one number in this layout not derived from a decision already taken. Pick the real maximum before the ESI ships; after that it is expensive to change, and until then it is a single key in `od.yaml`. 0x1420 leaves roughly 2.9 KB of DPRAM spare, so a larger count is affordable if the answer is more than four.
 
 ### 4.4 Multi-axis
 
-Ship single-axis and prove OP first. Then axis *n* is `index + n*0x800` (axis 0 = 0x6040, axis 1 = 0x6840, and so on) — one `axes: 3` key in `od.yaml` and a loop in the generator; `utypes.h` becomes `Obj.axis[n]`. Three axes is roughly 45 Rx / 48 Tx bytes, still inside 64; at four, the generator recomputes §4.3 automatically. That is the payoff for §4.1.
+**v1 ships one axis, but the generator emits the indexed form from the start.** This is the reason §4.1 pays for itself: adding axes later must not require re-deriving the SM arithmetic, regenerating the ESI or re-scanning in TwinCAT, and with the layout reserved above it does not.
+
+Axis *n* sits at `index + n*0x800` — axis 0 at 0x6040, axis 1 at 0x6840, axis 2 at 0x7040. In `od.yaml` this is one `axes:` key; in the generator a loop; in `utypes.h` it becomes `Obj.axis[n]`. Write the generator to take the count as a parameter from the outset rather than special-casing a single axis, since retrofitting the indexed form is the change this structure exists to avoid.
+
+The populated PDO length still reflects the axes actually present, so a single-axis v1 puts 16 and 24 bytes on the wire regardless of the reservation.
 
 ### 4.5 Verification
 
@@ -465,6 +514,12 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 `Cia402Sm` is a free function — `transition(controlword, current_state, fault) → {next_state, statusword}`. The nine states and the transition table come from the **ETG.6010 / CiA402 state diagram**, written from the specification. **This is the highest-value unit test in the project:** an exhaustive controlword × state table under `ament_add_gtest`, running in CI with no hardware.
 
 `DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
+
+**The torque scaling contract belongs here**, because it is easy to get wrong and expensive to rediscover. CiA402 expresses torque as per-thousandths of rated torque (`0x6071`, `0x6077`, `0x6072`), with `0x6076` Motor rated torque in mNm as the scaling reference. The TMC4671's torque registers are signed 16-bit — `PID_TORQUE_FLUX_TARGET` (0x64), `PID_TORQUE_FLUX_ACTUAL` (0x69), `PID_TORQUE_FLUX_LIMITS` (0x5E) — so the widths match exactly and no range is lost. Three rules:
+
+- **Compute in `int32`.** The scaling multiply overflows `int16` well before the operands do; saturate on the way back down.
+- **The TMC4671 regulates current, not torque.** Its FOC loop controls Iq, so the conversion runs through the motor's torque constant Kt, a commissioning parameter, with `0x6076` as the bridge to physical units.
+- **Torque and flux share one register.** `PID_TORQUE_FLUX_TARGET` packs torque in the high half and flux in the low half, so write both fields together rather than read-modify-write — on the cyclic path the latter costs an extra SPI round trip per cycle.
 
 **Exactly one transport, fixed at configuration.** WebSocket, ROS 2 DDS, EtherCAT or CANopen is selected when the device is configured and started, and does not change for the life of the run. This is a decided constraint on the cmc architecture and it removes a great deal: no priority ladder, no arbitration between concurrent commanders, no observer mode, and no handover path that would otherwise have to pass through a safe state to avoid a step discontinuity in the setpoint.
 
@@ -522,9 +577,15 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 - **SM watchdog** — TwinCAT default, 100 ms.
 - **Retention** — XMC4 and AM335x/TI HALs and demos are kept (§1.2).
 - **Process image** — fixed, not master-configurable; `ATYPE_RO` mapping objects, dynamic machinery retained (§4.2).
+- **PDO field order** — widest-first for natural alignment; 16 bytes out, 24 in, per axis (§4.2).
+- **Telemetry** — vendor objects in 0x2000-0x5FFF, SDO-readable, with only the status/fault word PDO-mapped (§4.2).
+- **Scaling objects** — 0x608F, 0x6091, 0x6092 and 0x6076 present, SDO-only (§4.2).
+- **Identity** — ETG evaluation range for now, replaced by an assigned Vendor ID before shipping (§4.2).
+- **Axis count** — v1 ships one axis; the generator and SM layout are built for several from the start (§4.3, §4.4).
 - **Transport** — exactly one, selected at **compile time** as separate executable targets; no ROS in an EtherCAT build (§5.3).
 
 ## Open questions
 
+- **Maximum axis count** — §4.3 reserves SM space for four as a placeholder. This is the one number in the layout not derived from a decision already taken, and it must be fixed before the ESI ships.
 - **`SyncErrorCounterLimit` value** — method settled (§3.3.1); the number waits on a `cyclictest` measurement under PREEMPT_RT on the real target.
-- **Telemetry in a ROS-free build** — which quantities must become TxPDO entries or SDO-readable objects. This has to be answered before Phase 4 fixes the PDO layout, since adding entries later means re-deriving the SM arithmetic (§4.3).
+- **0x2000:01 bit assignments** — which cmc fault and status sources map to which bits of the one PDO-mapped vendor word (§4.2).
