@@ -2,7 +2,9 @@
 
 ## Context
 
-This repository is a hard fork of the unmaintained [OpenEtherCATsociety/SOES](https://github.com/OpenEtherCATsociety/SOES) EtherCAT slave stack. It is being developed as a git submodule of **cmc**, a ROS 2 motion controller (TMC4671 FOC controller + TMC6200 gate driver) running on a Raspberry Pi 4 under Ubuntu 26.04 and ROS 2 Lyrical.
+This repository is a hard fork of the unmaintained [OpenEtherCATsociety/SOES](https://github.com/OpenEtherCATsociety/SOES) EtherCAT slave stack. It is being developed as a git submodule of **cmc**, a ROS 2 motion controller (TMC4671 FOC controller + TMC6200 gate driver) running under Ubuntu 26.04 and ROS 2 Lyrical.
+
+**Hardware targets differ by build.** The EtherCAT build requires the custom carrier board being designed for the Compute Module 4, since the LAN9252 lives on it. The ROS 2 build carries no such requirement and runs on either a stock Raspberry Pi 4 or that same CM4 carrier. Both platforms use the BCM2711, so the peripheral analysis in this document — SPI1's fixed ALT4 assignment, AUX block behaviour, `gpiochip0` as the SoC bank — applies to either. This pairs with the single-transport rule in §5.3: a build targets one transport, and the EtherCAT choice implies the carrier.
 
 The end state: **cmc presents itself as a CiA402-compatible servo drive**, commanded by an external EtherCAT master. ROS 2 DDS, EtherCAT (CoE) and later CANopen-over-CAN become three interchangeable transports onto one shared CiA402 core, with the SOES cyclic task running on a `SCHED_FIFO` thread inside cmc's existing `axis` executable.
 
@@ -28,13 +30,13 @@ The SOES linking exception is load-bearing — it is what permits linking into a
 
 ### Master and test topology
 
-The authoritative master is **TwinCAT**, running on the Windows boot of the development workstation (Linux and Windows are on separate NVMe drives, so the two boots are mutually exclusive). The slave runs on separate hardware — the Raspberry Pi 4 — so master and slave never contend for one machine.
+The authoritative master is **TwinCAT**, running on the Windows boot of the development workstation (Linux and Windows are on separate NVMe drives, so the two boots are mutually exclusive). The slave runs on separate hardware, so master and slave never contend for one machine. Production hardware is the CM4 carrier. Phase 1 bring-up need not wait for it if that is preferable — a stock Pi 4 with a LAN9252 breakout exercises the same SoC and the same pin assignment.
 
 TwinCAT is the standard to validate against, not a fallback. As the reference implementation it is materially better than SOEM at the three things this project leans on hardest: ESI validation (Phase 4), DC/SYNC0 diagnostics (Phase 3), and driving a CiA402 axis natively through NC rather than by hand-assembled SDO writes (Phases 4–5). It also writes the SII EEPROM directly, which removes any need for `eepromtool`.
 
 The EtherCAT NIC is the workstation's wired adapter (`enp4s0` under Linux), cabled directly to the LAN9252 IN port. Under Windows, TwinCAT binds it with the Beckhoff real-time driver.
 
-**Iteration workflow.** Editing on Linux and testing from Windows costs two reboots per iteration, which is untenable for a stack needing many. The fix is to make the Pi the build host — build and deploy there over ssh, driving that ssh session *from the Windows boot* (VS Code Remote-SSH works well). Linux then becomes optional for a test cycle rather than mandatory.
+**Iteration workflow.** Editing on Linux and testing from Windows costs two reboots per iteration, which is untenable for a stack needing many. The fix is to make the target board the build host — build and deploy there over ssh, driving that ssh session *from the Windows boot* (VS Code Remote-SSH works well). Linux then becomes optional for a test cycle rather than mandatory.
 
 **SOEM is optional.** It is not needed for correctness; TwinCAT covers every verification step below. Its one genuine advantage is scriptability: the Phase 1.4b loopback harness and the Phase 4/5 regression checks automate naturally against a headless Linux master, whereas TwinCAT is GUI-driven (scriptable via ADS, but heavier). Build it on the Linux boot only if unattended regression runs are wanted.
 
@@ -61,6 +63,8 @@ The only free GPIO on this board are the three SPI1 CE positions (GPIO16/17/18) 
 Before committing the board layout, confirm on the target that the Ubuntu 26.04 overlay set supports the parameter: `dtoverlay -h spi1-1cs` should list `cs0_pin`. If it does not, fall back to stock `dtoverlay=spi1-1cs` with CS on GPIO18 and RESET on GPIO16 — a pin-role swap only, no change elsewhere.
 
 GPIO18 is also PWM0 / PCM_CLK; nothing in cmc or this roadmap uses either, so it is free as a plain output.
+
+**The BCM numbers are authoritative; the header column is a reference.** On a Pi 4 they are literal 40-pin header positions. On the CM4 carrier they become net names in the schematic, while the BCM assignments carry over unchanged.
 
 **AUX block contention — a board-design consideration.** SPI1 is an AUX peripheral, and so is the mini-UART. cmc drives the TMC4671 over `/dev/ttyS0` at 921600 baud (`cmc/include/comm/UARTConstants.cpp:11`) — that *is* the mini-UART. Both share the AUX block's bus and interrupt, and both have shallow FIFOs. Secondary to the syscall cost analysed in Phase 3.4, but it belongs in the jitter budget. Moving the TMC4671 to the PL011 (`/dev/ttyAMA0`) on the new motherboard would remove it entirely.
 
@@ -290,9 +294,20 @@ Widen `ESCvar.synccounter` from `int8_t` to `int16_t` ([`esc.h:510`](../soes/esc
 
 The XMC4 HAL keeps its existing balance-counter logic — only the field's type changes.
 
+#### Sizing the limit
+
+The `+3` / `−1` weighting turns the limit into a time budget: **limit ÷ 3 is the number of consecutive fully-missed cycles tolerated before tripping**. At a 1 ms cycle a limit of 24 tolerates eight such cycles (~8 ms); the top of the range, 255, tolerates eighty-five (~85 ms).
+
+Two bounds determine the value:
+
+- **Lower — survive the worst scheduling excursion.** A stall spanning *n* cycles adds `3n`, then needs `3n` good cycles to drain, so the limit must exceed `3n` for the worst *n* the platform actually produces. **This number is to be measured, not assumed.**
+- **Upper — fire before the SM watchdog.** If `limit ÷ 3 × cycle_time` exceeds the SM watchdog period, the watchdog always trips first and the sync error counter never fires at all. The master uses TwinCAT's 100 ms default, capping the useful limit near **300** at a 1 ms cycle — so the full 255 range stays meaningful, with little headroom above it.
+
+**The value is deliberately left open.** Derive it from a `cyclictest` run under representative load on the real target with PREEMPT_RT (§3.6): take the p99.99 latency, convert to missed cycles at the chosen SYNC0 period, multiply by three, and add margin. A limit guessed too low drops the drive to SAFEOP on a transient stall; one guessed too high defers to the watchdog and never fires.
+
 ### 3.4 Achievable cycle time
 
-The cost is **ioctls, not bits**. One CSR access is three SPI transactions (write CMD / poll / read DATA) plus the unconditional ALEVENT tail read = **six `SPI_IOC_MESSAGE` ioctls per register read**. At roughly 15-30 µs of syscall and DMA setup each on a Pi 4, a 2-byte register read costs about 100-180 µs; the 7 payload bytes at 12.5 MHz (~4.5 µs) are noise.
+The cost is **ioctls, not bits**. One CSR access is three SPI transactions (write CMD / poll / read DATA) plus the unconditional ALEVENT tail read = **six `SPI_IOC_MESSAGE` ioctls per register read**. At an estimated 15-30 µs of syscall and DMA setup each on BCM2711 — a figure to replace with measurement — a 2-byte register read costs about 100-180 µs; the 7 payload bytes at 12.5 MHz (~4.5 µs) are noise.
 
 **1 ms is not reachable with this HAL as written.** Optimisations in order:
 
@@ -301,17 +316,17 @@ The cost is **ioctls, not bits**. One CSR access is three SPI transactions (writ
 3. **Raise the clock** to 20 MHz (the LAN9252 tops out at 30 MHz in the plain serial mode this HAL uses); validate with the byte-test register reading `0x87654321` at 20 and 25 MHz first.
 4. Use LAN9252 **fast-read (0x0B)** for PRAM bursts.
 
-After 1–3, expect `DIG_process` in the **200-400 µs** range for a 24-byte PDO pair. Then add OS latency: without PREEMPT_RT (currently blocked by the Ubuntu 26.04 tryboot A/B bug documented in cmc), `SCHED_FIFO` on a mainline kernel gives roughly 50-150 µs wakeup latency with 1-3 ms tail excursions under load.
+After 1–3, expect `DIG_process` in the **200-400 µs** range for a 24-byte PDO pair. That is the SPI cost alone; scheduling latency is additive and must be measured on the target rather than assumed.
 
 **Target SYNC0 = 1 ms.** This is the cycle time a CiA402 drive in cyclic synchronous position, velocity or torque mode is expected to sustain — a conservative figure, given that commercial servo drives commonly run at 250 µs or below. The target comes from the profile, not from any downstream consumer. The period itself is set by the master, so it is configurable by construction; the slave's obligations are to publish an honest floor in 0x1C32:05 and to size `SyncErrorCounterLimit` for the period actually in use.
 
-1 ms is reachable only once optimisations 1–3 land, leaving roughly 600-800 µs of the period for OS scheduling after `DIG_process` costs 200-400 µs. The risk is concentrated in the tail: without PREEMPT_RT, `SCHED_FIFO` excursions of 1-3 ms exceed a whole period, so at 1 ms the sync error counter stops being a formality and becomes the mechanism deciding whether those excursions drop the drive to SAFEOP. Size the limit against a measured `cyclictest` histogram (§3.6), not an assumption.
+1 ms is reachable only once optimisations 1–3 land, leaving roughly 600-800 µs of the period for OS scheduling after `DIG_process` costs 200-400 µs. **The target platform runs PREEMPT_RT**, so the remaining budget is a question for measurement rather than estimation — run `cyclictest` under representative load on the real carrier (§3.6) and compare its p99.99 against that 600-800 µs. That measurement, not an assumed figure, is what decides whether 1 ms holds and what `SyncErrorCounterLimit` must be (§3.3.1).
 
-2 ms is an acceptable fallback if the measured tail cannot be brought inside budget at 1 ms. Revisit both when PREEMPT_RT unblocks.
+2 ms is an acceptable fallback if the measured tail will not fit inside the budget at 1 ms.
 
 ### 3.5 Real-time setup
 
-`mlockall(MCL_CURRENT|MCL_FUTURE)` process-wide at startup before any thread spawns; `mallopt(M_TRIM_THRESHOLD, -1)` and `mallopt(M_MMAP_MAX, 0)`; pre-fault the stack; `SCHED_FIFO` priority **60** with `PTHREAD_EXPLICIT_SCHED`; pin to an isolated core with `isolcpus=3 nohz_full=3 irqaffinity=0-2` in `cmdline.txt` (worth more than PREEMPT_RT on a 4-core Pi).
+`mlockall(MCL_CURRENT|MCL_FUTURE)` process-wide at startup before any thread spawns; `mallopt(M_TRIM_THRESHOLD, -1)` and `mallopt(M_MMAP_MAX, 0)`; pre-fault the stack; `SCHED_FIFO` priority **60** with `PTHREAD_EXPLICIT_SCHED`; pin to an isolated core with `isolcpus=3 nohz_full=3 irqaffinity=0-2` in `cmdline.txt`. Core isolation complements PREEMPT_RT rather than substituting for it — on a four-core part it removes the scheduler contention that the RT patch alone does not.
 
 Priority 60 rather than 80 leaves headroom to promote the SPI controller's IRQ thread above it later.
 
@@ -478,11 +493,13 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 - **Object dictionary tooling** — YAML source plus a Python generator (§4.1).
 - **Sync error semantics** — ETG.1020, replacing SOES's balance counter (§3.3.1).
 - **Cycle time** — 1 ms SYNC0 target, 2 ms acceptable fallback (§3.4).
+- **Platform** — EtherCAT builds require the CM4 carrier; ROS 2 builds run on a stock Pi 4 or the carrier. PREEMPT_RT is present on the target.
+- **SM watchdog** — TwinCAT default, 100 ms.
 - **Retention** — XMC4 and AM335x/TI HALs and demos are kept (§1.2).
 - **Transport** — exactly one, fixed at configuration; no ROS in an EtherCAT build (§5.3).
 
 ## Open questions
 
-- **`SyncErrorCounterLimit` value** — to be derived from a measured `cyclictest` histogram at the chosen cycle time, against the ETG.1020 semantics in §3.3.1.
+- **`SyncErrorCounterLimit` value** — method settled (§3.3.1); the number waits on a `cyclictest` measurement under PREEMPT_RT on the real target.
 - **Telemetry in a ROS-free build** — which quantities must become TxPDO entries or SDO-readable objects. This has to be answered before Phase 4 fixes the PDO layout, since adding entries later means re-deriving the SM arithmetic (§4.3).
 - **Transport selection mechanism** — compile-time build variants or a runtime configuration switch. "No ROS in an EtherCAT build" is achievable either way, but the choice affects how `main()` and the CMake targets are structured.
