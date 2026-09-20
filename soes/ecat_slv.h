@@ -9,15 +9,22 @@
 #include "options.h"
 #include "esc.h"
 
-/**
- * This function is called when to get input values
+/** Refresh the objects the TxPDO is packed from.
+ *
+ * Called immediately before the TxPDO is packed and written to SM3, so the
+ * application samples its hardware here. TxPDO is the slave-to-master
+ * direction: whatever is written to the mapped objects during this call is
+ * what the master reads on the next cycle.
  */
-void cb_get_inputs();
+void cb_update_txpdo (void);
 
-/**
-* This function is called when to set outputs values
+/** Apply the objects the RxPDO was unpacked into.
+ *
+ * Called immediately after the RxPDO has been read from SM2 and unpacked, so
+ * the application drives its hardware here. RxPDO is the master-to-slave
+ * direction: the mapped objects already hold this cycle's commands.
  */
-void cb_set_outputs();
+void cb_apply_rxpdo (void);
 
 /** Set the watchdog count value
  *
@@ -25,8 +32,12 @@ void cb_set_outputs();
  */
 void APP_setwatchdog (int watchdogcnt);
 
-#define DIG_PROCESS_INPUTS_FLAG     0x01
-#define DIG_PROCESS_OUTPUTS_FLAG    0x02
+/* Phase selectors for DIG_process. Under Distributed Clocks the two PDO
+ * phases are driven from different events -- RxPDO on the SM2 interrupt,
+ * TxPDO on the SYNC0 edge -- so they must be separately selectable.
+ */
+#define DIG_PROCESS_TXPDO_FLAG      0x01
+#define DIG_PROCESS_RXPDO_FLAG      0x02
 #define DIG_PROCESS_WD_FLAG         0x04
 #define DIG_PROCESS_APP_HOOK_FLAG   0x08
 /** Implements the watch-dog counter to count if we should make a state change

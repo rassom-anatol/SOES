@@ -919,7 +919,7 @@ uint8_t ESC_startoutput (uint8_t state)
 }
 
 /** Unconditional stop of updating outputs by disabling Sync Manager 2.
- * Set the App.state to APPSTATE_INPUT. Call application hook APP_safeoutput
+ * Set the App.state to APPSTATE_INPUT. Call application hook APP_safe_state
  * letting the user to set safe state values on outputs.
  *
  */
@@ -927,7 +927,7 @@ void ESC_stopoutput (void)
 {
    CC_ATOMIC_AND(ESCvar.App.state, APPSTATE_INPUT);
    ESC_SMdisable (2);
-   APP_safeoutput ();
+   APP_safe_state ();
 }
 
 /** The state handler acting on SyncManager Activation BIT(4)
@@ -1351,7 +1351,7 @@ void ESC_config (esc_cfg_t * cfg)
    ESCvar.pre_state_change_hook = cfg->pre_state_change_hook;
    ESCvar.post_state_change_hook = cfg->post_state_change_hook;
    ESCvar.application_hook = cfg->application_hook;
-   ESCvar.safeoutput_override = cfg->safeoutput_override;
+   ESCvar.safe_state_override = cfg->safe_state_override;
    ESCvar.pre_object_download_hook = cfg->pre_object_download_hook;
    ESCvar.post_object_download_hook = cfg->post_object_download_hook;
    ESCvar.pre_object_upload_hook = cfg->pre_object_upload_hook;

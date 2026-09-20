@@ -317,7 +317,7 @@ typedef struct esc_cfg
    void (*pre_state_change_hook) (uint8_t * as, uint8_t * an);
    void (*post_state_change_hook) (uint8_t * as, uint8_t * an);
    void (*application_hook) (void);
-   void (*safeoutput_override) (void);
+   void (*safe_state_override) (void);
    uint32_t (*pre_object_download_hook) (uint16_t index,
          uint8_t subindex,
          void * data,
@@ -442,7 +442,7 @@ typedef struct
    void (*pre_state_change_hook) (uint8_t * as, uint8_t * an);
    void (*post_state_change_hook) (uint8_t * as, uint8_t * an);
    void (*application_hook) (void);
-   void (*safeoutput_override) (void);
+   void (*safe_state_override) (void);
    uint32_t (*pre_object_download_hook) (uint16_t index,
          uint8_t subindex,
          void * data,
@@ -741,7 +741,7 @@ int ESC_init (const esc_cfg_t * cfg);
 void ESC_reset (void);
 
 /* From application */
-extern void APP_safeoutput ();
+extern void APP_safe_state ();
 extern _ESCvar ESCvar;
 extern _MBXcontrol MBXcontrol[];
 extern uint8_t MBX[];

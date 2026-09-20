@@ -17,7 +17,7 @@ _Objects    Obj;
 /*
  * This function is called to get input values
  */
-void cb_get_inputs()
+void cb_update_txpdo()
 {
    Obj.Buttons.Button1 = gpio_get (GPIO_BUTTON1);
 }
@@ -25,7 +25,7 @@ void cb_get_inputs()
 /*
  * This function is called to set output values
  */
-void cb_set_outputs()
+void cb_apply_rxpdo()
 {
    gpio_set (GPIO_LED1, Obj.LEDgroup0.LED0);
    gpio_set (GPIO_LED2, Obj.LEDgroup1.LED1);
@@ -43,7 +43,7 @@ void cb_state_change (uint8_t * as, uint8_t * an)
       /* Write initial input data requried if an input only slave,
        * otherwise the SM3 will never occur.
        */
-      DIG_process (DIG_PROCESS_INPUTS_FLAG);
+      DIG_process (DIG_PROCESS_TXPDO_FLAG);
    }
 }
 
@@ -68,7 +68,7 @@ int main (void)
       .pre_state_change_hook = NULL,
       .post_state_change_hook = cb_state_change,
       .application_hook = NULL,
-      .safeoutput_override = NULL,
+      .safe_state_override = NULL,
       .pre_object_download_hook = NULL,
       .post_object_download_hook = NULL,
       .rxpdo_override = NULL,

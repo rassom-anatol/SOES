@@ -131,19 +131,19 @@ uint32_t ESC_upload_post_objecthandler (uint16_t index, uint8_t subindex, uint16
 /** Hook called from the slave stack ESC_stopoutputs to act on state changes
  * forcing us to stop outputs. Here we can set them to a safe state.
  */
-void APP_safeoutput (void)
+void APP_safe_state (void)
 {
-   DPRINT ("APP_safeoutput\n");
+   DPRINT ("APP_safe_state\n");
 
-   if(ESCvar.safeoutput_override != NULL)
+   if(ESCvar.safe_state_override != NULL)
    {
-      (ESCvar.safeoutput_override)();
+      (ESCvar.safe_state_override)();
    }
 }
 
 /** Write local process data to Sync Manager 3, Master Inputs.
  */
-void TXPDO_update (void)
+static void txpdo_write_sm3 (void)
 {
    if(ESCvar.txpdo_override != NULL)
    {
@@ -161,7 +161,7 @@ void TXPDO_update (void)
 
 /** Read Sync Manager 2 to local process data, Master Outputs.
  */
-void RXPDO_update (void)
+static void rxpdo_read_sm2 (void)
 {
    if(ESCvar.rxpdo_override != NULL)
    {
@@ -215,15 +215,15 @@ void DIG_process (uint8_t flags)
    }
 
    /* Handle Outputs */
-   if ((flags & DIG_PROCESS_OUTPUTS_FLAG) > 0)
+   if ((flags & DIG_PROCESS_RXPDO_FLAG) > 0)
    {
       if(((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) > 0) &&
          (ESCvar.ALevent & ESCREG_ALEVENT_SM2))
       {
-         RXPDO_update();
+         rxpdo_read_sm2();
          CC_ATOMIC_SET(watchdog, ESCvar.watchdogcnt);
          /* Set outputs */
-         cb_set_outputs();
+         cb_apply_rxpdo();
       }
       else if (ESCvar.ALevent & ESCREG_ALEVENT_SM2)
       {
@@ -242,13 +242,13 @@ void DIG_process (uint8_t flags)
    }
 
    /* Handle Inputs */
-   if ((flags & DIG_PROCESS_INPUTS_FLAG) > 0)
+   if ((flags & DIG_PROCESS_TXPDO_FLAG) > 0)
    {
       if(CC_ATOMIC_GET(ESCvar.App.state) > 0)
       {
          /* Update inputs */
-         cb_get_inputs();
-         TXPDO_update();
+         cb_update_txpdo();
+         txpdo_write_sm3();
       }
    }
 }
@@ -340,8 +340,8 @@ void ecat_slv_poll (void)
 void ecat_slv (void)
 {
    ecat_slv_poll();
-   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
-         DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_RXPDO_FLAG |
+         DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_TXPDO_FLAG);
 }
 
 /*

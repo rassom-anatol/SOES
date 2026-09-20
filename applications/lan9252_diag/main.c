@@ -68,7 +68,7 @@ static esc_cfg_t config =
    .pre_state_change_hook = NULL,
    .post_state_change_hook = NULL,
    .application_hook = NULL,
-   .safeoutput_override = NULL,
+   .safe_state_override = NULL,
    .pre_object_download_hook = NULL,
    .post_object_download_hook = NULL,
    .rxpdo_override = NULL,
@@ -80,11 +80,11 @@ static esc_cfg_t config =
 };
 
 /* The stack calls these; probe mode never reaches them, but they must link. */
-void cb_get_inputs (void)
+void cb_update_txpdo (void)
 {
 }
 
-void cb_set_outputs (void)
+void cb_apply_rxpdo (void)
 {
 }
 
