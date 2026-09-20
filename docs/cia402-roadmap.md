@@ -445,7 +445,9 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 
 **Exactly one transport, fixed at configuration.** WebSocket, ROS 2 DDS, EtherCAT or CANopen is selected when the device is configured and started, and does not change for the life of the run. This is a decided constraint on the cmc architecture and it removes a great deal: no priority ladder, no arbitration between concurrent commanders, no observer mode, and no handover path that would otherwise have to pass through a safe state to avoid a step discontinuity in the setpoint.
 
-`Cia402Core` therefore holds a single `Transport*`, resolved at startup from configuration. The unselected transports need not be constructed at all, which is simpler than building them and leaving them idle.
+**The transport is selected at compile time.** `Cia402Core` binds to one transport implementation in the build; the others are not compiled in at all. This is stronger than a runtime switch and simplifies several things at once: an EtherCAT build genuinely contains no ROS (no `rclcpp` link dependency, not merely an unused one), dead transports cannot be reached by accident, and the binary shrinks to what the device actually does.
+
+In CMake terms this means separate executable targets over a shared core rather than one binary with runtime branches — `axis_ethercat`, `axis_ros2` and so on, each linking the common `Cia402Core` plus its own transport. The ROS-specific sources and the `ament` dependencies belong only to the ROS target.
 
 **An EtherCAT build contains no ROS.** No `rclcpp::init`, no `Axis` ROS node, no publishers, no 20 ms wall timer. This is the structurally significant consequence, and it dictates the shape of the refactor: `Axis` today (`cmc/include/axis/Axis.cpp`, ~916 lines) is simultaneously the ROS node *and* the drive logic, so the drive logic has to come out of it first. `Cia402Core`, `DriveInterface`, `Tmc`, `Controller` and `GateDriver` must all be ROS-free — most already are; `Axis` is the exception.
 
@@ -496,10 +498,9 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 - **Platform** — EtherCAT builds require the CM4 carrier; ROS 2 builds run on a stock Pi 4 or the carrier. PREEMPT_RT is present on the target.
 - **SM watchdog** — TwinCAT default, 100 ms.
 - **Retention** — XMC4 and AM335x/TI HALs and demos are kept (§1.2).
-- **Transport** — exactly one, fixed at configuration; no ROS in an EtherCAT build (§5.3).
+- **Transport** — exactly one, selected at **compile time** as separate executable targets; no ROS in an EtherCAT build (§5.3).
 
 ## Open questions
 
 - **`SyncErrorCounterLimit` value** — method settled (§3.3.1); the number waits on a `cyclictest` measurement under PREEMPT_RT on the real target.
 - **Telemetry in a ROS-free build** — which quantities must become TxPDO entries or SDO-readable objects. This has to be answered before Phase 4 fixes the PDO layout, since adding entries later means re-deriving the SM arithmetic (§4.3).
-- **Transport selection mechanism** — compile-time build variants or a runtime configuration switch. "No ROS in an EtherCAT build" is achievable either way, but the choice affects how `main()` and the CMake targets are structured.
