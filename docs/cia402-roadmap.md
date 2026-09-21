@@ -521,13 +521,19 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 
 **The cyclic SPI budget.** The EtherCAT half costs a measured 141 us median / 220 us p99 per cycle at 25 MHz (§3.4). The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
 
-| TMC4671 clock | per access | 6 accesses | + EtherCAT | total in a 1 ms cycle |
-|---|---|---|---|---|
-| 1 MHz (current) | ~55 us | ~330 us | 141 us | ~470 us |
-| 2 MHz | ~35 us | ~210 us | 141 us | ~350 us |
-| 8 MHz split read | ~20 us | ~120 us | 141 us | ~260 us |
+**Measured on SPI0** with [`tools/spidev_bench.c`](../tools/spidev_bench.c), 20000 iterations per shape, medians:
 
-Doubling to 2 MHz is sufficient for 1 ms; the 8 MHz mode is headroom, not a requirement. Whether the split read is worth it depends on the cost of a two-transfer `SPI_IOC_MESSAGE` with `delay_usecs` on the main `spi-bcm2835` controller — on the AUX controller multi-transfer messages measured slower (§3.4), but SPI0 uses hardware chip select rather than a GPIO, so that result may not carry over. Measure before adopting.
+| TMC4671 config | per access | 6 accesses | + EtherCAT | total in a 1 ms cycle |
+|---|---|---|---|---|
+| 1 MHz single (current) | 67.1 us | 403 us | 141 us | **544 us** |
+| 2 MHz single | 26.8 us | 161 us | 141 us | **302 us** |
+| 8 MHz split read | 13.3 us | 80 us | 141 us | **221 us** |
+
+**The split transfer is cheap on SPI0 — about 3 us** (13.3 vs 10.3 us at 8 MHz), so the TMC4671's 8 MHz read mode is viable and roughly halves the cost of 2 MHz single datagrams. This does *not* carry over from the AUX controller, where multi-transfer messages measured much worse (§3.4); the difference is that SPI0 uses a hardware chip select while the AUX bus uses a GPIO the driver toggles.
+
+**1 MHz is disproportionately bad.** Fixed overhead is 5-7 us at 2 MHz and above but about 27 us at 1 MHz, an extra 21 us that appears at no other rate. Whatever the cause in the driver, the current setting costs 2.5x what 2 MHz does for only twice the wire time, so moving off 1 MHz is worthwhile even if nothing else changes.
+
+Timings were taken with no device attached, which is valid for transaction cost — the bus clocks the same bits in the same time — but says nothing about whether a real TMC4671 is reliable at 8 MHz on a given layout. Validate with the chip before adopting.
 
 **Keep telemetry off the cyclic path.** cmc already reads telemetry over UART at 921600 in parallel with SPI. That split is worth preserving: UART is no faster per transaction (~59 us for 5 bytes) but it is a separate channel, so temperatures, voltages and diagnostics cost nothing in the cyclic budget provided they stay on their own thread. The cyclic SPI path should carry only what the TxPDO needs.
 
