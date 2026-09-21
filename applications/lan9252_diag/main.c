@@ -535,8 +535,23 @@ int main (int argc, char * argv[])
          static uint64_t samples[NS];
          static uint64_t spi_samples[NS];
          static uint64_t xfer_samples[NS];
-         uint32_t n = 0;
+         static uint64_t iv[NS];            /* SYNC0 inter-edge intervals */
+         uint32_t n = 0, nv = 0;
+         uint64_t n_sync = 0, n_irq = 0, t_prev = 0, t_edge;
+         uint64_t lat_sum = 0, lat_max = 0, lat_n = 0;
+         int irq_fd, sync_fd, coalesced;
          struct timespec a, b, last;
+
+         /* Watch the DC and interrupt lines from inside the cyclic loop. A
+          * separate probe process cannot do this: the master only configures
+          * DC once the slave is in OP, which requires this stack to be the one
+          * holding the SPI bus.
+          */
+         irq_fd  = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.irq_line);
+         sync_fd = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.sync0_line);
+         printf ("edge lines: IRQ %d %s, SYNC0 %d %s\n",
+                 hw_cfg.irq_line, irq_fd >= 0 ? "ok" : "FAILED",
+                 hw_cfg.sync0_line, sync_fd >= 0 ? "ok" : "FAILED");
 
          clock_gettime (CLOCK_MONOTONIC, &last);
          for (;;)
@@ -551,6 +566,35 @@ int main (int argc, char * argv[])
                xfer_samples[n] = ESC_hw_spi_count () - c0;
                samples[n++] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
                               (uint64_t)(b.tv_nsec - a.tv_nsec);
+            }
+
+            /* Drain both lines without blocking. Intervals come from the
+             * kernel's event timestamps, so they measure the signal itself
+             * rather than when this loop got around to looking.
+             */
+            while (ESC_hw_edge_wait (sync_fd, 0, &t_edge, &coalesced) == 1)
+            {
+               uint64_t nowns = (uint64_t)b.tv_sec * 1000000000ull +
+                                (uint64_t)b.tv_nsec;
+               n_sync += 1u + (uint64_t)coalesced;
+               if (t_prev != 0 && nv < NS)
+               {
+                  iv[nv++] = t_edge - t_prev;
+               }
+               t_prev = t_edge;
+               /* Upper bound on wake latency: this is a polling loop, so it
+                * includes however long the loop took to come back round. A
+                * true figure needs the blocking design of Phase 3. */
+               if (nowns > t_edge)
+               {
+                  uint64_t l = nowns - t_edge;
+                  lat_sum += l; lat_n++;
+                  if (l > lat_max) lat_max = l;
+               }
+            }
+            while (ESC_hw_edge_wait (irq_fd, 0, NULL, NULL) == 1)
+            {
+               n_irq++;
             }
 
             if (b.tv_sec - last.tv_sec >= 5)
@@ -586,6 +630,34 @@ int main (int argc, char * argv[])
                              (double)spisum / (double)n / 1000.0,
                              (double)xfersum / (double)n,
                              100.0 * (1.0 - (double)spisum / (double)sum));
+                     if (n_sync > 0)
+                     {
+                        printf ("   SYNC0 %llu edges, IRQ %llu",
+                                (unsigned long long)n_sync,
+                                (unsigned long long)n_irq);
+                        if (nv > 8)
+                        {
+                           qsort (iv, nv, sizeof (uint64_t), cmp_u64);
+                           printf (" | interval min %.1f median %.1f p99 %.1f max %.1f us",
+                                   (double)iv[0] / 1000.0,
+                                   (double)iv[nv / 2] / 1000.0,
+                                   (double)iv[(nv * 99) / 100] / 1000.0,
+                                   (double)iv[nv - 1] / 1000.0);
+                        }
+                        if (lat_n > 0)
+                        {
+                           printf (" | observe-delay mean %.1f max %.1f us (polling, upper bound)",
+                                   (double)lat_sum / (double)lat_n / 1000.0,
+                                   (double)lat_max / 1000.0);
+                        }
+                        printf ("\n");
+                     }
+                     else
+                     {
+                        printf ("   SYNC0 no edges (enable distributed clocks in the master)\n");
+                     }
+                     n_sync = 0; n_irq = 0; nv = 0;
+                     lat_sum = 0; lat_max = 0; lat_n = 0;
                      free (srt);
                   }
                }
