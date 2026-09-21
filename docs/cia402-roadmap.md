@@ -274,6 +274,19 @@ SYNC0 was brought up and measured at **1000 edges/s against a 1 ms cycle**, from
 
 **Manually forcing AL states from the TwinCAT UI does not re-apply the DC configuration.** Walking OP→PREOP→INIT→PREOP→OP by hand leaves `0x0981` at `0x00`. Restarting the slave process does re-apply it, because the master re-runs its initialisation sequence — that is the cheap way to recover DC, and it needs no master restart.
 
+**Measured SYNC0 quality** at a 1 ms cycle, 20002 edges over 20 s, kernel timestamps from the GPIO chardev:
+
+```
+min 995.9   median 1000.0   mean 999.9   p99 1001.7   p99.9 1001.8   max 1004.0 us
+jitter: p99 +1.7 us, worst +-4 us from the median
+```
+
+The pulse is 1 us wide, confirming `0x0982` counts in 10 ns units (`0x0064` = 100).
+
+This measures the *signal*, not thread responsiveness: the timestamp is taken in the kernel's GPIO interrupt handler, so it covers DC hardware jitter plus kernel IRQ latency and nothing above that. Wakeup latency — the delay from edge to the cyclic thread resuming — still needs a blocking-wait measurement, and that is the figure real-time priority affects and the one that sizes `SyncErrorCounterLimit` (§3.3.1).
+
+With 141 us median / 220 us p99 of cycle work (§3.4) against a trigger this stable, roughly 780 us of a 1 ms period remains for scheduling. The signal is not the constraint.
+
 ### 3.3.0.1 Why the SYNC0 pin is an input by default
 
 **Enabling distributed clocks in the master is not sufficient to get a SYNC0 signal on a pin.** Measured on hardware: with TwinCAT configured for DC-Synchron at 1 ms, the ESC reported `0x0981 = 0x03` (cyclic unit and SYNC0 generation enabled), a 1,000,000 ns cycle time, and an advancing next-pulse time at `0x0990` — the sync unit was running correctly. The pin nonetheless sat at 1.5 V, floating.
