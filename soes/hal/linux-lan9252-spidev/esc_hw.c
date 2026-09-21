@@ -181,39 +181,100 @@ static int spi_xfer (uint8_t * buf, uint32_t len)
    return 0;
 }
 
+/* --- batched access ------------------------------------------------------
+ *
+ * The syscall dominates: one ioctl costs roughly 12 us on this hardware while
+ * a 7 byte frame at 12 MHz is under 5 us. A CSR access is three frames --
+ * command, busy check, data -- which as three ioctls is three times the cost
+ * of the work. spidev can carry them in a single SPI_IOC_MESSAGE, with
+ * cs_change deasserting the chip select between frames so each is still a
+ * distinct LAN9252 command.
+ *
+ * The busy check and the data read are issued speculatively, before knowing
+ * whether the command has completed. In practice LAN9252 CSR operations finish
+ * within the same transaction window; if the returned busy flag says otherwise
+ * the data is discarded and the slow path polls as before, so correctness does
+ * not depend on the assumption holding.
+ */
+
+#define FRAME_LEN 7
+
+static void frame_read (uint8_t * f, uint16_t address)
+{
+   memset (f, 0, FRAME_LEN);
+   f[0] = ESC_CMD_SERIAL_READ;
+   f[1] = (uint8_t)((address >> 8) & 0xFF);
+   f[2] = (uint8_t)(address & 0xFF);
+}
+
+static void frame_write (uint8_t * f, uint16_t address, uint32_t val)
+{
+   f[0] = ESC_CMD_SERIAL_WRITE;
+   f[1] = (uint8_t)((address >> 8) & 0xFF);
+   f[2] = (uint8_t)(address & 0xFF);
+   f[3] = (uint8_t)(val & 0xFF);
+   f[4] = (uint8_t)((val >> 8) & 0xFF);
+   f[5] = (uint8_t)((val >> 16) & 0xFF);
+   f[6] = (uint8_t)((val >> 24) & 0xFF);
+}
+
+static uint32_t frame_value (const uint8_t * f)
+{
+   return (((uint32_t)f[6] << 24) | ((uint32_t)f[5] << 16) |
+           ((uint32_t)f[4] << 8)  |  (uint32_t)f[3]);
+}
+
+/* Submit n frames of FRAME_LEN bytes as one ioctl, chip select cycling
+ * between them. frames must be a contiguous array of n * FRAME_LEN bytes.
+ */
+static int spi_xfer_frames (uint8_t * frames, int n)
+{
+   struct spi_ioc_transfer x[4];
+   int i;
+
+   if (n < 1 || n > (int)(sizeof (x) / sizeof (x[0])))
+   {
+      return -1;
+   }
+
+   memset (x, 0, sizeof (x));
+   for (i = 0; i < n; i++)
+   {
+      uint8_t * f = frames + (i * FRAME_LEN);
+      x[i].tx_buf = (unsigned long)f;
+      x[i].rx_buf = (unsigned long)f;
+      x[i].len    = FRAME_LEN;
+      /* Deassert between frames so each is its own LAN9252 command; the
+       * final frame leaves the chip select released by the message end. */
+      x[i].cs_change = (i + 1 < n) ? 1 : 0;
+   }
+
+   if (ioctl (spi_fd, SPI_IOC_MESSAGE (n), x) < 0)
+   {
+      hw_timeout ("spi batch transfer");
+      return -1;
+   }
+   return 0;
+}
+
 static void lan9252_write_32 (uint16_t address, uint32_t val)
 {
-   uint8_t data[7];
+   uint8_t data[FRAME_LEN];
 
-   data[0] = ESC_CMD_SERIAL_WRITE;
-   data[1] = (uint8_t)((address >> 8) & 0xFF);
-   data[2] = (uint8_t)(address & 0xFF);
-   data[3] = (uint8_t)(val & 0xFF);
-   data[4] = (uint8_t)((val >> 8) & 0xFF);
-   data[5] = (uint8_t)((val >> 16) & 0xFF);
-   data[6] = (uint8_t)((val >> 24) & 0xFF);
-
+   frame_write (data, address, val);
    (void)spi_xfer (data, sizeof (data));
 }
 
 static uint32_t lan9252_read_32 (uint16_t address)
 {
-   uint8_t data[7];
+   uint8_t data[FRAME_LEN];
 
-   memset (data, 0, sizeof (data));
-   data[0] = ESC_CMD_SERIAL_READ;
-   data[1] = (uint8_t)((address >> 8) & 0xFF);
-   data[2] = (uint8_t)(address & 0xFF);
-
+   frame_read (data, address);
    if (spi_xfer (data, sizeof (data)) < 0)
    {
       return 0;
    }
-
-   return (((uint32_t)data[6] << 24) |
-           ((uint32_t)data[5] << 16) |
-           ((uint32_t)data[4] << 8) |
-            (uint32_t)data[3]);
+   return frame_value (data);
 }
 
 /* Poll a register until (value & mask) matches want, or the deadline passes.
@@ -249,32 +310,60 @@ static uint32_t wait_until (uint16_t reg, uint32_t mask, uint32_t want,
 
 static void ESC_read_csr (uint16_t address, void *buf, uint16_t len)
 {
+   uint8_t  f[3 * FRAME_LEN];
    uint32_t value;
 
-   value = (ESC_CSR_CMD_READ | ESC_CSR_CMD_SIZE (len) | address);
-   lan9252_write_32 (ESC_CSR_CMD_REG, value);
+   frame_write (&f[0 * FRAME_LEN], ESC_CSR_CMD_REG,
+                ESC_CSR_CMD_READ | ESC_CSR_CMD_SIZE (len) | address);
+   frame_read  (&f[1 * FRAME_LEN], ESC_CSR_CMD_REG);   /* busy check */
+   frame_read  (&f[2 * FRAME_LEN], ESC_CSR_DATA_REG);  /* speculative data */
 
-   (void)wait_until (ESC_CSR_CMD_REG, ESC_CSR_CMD_BUSY, 0, "CSR read");
-   if (hw_fault)
+   if (spi_xfer_frames (f, 3) < 0)
    {
       memset (buf, 0, len);
       return;
    }
 
-   value = lan9252_read_32 (ESC_CSR_DATA_REG);
+   if ((frame_value (&f[1 * FRAME_LEN]) & ESC_CSR_CMD_BUSY) == 0)
+   {
+      value = frame_value (&f[2 * FRAME_LEN]);
+   }
+   else
+   {
+      /* Command had not completed: discard the speculative data and poll. */
+      (void)wait_until (ESC_CSR_CMD_REG, ESC_CSR_CMD_BUSY, 0, "CSR read");
+      if (hw_fault)
+      {
+         memset (buf, 0, len);
+         return;
+      }
+      value = lan9252_read_32 (ESC_CSR_DATA_REG);
+   }
+
    memcpy (buf, (uint8_t *)&value, len);
 }
 
 static void ESC_write_csr (uint16_t address, void *buf, uint16_t len)
 {
+   uint8_t  f[3 * FRAME_LEN];
    uint32_t value = 0;
 
    memcpy ((uint8_t *)&value, buf, len);
-   lan9252_write_32 (ESC_CSR_DATA_REG, value);
-   value = (ESC_CSR_CMD_WRITE | ESC_CSR_CMD_SIZE (len) | address);
-   lan9252_write_32 (ESC_CSR_CMD_REG, value);
 
-   (void)wait_until (ESC_CSR_CMD_REG, ESC_CSR_CMD_BUSY, 0, "CSR write");
+   frame_write (&f[0 * FRAME_LEN], ESC_CSR_DATA_REG, value);
+   frame_write (&f[1 * FRAME_LEN], ESC_CSR_CMD_REG,
+                ESC_CSR_CMD_WRITE | ESC_CSR_CMD_SIZE (len) | address);
+   frame_read  (&f[2 * FRAME_LEN], ESC_CSR_CMD_REG);   /* busy check */
+
+   if (spi_xfer_frames (f, 3) < 0)
+   {
+      return;
+   }
+
+   if (frame_value (&f[2 * FRAME_LEN]) & ESC_CSR_CMD_BUSY)
+   {
+      (void)wait_until (ESC_CSR_CMD_REG, ESC_CSR_CMD_BUSY, 0, "CSR write");
+   }
 }
 
 /* --------------------------------------------------------------- PRAM access */
