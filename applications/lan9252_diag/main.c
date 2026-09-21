@@ -57,7 +57,7 @@ static volatile uint64_t tx_calls = 0;
 static esc_hw_cfg_t hw_cfg =
 {
    .spidev        = "/dev/spidev1.0",
-   .spi_speed_hz  = 12000000,
+   .spi_speed_hz  = 25000000,  /* measured knee; see roadmap 3.4 */
    .spi_mode      = 0,
    .gpiochip      = "/dev/gpiochip0",
    .irq_line      = 17,     /* LAN9252 IRQ */
