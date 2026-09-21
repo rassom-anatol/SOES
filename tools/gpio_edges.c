@@ -13,8 +13,9 @@
  * which looks exactly like a working signal if all you do is count.
  *
  * This deliberately touches no SPI, so any edges it sees are not coupling from
- * the bus this project drives. It also reports the steady level, which
- * distinguishes "floating" from "driven and idle".
+ * the bus this project drives. It also samples the level under each bias,
+ * which can prove a line is floating but cannot prove the opposite -- see the
+ * note in the level probe.
  *
  * Build:  gcc -O2 -Wall -o gpio_edges gpio_edges.c
  * Usage:  ./gpio_edges <gpiochip> <seconds> <line> [line ...]
@@ -132,9 +133,17 @@ int main (int argc, char * argv[])
       }
       else
       {
+         /* A line that follows the bias is certainly floating. The converse
+          * does NOT hold: the internal bias is only about 50 kOhm, too weak to
+          * drag a line floating near mid-rail across the logic threshold, so
+          * an undriven line can read the same under both biases and look
+          * driven. Confirmed on hardware -- a SYNC0 pin measured at 1.5 V on a
+          * scope read 1 under both biases here. Treat agreement as
+          * inconclusive and reach for a scope. */
          printf ("  line %2d: pull-down reads %d, pull-up reads %d  -> %s\n",
                  off, lo, hi,
-                 (lo == hi) ? "DRIVEN" : "floating (follows the bias)");
+                 (lo != hi) ? "floating (follows the bias)"
+                            : "inconclusive: driven, or floating near mid-rail");
       }
    }
    printf ("\n");
