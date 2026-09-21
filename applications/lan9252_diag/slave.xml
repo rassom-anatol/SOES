@@ -1105,7 +1105,7 @@
         </Dc>
         <Eeprom>
           <ByteSize>256</ByteSize>
-          <ConfigData>8002000000000000</ConfigData>
+          <ConfigData>8002000E64000000</ConfigData>
           <BootStrap>0010800080108000</BootStrap>
         </Eeprom>
       </Device>
