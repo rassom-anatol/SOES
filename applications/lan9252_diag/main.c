@@ -519,6 +519,14 @@ int main (int argc, char * argv[])
 
    if (strcmp (mode, "run") == 0)
    {
+      /* "noedge" releases the IRQ and SYNC0 lines so an external tool can
+       * watch them while this process drives the stack. A line can only be
+       * requested once, so the two cannot observe it simultaneously. */
+      if (argc > 4 && strcmp (argv[4], "noedge") == 0)
+      {
+         hw_cfg.irq_line = -1;
+         hw_cfg.sync0_line = -1;
+      }
       if (ecat_slv_init (&config) != 0)
       {
          printf ("FAIL: stack init failed\n");
