@@ -50,6 +50,7 @@ _Objects Obj;
 static void cb_state_change (uint8_t * as, uint8_t * an);
 
 /* Observed process data and callback counts, reported by the run loop. */
+static int sync_pin_cfg = -1;   /* value to try writing to 0x0151 */
 static volatile uint8_t  rx_mirror = 0;
 static volatile uint64_t rx_calls = 0;
 static volatile uint64_t tx_calls = 0;
@@ -527,6 +528,14 @@ int main (int argc, char * argv[])
          hw_cfg.irq_line = -1;
          hw_cfg.sync0_line = -1;
       }
+      /* Optional: attempt to set the Sync/Latch PDI configuration (0x0151)
+       * at run time. Normally this is loaded from the SII EEPROM and is not
+       * writable, but if the PDI can write it the correct value can be found
+       * on a scope without flashing anything. Readback tells us which. */
+      if (argc > 5)
+      {
+         sync_pin_cfg = (int)strtoul (argv[5], NULL, 0);
+      }
       if (ecat_slv_init (&config) != 0)
       {
          printf ("FAIL: stack init failed\n");
@@ -557,6 +566,14 @@ int main (int argc, char * argv[])
           */
          irq_fd  = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.irq_line);
          sync_fd = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.sync0_line);
+         if (sync_pin_cfg >= 0)
+         {
+            uint8_t w = (uint8_t)sync_pin_cfg, rb = 0;
+            ESC_write (0x0151, &w, sizeof (w));
+            ESC_read (0x0151, &rb, sizeof (rb));
+            printf ("0x0151: wrote %02X, reads back %02X -> %s\n", w, rb,
+                    (rb == w) ? "PDI-WRITABLE" : "not writable from the PDI");
+         }
          printf ("edge lines: IRQ %d %s, SYNC0 %d %s\n",
                  hw_cfg.irq_line, irq_fd >= 0 ? "ok" : "FAILED",
                  hw_cfg.sync0_line, sync_fd >= 0 ? "ok" : "FAILED");
