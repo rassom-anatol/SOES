@@ -47,6 +47,8 @@ _Objects Obj;
 #define LAN9252_RESET_BIT   (1u << 6)
 #define BYTE_TEST_EXPECTED  0x87654321u
 
+static void cb_state_change (uint8_t * as, uint8_t * an);
+
 static esc_hw_cfg_t hw_cfg =
 {
    .spidev        = "/dev/spidev1.0",
@@ -68,7 +70,7 @@ static esc_cfg_t config =
    .watchdog_cnt = 150,
    .set_defaults_hook = NULL,
    .pre_state_change_hook = NULL,
-   .post_state_change_hook = NULL,
+   .post_state_change_hook = cb_state_change,
    .application_hook = NULL,
    .safe_state_override = NULL,
    .pre_object_download_hook = NULL,
@@ -80,6 +82,36 @@ static esc_cfg_t config =
    .esc_hw_eep_handler = NULL,
    .esc_check_dc_handler = NULL,
 };
+
+static const char * al_name (uint8_t st)
+{
+   switch (st & 0x0F)
+   {
+      case ESCinit:   return "INIT";
+      case ESCpreop:  return "PREOP";
+      case ESCboot:   return "BOOT";
+      case ESCsafeop: return "SAFEOP";
+      case ESCop:     return "OP";
+      default:        return "?";
+   }
+}
+
+/* Report every AL state transition and any error the stack raises.
+ *
+ * Without these the slave is silent about the one thing that matters when a
+ * master cannot bring it up: which transition was refused and why. The AL
+ * status code is the actual diagnosis -- SMRESULT_ERRSM2/ERRSM3 point at a
+ * SyncManager mismatch, anything else at the stack above it.
+ */
+static void cb_state_change (uint8_t * as, uint8_t * an)
+{
+   printf ("AL: %s -> %s%s  ALstatus 0x%04X  ALerror 0x%04X\n",
+           al_name ((uint8_t)(ESCvar.ALstatus & 0x0F)),
+           al_name (*an),
+           (*an & ESCerror) ? " (ERROR)" : "",
+           ESCvar.ALstatus, ESCvar.ALerror);
+   (void)as;
+}
 
 /* The stack calls these; probe mode never reaches them, but they must link. */
 void cb_update_txpdo (void)
