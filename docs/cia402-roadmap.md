@@ -519,6 +519,18 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 
 `DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
 
+**The cyclic SPI budget.** The EtherCAT half costs a measured 141 us median / 220 us p99 per cycle at 25 MHz (§3.4). The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
+
+| TMC4671 clock | per access | 6 accesses | + EtherCAT | total in a 1 ms cycle |
+|---|---|---|---|---|
+| 1 MHz (current) | ~55 us | ~330 us | 141 us | ~470 us |
+| 2 MHz | ~35 us | ~210 us | 141 us | ~350 us |
+| 8 MHz split read | ~20 us | ~120 us | 141 us | ~260 us |
+
+Doubling to 2 MHz is sufficient for 1 ms; the 8 MHz mode is headroom, not a requirement. Whether the split read is worth it depends on the cost of a two-transfer `SPI_IOC_MESSAGE` with `delay_usecs` on the main `spi-bcm2835` controller — on the AUX controller multi-transfer messages measured slower (§3.4), but SPI0 uses hardware chip select rather than a GPIO, so that result may not carry over. Measure before adopting.
+
+**Keep telemetry off the cyclic path.** cmc already reads telemetry over UART at 921600 in parallel with SPI. That split is worth preserving: UART is no faster per transaction (~59 us for 5 bytes) but it is a separate channel, so temperatures, voltages and diagnostics cost nothing in the cyclic budget provided they stay on their own thread. The cyclic SPI path should carry only what the TxPDO needs.
+
 **The torque scaling contract belongs here**, because it is easy to get wrong and expensive to rediscover. CiA402 expresses torque as per-thousandths of rated torque (`0x6071`, `0x6077`, `0x6072`), with `0x6076` Motor rated torque in mNm as the scaling reference. The TMC4671's torque registers are signed 16-bit — `PID_TORQUE_FLUX_TARGET` (0x64), `PID_TORQUE_FLUX_ACTUAL` (0x69), `PID_TORQUE_FLUX_LIMITS` (0x5E) — so the widths match exactly and no range is lost. Three rules:
 
 - **Compute in `int32`.** The scaling multiply overflows `int16` well before the operands do; saturate on the way back down.
