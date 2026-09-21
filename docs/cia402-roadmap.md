@@ -272,7 +272,13 @@ SYNC0 was brought up and measured at **1000 edges/s against a 1 ms cycle**, from
 | EEPROM re-flash **and power cycle** | `0x0151` is loaded from EEPROM at reset. A new image without a reset leaves the stale value live |
 | A fresh state machine run | TwinCAT writes `0x0980`/`0x0981`/`0x09A0` while the slave is in **PREOP**, as part of its initialisation toward SAFEOP |
 
-**Manually forcing AL states from the TwinCAT UI does not re-apply the DC configuration.** Walking OP→PREOP→INIT→PREOP→OP by hand leaves `0x0981` at `0x00`. Restarting the slave process does re-apply it, because the master re-runs its initialisation sequence — that is the cheap way to recover DC, and it needs no master restart.
+**How the DC configuration actually gets applied**, in the order these were established:
+
+* **Manually forcing AL states from the TwinCAT UI does not apply it.** Walking OP→PREOP→INIT→PREOP→OP by hand leaves `0x0981` at `0x00`.
+* **After an ESI or EEPROM change, TwinCAT itself must be restarted.** Following the EEPROM reflash and re-scan, several slave process restarts all left `0x0981` at `0x00`; only restarting TwinCAT made it apply the project's DC settings. The likely cause is TwinCAT holding stale configuration for that slave.
+* **Once TwinCAT is in a good state, restarting the slave process is enough** to re-apply DC, because the master re-runs its initialisation and writes `0x0980`/`0x0981`/`0x09A0` while the slave is in PREOP. That is the cheap recovery during normal work.
+
+The distinction matters: the last point only holds once the first two are satisfied. Someone following it after changing the ESI or EEPROM will restart the slave repeatedly and see nothing.
 
 **Measured SYNC0 quality** at a 1 ms cycle, 20002 edges over 20 s, kernel timestamps from the GPIO chardev:
 
