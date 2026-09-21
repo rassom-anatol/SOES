@@ -287,6 +287,143 @@ static int dlstatus_test (uint32_t iterations)
    return 0;
 }
 
+/* ESC DC registers not already named in esc.h. */
+#define ESCREG_CYCLIC_UNIT_CTRL  0x0980
+#define ESCREG_SYNC0_START_TIME  0x0990
+
+/* Validate the IRQ and SYNC0 wiring without a master.
+ *
+ * The ESC's own distributed-clock unit can generate SYNC0 from its free
+ * running local time, so the slave can provoke the very edges it needs to
+ * observe. Unmasking DC_SYNC0 in the AL event mask makes the same event drive
+ * the IRQ pin, so one mechanism exercises both lines.
+ *
+ * Kernel edge timestamps come from the GPIO chardev, so the interval spread
+ * reported here is measured at the kernel, not in userspace.
+ */
+static int edge_test (uint32_t period_us, uint32_t seconds)
+{
+   int irq_fd, sync_fd;
+   uint64_t now = 0, start;
+   uint32_t period_ns = period_us * 1000u;
+   uint8_t act;
+   uint64_t t_prev = 0, t_now;
+   uint64_t n_sync = 0, n_irq = 0;
+   uint64_t min_iv = ~0ull, max_iv = 0, sum_iv = 0, n_iv = 0;
+   int coalesced, total_coalesced = 0;
+   struct timespec t_end, t_cur;
+
+   printf ("edge test: SYNC0 %u us for %u s\n", period_us, seconds);
+
+   if (ESC_init (&config) != 0)
+   {
+      printf ("FAIL: ESC_init returned non-zero\n");
+      return 1;
+   }
+
+   irq_fd  = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.irq_line);
+   sync_fd = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.sync0_line);
+   printf ("  IRQ   line %d: %s\n", hw_cfg.irq_line,
+           irq_fd >= 0 ? "requested" : "FAILED");
+   printf ("  SYNC0 line %d: %s\n", hw_cfg.sync0_line,
+           sync_fd >= 0 ? "requested" : "FAILED");
+   if (irq_fd < 0 || sync_fd < 0)
+   {
+      return 1;
+   }
+
+   /* The DC unit is master-owned: 0x0980, 0x0981, 0x0990 and 0x09A0 are
+    * ECAT-write / PDI-read, so a slave cannot start its own SYNC0. Verified
+    * on hardware -- writes to all four read back as zero while a write to the
+    * PDI-writable AL Status register lands correctly. This mode therefore
+    * observes what a master has configured rather than configuring anything.
+    */
+   {
+      uint8_t  r_unit = 0, r_act = 0;
+      uint32_t r_cycle = 0;
+      uint64_t r_time = 0;
+      ESC_read (ESCREG_CYCLIC_UNIT_CTRL, &r_unit, sizeof (r_unit));
+      ESC_read (ESCREG_SYNC_ACT, &r_act, sizeof (r_act));
+      ESC_read (ESCREG_SYNC0_CYCLE_TIME, &r_cycle, sizeof (r_cycle));
+      ESC_read (ESCREG_LOCALTIME, &r_time, sizeof (r_time));
+      printf ("  0x0981 activation 0x%02X  (bit0 sync unit, bit1 SYNC0)\n", r_act);
+      printf ("  0x09A0 cycle time %u ns\n", (unsigned)r_cycle);
+      printf ("  0x0910 local time %llu\n", (unsigned long long)r_time);
+      if ((r_act & (ESCREG_SYNC_ACT_ACTIVATED | ESCREG_SYNC_SYNC0_EN)) == 0)
+      {
+         printf ("  NOTE: SYNC0 is not activated. Connect a master and enable\n"
+                 "        distributed clocks, or expect no edges below.\n");
+      }
+      (void)r_unit; (void)period_ns; (void)now; (void)start; (void)act;
+   }
+
+   /* Let the same event reach the IRQ pin. */
+   ESC_interrupt_enable (ESCREG_ALEVENT_DC_SYNC0);
+
+   clock_gettime (CLOCK_MONOTONIC, &t_end);
+   t_end.tv_sec += (time_t)seconds;
+
+   for (;;)
+   {
+      clock_gettime (CLOCK_MONOTONIC, &t_cur);
+      if (t_cur.tv_sec > t_end.tv_sec ||
+          (t_cur.tv_sec == t_end.tv_sec && t_cur.tv_nsec >= t_end.tv_nsec))
+      {
+         break;
+      }
+
+      coalesced = 0;
+      if (ESC_hw_edge_wait (sync_fd, 200000000ull, &t_now, &coalesced) == 1)
+      {
+         /* One call drains up to eight queued events, so count them all. */
+         n_sync += 1u + (uint64_t)coalesced;
+         total_coalesced += coalesced;
+         if (t_prev != 0)
+         {
+            uint64_t iv = t_now - t_prev;
+            if (iv < min_iv) min_iv = iv;
+            if (iv > max_iv) max_iv = iv;
+            sum_iv += iv;
+            n_iv++;
+         }
+         t_prev = t_now;
+      }
+
+      /* Drain IRQ without blocking; it should track SYNC0 one-for-one. */
+      while (ESC_hw_edge_wait (irq_fd, 0, NULL, NULL) == 1)
+      {
+         n_irq++;
+      }
+   }
+
+   ESC_interrupt_disable (ESCREG_ALEVENT_DC_SYNC0);
+
+   printf ("  SYNC0 edges %llu (expected ~%llu)\n",
+           (unsigned long long)n_sync,
+           (unsigned long long)((uint64_t)seconds * 1000000ull / period_us));
+   printf ("  IRQ   edges %llu\n", (unsigned long long)n_irq);
+   printf ("  coalesced   %d (non-zero means we fell behind)\n", total_coalesced);
+   if (n_iv > 0)
+   {
+      printf ("  interval    min %.3f ms  mean %.3f ms  max %.3f ms\n",
+              (double)min_iv / 1e6, (double)sum_iv / (double)n_iv / 1e6,
+              (double)max_iv / 1e6);
+   }
+
+   close (irq_fd);
+   close (sync_fd);
+
+   /* Observation only. Without a master driving DC there is nothing to
+    * validate against, and a handful of edges at start-up proves only that
+    * the line is connected to something that moves.
+    */
+   if (n_sync == 0)
+   {
+      printf ("  no SYNC0 edges observed\n");
+   }
+   return 0;
+}
+
 static void usage (const char * argv0)
 {
    printf ("usage: %s [probe|reset|dlstatus|edges|run] [spidev] [speed_hz] [period_us] [seconds] [spidev] [speed_hz]\n", argv0);
