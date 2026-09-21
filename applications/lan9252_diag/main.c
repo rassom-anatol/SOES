@@ -533,17 +533,22 @@ int main (int argc, char * argv[])
           */
          enum { NS = 20000 };
          static uint64_t samples[NS];
+         static uint64_t spi_samples[NS];
+         static uint64_t xfer_samples[NS];
          uint32_t n = 0;
          struct timespec a, b, last;
 
          clock_gettime (CLOCK_MONOTONIC, &last);
          for (;;)
          {
+            uint64_t s0 = ESC_hw_spi_ns (), c0 = ESC_hw_spi_count ();
             clock_gettime (CLOCK_MONOTONIC, &a);
             ecat_slv ();
             clock_gettime (CLOCK_MONOTONIC, &b);
             if (n < NS)
             {
+               spi_samples[n]  = ESC_hw_spi_ns () - s0;
+               xfer_samples[n] = ESC_hw_spi_count () - c0;
                samples[n++] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
                               (uint64_t)(b.tv_nsec - a.tv_nsec);
             }
@@ -554,11 +559,17 @@ int main (int argc, char * argv[])
                uint32_t i;
                if (n > 0)
                {
+                  uint64_t spisum = 0, xfersum = 0;
                   uint64_t * srt = malloc (n * sizeof (uint64_t));
                   if (srt != NULL)
                   {
                      memcpy (srt, samples, n * sizeof (uint64_t));
-                     for (i = 0; i < n; i++) sum += srt[i];
+                     for (i = 0; i < n; i++)
+                     {
+                        sum += srt[i];
+                        spisum += spi_samples[i];
+                        xfersum += xfer_samples[i];
+                     }
                      qsort (srt, n, sizeof (uint64_t), cmp_u64);
                      printf ("ecat_slv n=%u  min %.1f  median %.1f  mean %.1f  "
                              "p99 %.1f  max %.1f us | rx=%llu tx=%llu leds=0x%02X\n",
@@ -570,6 +581,11 @@ int main (int argc, char * argv[])
                              (unsigned long long)rx_calls,
                              (unsigned long long)tx_calls,
                              rx_mirror);
+                     printf ("   SPI: mean %.1f us over %.1f transfers per cycle"
+                             " -> %.0f%% of cycle time is NOT SPI\n",
+                             (double)spisum / (double)n / 1000.0,
+                             (double)xfersum / (double)n,
+                             100.0 * (1.0 - (double)spisum / (double)sum));
                      free (srt);
                   }
                }

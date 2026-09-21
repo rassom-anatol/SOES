@@ -75,6 +75,14 @@ void ESC_interrupt_disable (uint32_t mask);
  */
 int  ESC_hw_faulted (void);
 
+/** Nanoseconds spent inside SPI transfers since start-up, and the number of
+ *  transfers. Lets a caller separate time the hardware actually took from time
+ *  the process spent descheduled, which a wall-clock cycle measurement alone
+ *  cannot distinguish.
+ */
+uint64_t ESC_hw_spi_ns (void);
+uint64_t ESC_hw_spi_count (void);
+
 /** Read a LAN9252 *system* register directly over SPI.
  *
  * System registers (BYTE_TEST 0x0064, ID_REV 0x0050, HW_CFG 0x0074, the reset

@@ -97,6 +97,12 @@ static uint32_t timeout_ms = DEFAULT_TIMEOUT_MS;
  */
 static int hw_fault = 0;
 
+static uint64_t spi_ns = 0;
+static uint64_t spi_count = 0;
+
+uint64_t ESC_hw_spi_ns (void)    { return spi_ns; }
+uint64_t ESC_hw_spi_count (void) { return spi_count; }
+
 int ESC_hw_faulted (void)
 {
    return hw_fault;
@@ -167,13 +173,22 @@ static void hw_timeout (const char * what)
 static int spi_xfer (uint8_t * buf, uint32_t len)
 {
    struct spi_ioc_transfer xfer;
+   struct timespec a, b;
+   int rc;
 
    memset (&xfer, 0, sizeof (xfer));
    xfer.tx_buf = (unsigned long)buf;
    xfer.rx_buf = (unsigned long)buf;
    xfer.len    = len;
 
-   if (ioctl (spi_fd, SPI_IOC_MESSAGE (1), &xfer) < 0)
+   clock_gettime (CLOCK_MONOTONIC, &a);
+   rc = ioctl (spi_fd, SPI_IOC_MESSAGE (1), &xfer);
+   clock_gettime (CLOCK_MONOTONIC, &b);
+   spi_ns += (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
+             (uint64_t)(b.tv_nsec - a.tv_nsec);
+   spi_count++;
+
+   if (rc < 0)
    {
       hw_timeout ("spi transfer");
       return -1;
