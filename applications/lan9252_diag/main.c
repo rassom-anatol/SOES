@@ -593,6 +593,27 @@ int main (int argc, char * argv[])
                               (uint64_t)(b.tv_nsec - a.tv_nsec);
             }
 
+            /* Watch the DC activation register every cycle and report any
+             * change. A five second sample cannot distinguish "the master
+             * never wrote it" from "the master wrote it and something cleared
+             * it", and those have different causes. */
+            {
+               static uint8_t dc_prev = 0xFF;
+               static int dc_first = 1;
+               uint8_t dc_now = 0;
+               ESC_read (ESCREG_SYNC_ACT, &dc_now, sizeof (dc_now));
+               if (dc_first || dc_now != dc_prev)
+               {
+                  uint32_t c = 0;
+                  ESC_read (ESCREG_SYNC0_CYCLE_TIME, &c, sizeof (c));
+                  printf ("0x0981 %02X -> %02X  (cycle %u ns, AL %04X)\n",
+                          dc_first ? 0 : dc_prev, dc_now, (unsigned)c,
+                          ESCvar.ALstatus);
+                  dc_prev = dc_now;
+                  dc_first = 0;
+               }
+            }
+
             /* Drain both lines without blocking. Intervals come from the
              * kernel's event timestamps, so they measure the signal itself
              * rather than when this loop got around to looking.
