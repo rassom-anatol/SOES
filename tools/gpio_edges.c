@@ -116,6 +116,29 @@ int main (int argc, char * argv[])
       return 2;
    }
 
+   /* Probe levels first. A line can only be requested once, so this must
+    * happen before the edge requests claim them -- otherwise every probe
+    * fails with EBUSY and a naive comparison of two failures looks like
+    * agreement. */
+   printf ("levels before counting (no SPI traffic):\n");
+   for (i = 3; i < argc; i++)
+   {
+      int off = atoi (argv[i]);
+      int lo = read_level (chip, off, 1);
+      int hi = read_level (chip, off, 0);
+      if (lo < 0 || hi < 0)
+      {
+         printf ("  line %2d: could not read level (%s)\n", off, strerror (errno));
+      }
+      else
+      {
+         printf ("  line %2d: pull-down reads %d, pull-up reads %d  -> %s\n",
+                 off, lo, hi,
+                 (lo == hi) ? "DRIVEN" : "floating (follows the bias)");
+      }
+   }
+   printf ("\n");
+
    for (i = 3; i < argc && n < MAX_LINES; i++)
    {
       memset (&lines[n], 0, sizeof (lines[n]));
@@ -130,19 +153,6 @@ int main (int argc, char * argv[])
       n++;
    }
    if (n == 0) return 1;
-
-   /* Level with each bias in turn. A line that follows the bias in both
-    * directions is floating; one that holds the same value against both is
-    * being driven. */
-   printf ("levels before counting (no SPI traffic):\n");
-   for (i = 0; i < n; i++)
-   {
-      int lo = read_level (chip, lines[i].offset, 1);
-      int hi = read_level (chip, lines[i].offset, 0);
-      printf ("  line %2d: pull-down reads %d, pull-up reads %d  -> %s\n",
-              lines[i].offset, lo, hi,
-              (lo == hi) ? "DRIVEN" : "floating (follows the bias)");
-   }
 
    printf ("\ncounting edges for %d s with the SPI bus idle...\n", seconds);
    clock_gettime (CLOCK_MONOTONIC, &deadline);
