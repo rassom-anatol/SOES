@@ -299,7 +299,14 @@ The cost is **ioctls, not bits**. One CSR access is three SPI transactions (writ
 
 **1 ms is not reachable with this HAL as written.** Optimisations in order:
 
-1. **Collapse each CSR access into one `SPI_IOC_MESSAGE`** carrying an array of `spi_ioc_transfer` with `cs_change`. Three ioctls → one. Biggest structural win, no semantic risk.
+1. **Collapse each CSR access into one `SPI_IOC_MESSAGE`** carrying an array of `spi_ioc_transfer` with `cs_change`. **Done and measured on hardware.** It is the biggest win, but for tail latency rather than throughput, and it is slightly *slower* at the median:
+
+   | | min | median | mean | p99 | max |
+   |---|---|---|---|---|---|
+   | Unbatched | 61.7 us | 81.1 us | 242.3 us | 4466 us | 6369 us |
+   | Batched | 90.7 us | 91.1 us | 92.3 us | 113 us | 184 us |
+
+   The mechanism is not syscall count, which is what the original estimate assumed. Unbatched, `wait_until` spins re-reading the command register until BUSY clears and occasionally takes milliseconds; batched, the data read is issued speculatively in the same message and the poll almost never runs. Removing a variable-length loop from the common path is what bounds the tail. Measure p99, not the median — a ten-sample comparison shows only the median and hides this completely.
 2. **Merge the ALEVENT tail into the same `SPI_IOC_MESSAGE`** rather than deleting it — costs 7 bytes, saves ~60 µs, and avoids auditing every place in `esc.c` that assumes `ESCvar.ALevent` freshness.
 3. **Raise the clock to 30 MHz.** Verified on hardware: a byte-test sweep from 8 to 30 MHz all returned `0x87654321`, and 40 MHz failed cleanly on the timeout path. 30 MHz is the datasheet ceiling for the plain serial mode this HAL uses, so there is no headroom above it. Re-validate on the CM4 carrier, since signal integrity on a designed PCB differs from the bring-up rig.
 4. Use LAN9252 **fast-read (0x0B)** for PRAM bursts.
