@@ -638,6 +638,28 @@ int main (int argc, char * argv[])
                              (double)spisum / (double)n / 1000.0,
                              (double)xfersum / (double)n,
                              100.0 * (1.0 - (double)spisum / (double)sum));
+                     {
+                        /* What the master actually wrote to the DC unit.
+                         * 0x0981 bit0 = cyclic unit enabled, bit1 = SYNC0
+                         * generation. If these read zero the master never
+                         * activated it, and no amount of probing the pin will
+                         * show a signal. */
+                        uint8_t  r_unit = 0, r_act = 0;
+                        uint32_t r_cyc = 0;
+                        uint64_t r_start = 0, r_time = 0;
+                        ESC_read (0x0980, &r_unit, sizeof (r_unit));
+                        ESC_read (ESCREG_SYNC_ACT, &r_act, sizeof (r_act));
+                        ESC_read (ESCREG_SYNC0_CYCLE_TIME, &r_cyc, sizeof (r_cyc));
+                        ESC_read (0x0990, &r_start, sizeof (r_start));
+                        ESC_read (ESCREG_LOCALTIME, &r_time, sizeof (r_time));
+                        printf ("   DC: 0x0980=%02X 0x0981=%02X (%s) "
+                                "cycle=%u ns start=%llu now=%llu\n",
+                                r_unit, r_act,
+                                (r_act & 0x02) ? "SYNC0 ENABLED" : "sync0 off",
+                                (unsigned)r_cyc,
+                                (unsigned long long)r_start,
+                                (unsigned long long)r_time);
+                     }
                      if (n_sync > 0)
                      {
                         printf ("   SYNC0 %llu edges, IRQ %llu",
