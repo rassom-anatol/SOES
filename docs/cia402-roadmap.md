@@ -30,13 +30,15 @@ The SOES linking exception is load-bearing — it is what permits linking into a
 
 ### Master and test topology
 
-The authoritative master is **TwinCAT**, running on the Windows boot of the development workstation (Linux and Windows are on separate NVMe drives, so the two boots are mutually exclusive). The slave runs on separate hardware, so master and slave never contend for one machine. Production hardware is the CM4 carrier. Phase 1 bring-up need not wait for it if that is preferable — a stock Pi 4 with a LAN9252 breakout exercises the same SoC and the same pin assignment.
+The authoritative master is **TwinCAT, on a separate Windows PC** — not on the Linux development workstation. Three machines are involved: the Linux workstation where development happens, the Windows PC running TwinCAT, and the slave hardware. All three can run at once. Production slave hardware is the CM4 carrier; Phase 1 bring-up need not wait for it, since a stock Pi 4 with a LAN9252 breakout exercises the same SoC and the same pin assignment.
 
 TwinCAT is the standard to validate against, not a fallback. As the reference implementation it is materially better than SOEM at the three things this project leans on hardest: ESI validation (Phase 4), DC/SYNC0 diagnostics (Phase 3), and driving a CiA402 axis natively through NC rather than by hand-assembled SDO writes (Phases 4–5). It also writes the SII EEPROM directly, which removes any need for `eepromtool`.
 
 The EtherCAT NIC is the workstation's wired adapter (`enp4s0` under Linux), cabled directly to the LAN9252 IN port. Under Windows, TwinCAT binds it with the Beckhoff real-time driver.
 
-**Iteration workflow.** Editing on Linux and testing from Windows costs two reboots per iteration, which is untenable for a stack needing many. The fix is to make the target board the build host — build and deploy there over ssh, driving that ssh session *from the Windows boot* (VS Code Remote-SSH works well). Linux then becomes optional for a test cycle rather than mandatory.
+**Iteration workflow.** Build and deploy on the slave board over ssh from the Linux workstation. Since the master is a separate machine, editing and testing happen concurrently with no reboot cycle.
+
+**Anything on the master side must be done by hand.** The TwinCAT PC is not reachable from the development environment, so its ESI folder, DC configuration and AL status readings have to be checked there and reported back.
 
 **SOEM is optional.** It is not needed for correctness; TwinCAT covers every verification step below. Its one genuine advantage is scriptability: the Phase 1.4b loopback harness and the Phase 4/5 regression checks automate naturally against a headless Linux master, whereas TwinCAT is GUI-driven (scriptable via ADS, but heavier). Build it on the Linux boot only if unattended regression runs are wanted.
 
