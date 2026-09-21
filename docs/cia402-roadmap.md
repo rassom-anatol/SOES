@@ -260,7 +260,21 @@ Copy `dc_checker()` from the scratch reference (`rtl_xmc4_dynpdo/main.c:48-56`):
 
 Objects to add: **0x10F1** (ErrorSettings; `:02` SyncErrorCounterLimit), **0x1C32** and **0x1C33** (SM2/SM3 sync parameters — `:01` sync mode, `:02` cycle time, `:05` minimum cycle time, `:0B` SMEventMissedCnt, `:20` SyncError).
 
-### 3.3.0 SYNC0 output must be enabled in the SII EEPROM
+### 3.3.0 Getting SYNC0 working — verified configuration
+
+SYNC0 was brought up and measured at **1000 edges/s against a 1 ms cycle**, from a starting point of 102842 spurious edges/s on a floating pin. Five things all had to be right, and none of them is discoverable from the symptom:
+
+| | |
+|---|---|
+| ESI `<Dc>` block | Without it TwinCAT offers no DC operation modes at all. Two `OpMode` entries, DC-Synchron with `AssignActivate` `#x300` (cyclic unit + SYNC0, no SYNC1) and a non-DC mode with `#x0` |
+| Slave re-scan | Reloading device descriptions refreshes the library but a slave already in the project keeps its cached description. Delete and re-scan |
+| `ConfigData` = `8002000E64000000` | Byte 3 sets `0x0151` = `0x0E`: SYNC0 output, push-pull active high, mapped to AL event. Bytes 4-5 set `0x0982` pulse length |
+| EEPROM re-flash **and power cycle** | `0x0151` is loaded from EEPROM at reset. A new image without a reset leaves the stale value live |
+| A fresh state machine run | TwinCAT writes `0x0980`/`0x0981`/`0x09A0` while the slave is in **PREOP**, as part of its initialisation toward SAFEOP |
+
+**Manually forcing AL states from the TwinCAT UI does not re-apply the DC configuration.** Walking OP→PREOP→INIT→PREOP→OP by hand leaves `0x0981` at `0x00`. Restarting the slave process does re-apply it, because the master re-runs its initialisation sequence — that is the cheap way to recover DC, and it needs no master restart.
+
+### 3.3.0.1 Why the SYNC0 pin is an input by default
 
 **Enabling distributed clocks in the master is not sufficient to get a SYNC0 signal on a pin.** Measured on hardware: with TwinCAT configured for DC-Synchron at 1 ms, the ESC reported `0x0981 = 0x03` (cyclic unit and SYNC0 generation enabled), a 1,000,000 ns cycle time, and an advancing next-pulse time at `0x0990` — the sync unit was running correctly. The pin nonetheless sat at 1.5 V, floating.
 
