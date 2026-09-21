@@ -37,6 +37,12 @@
 
 #define MAX_LINES 8
 
+static int cmp_u64 (const void * a, const void * b)
+{
+   uint64_t x = *(const uint64_t *)a, y = *(const uint64_t *)b;
+   return (x < y) ? -1 : ((x > y) ? 1 : 0);
+}
+
 #define MAX_IV 200000
 
 struct line
