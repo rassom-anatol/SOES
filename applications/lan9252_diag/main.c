@@ -232,172 +232,58 @@ static int reset_test (void)
    return 0;
 }
 
-/* Time individual DLSTATUS polls, the loop ecat_slv_init sits in.
- * Reports the value, the elapsed time and whether the HAL has latched a fault,
- * which together distinguish "slow but working" from "timing out every call".
+/* Benchmark the CSR read path, which is the unit of cost in the cyclic loop.
+ * Reports min/mean/max over many samples so a change can be compared against
+ * a baseline rather than against a handful of noisy readings.
  */
-static int dlstatus_test (void)
+static int cmp_u64 (const void * a, const void * b)
+{
+   uint64_t x = *(const uint64_t *)a, y = *(const uint64_t *)b;
+   return (x < y) ? -1 : ((x > y) ? 1 : 0);
+}
+
+static int dlstatus_test (uint32_t iterations)
 {
    struct timespec a, b;
    uint16_t dls;
-   int i;
+   uint64_t * ns;
+   uint64_t sum = 0;
+   uint32_t i;
 
-   printf ("dlstatus timing on %s\n", hw_cfg.spidev);
+   if (iterations == 0) iterations = 1000;
+   ns = malloc (iterations * sizeof (uint64_t));
+   if (ns == NULL) return 1;
+
+   printf ("CSR read benchmark on %s, %u iterations\n",
+           hw_cfg.spidev, iterations);
    if (ESC_init (&config) != 0)
    {
       printf ("FAIL: ESC_init returned non-zero\n");
+      free (ns);
       return 1;
    }
 
-   for (i = 0; i < 10; i++)
+   for (i = 0; i < iterations; i++)
    {
       dls = 0;
       clock_gettime (CLOCK_MONOTONIC, &a);
       ESC_read (ESCREG_DLSTATUS, &dls, sizeof (dls));
       clock_gettime (CLOCK_MONOTONIC, &b);
-      printf ("  poll %2d: DLstatus 0x%04X  %8.3f ms  hw_fault=%d\n",
-              i, etohs (dls),
-              (double)(b.tv_sec - a.tv_sec) * 1000.0 +
-              (double)(b.tv_nsec - a.tv_nsec) / 1000000.0,
-              ESC_hw_faulted ());
-   }
-   return 0;
-}
-
-/* ESC DC registers not already named in esc.h. */
-#define ESCREG_CYCLIC_UNIT_CTRL  0x0980
-#define ESCREG_SYNC0_START_TIME  0x0990
-
-/* Validate the IRQ and SYNC0 wiring without a master.
- *
- * The ESC's own distributed-clock unit can generate SYNC0 from its free
- * running local time, so the slave can provoke the very edges it needs to
- * observe. Unmasking DC_SYNC0 in the AL event mask makes the same event drive
- * the IRQ pin, so one mechanism exercises both lines.
- *
- * Kernel edge timestamps come from the GPIO chardev, so the interval spread
- * reported here is measured at the kernel, not in userspace.
- */
-static int edge_test (uint32_t period_us, uint32_t seconds)
-{
-   int irq_fd, sync_fd;
-   uint64_t now = 0, start;
-   uint32_t period_ns = period_us * 1000u;
-   uint8_t act;
-   uint64_t t_prev = 0, t_now;
-   uint64_t n_sync = 0, n_irq = 0;
-   uint64_t min_iv = ~0ull, max_iv = 0, sum_iv = 0, n_iv = 0;
-   int coalesced, total_coalesced = 0;
-   struct timespec t_end, t_cur;
-
-   printf ("edge test: SYNC0 %u us for %u s\n", period_us, seconds);
-
-   if (ESC_init (&config) != 0)
-   {
-      printf ("FAIL: ESC_init returned non-zero\n");
-      return 1;
+      ns[i] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
+              (uint64_t)(b.tv_nsec - a.tv_nsec);
+      sum += ns[i];
    }
 
-   irq_fd  = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.irq_line);
-   sync_fd = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.sync0_line);
-   printf ("  IRQ   line %d: %s\n", hw_cfg.irq_line,
-           irq_fd >= 0 ? "requested" : "FAILED");
-   printf ("  SYNC0 line %d: %s\n", hw_cfg.sync0_line,
-           sync_fd >= 0 ? "requested" : "FAILED");
-   if (irq_fd < 0 || sync_fd < 0)
-   {
-      return 1;
-   }
-
-   /* The DC unit is master-owned: 0x0980, 0x0981, 0x0990 and 0x09A0 are
-    * ECAT-write / PDI-read, so a slave cannot start its own SYNC0. Verified
-    * on hardware -- writes to all four read back as zero while a write to the
-    * PDI-writable AL Status register lands correctly. This mode therefore
-    * observes what a master has configured rather than configuring anything.
-    */
-   {
-      uint8_t  r_unit = 0, r_act = 0;
-      uint32_t r_cycle = 0;
-      uint64_t r_time = 0;
-      ESC_read (ESCREG_CYCLIC_UNIT_CTRL, &r_unit, sizeof (r_unit));
-      ESC_read (ESCREG_SYNC_ACT, &r_act, sizeof (r_act));
-      ESC_read (ESCREG_SYNC0_CYCLE_TIME, &r_cycle, sizeof (r_cycle));
-      ESC_read (ESCREG_LOCALTIME, &r_time, sizeof (r_time));
-      printf ("  0x0981 activation 0x%02X  (bit0 sync unit, bit1 SYNC0)\n", r_act);
-      printf ("  0x09A0 cycle time %u ns\n", (unsigned)r_cycle);
-      printf ("  0x0910 local time %llu\n", (unsigned long long)r_time);
-      if ((r_act & (ESCREG_SYNC_ACT_ACTIVATED | ESCREG_SYNC_SYNC0_EN)) == 0)
-      {
-         printf ("  NOTE: SYNC0 is not activated. Connect a master and enable\n"
-                 "        distributed clocks, or expect no edges below.\n");
-      }
-      (void)r_unit; (void)period_ns; (void)now; (void)start; (void)act;
-   }
-
-   /* Let the same event reach the IRQ pin. */
-   ESC_interrupt_enable (ESCREG_ALEVENT_DC_SYNC0);
-
-   clock_gettime (CLOCK_MONOTONIC, &t_end);
-   t_end.tv_sec += (time_t)seconds;
-
-   for (;;)
-   {
-      clock_gettime (CLOCK_MONOTONIC, &t_cur);
-      if (t_cur.tv_sec > t_end.tv_sec ||
-          (t_cur.tv_sec == t_end.tv_sec && t_cur.tv_nsec >= t_end.tv_nsec))
-      {
-         break;
-      }
-
-      coalesced = 0;
-      if (ESC_hw_edge_wait (sync_fd, 200000000ull, &t_now, &coalesced) == 1)
-      {
-         /* One call drains up to eight queued events, so count them all. */
-         n_sync += 1u + (uint64_t)coalesced;
-         total_coalesced += coalesced;
-         if (t_prev != 0)
-         {
-            uint64_t iv = t_now - t_prev;
-            if (iv < min_iv) min_iv = iv;
-            if (iv > max_iv) max_iv = iv;
-            sum_iv += iv;
-            n_iv++;
-         }
-         t_prev = t_now;
-      }
-
-      /* Drain IRQ without blocking; it should track SYNC0 one-for-one. */
-      while (ESC_hw_edge_wait (irq_fd, 0, NULL, NULL) == 1)
-      {
-         n_irq++;
-      }
-   }
-
-   ESC_interrupt_disable (ESCREG_ALEVENT_DC_SYNC0);
-
-   printf ("  SYNC0 edges %llu (expected ~%llu)\n",
-           (unsigned long long)n_sync,
-           (unsigned long long)((uint64_t)seconds * 1000000ull / period_us));
-   printf ("  IRQ   edges %llu\n", (unsigned long long)n_irq);
-   printf ("  coalesced   %d (non-zero means we fell behind)\n", total_coalesced);
-   if (n_iv > 0)
-   {
-      printf ("  interval    min %.3f ms  mean %.3f ms  max %.3f ms\n",
-              (double)min_iv / 1e6, (double)sum_iv / (double)n_iv / 1e6,
-              (double)max_iv / 1e6);
-   }
-
-   close (irq_fd);
-   close (sync_fd);
-
-   /* Observation only. Without a master driving DC there is nothing to
-    * validate against, and a handful of edges at start-up proves only that
-    * the line is connected to something that moves.
-    */
-   if (n_sync == 0)
-   {
-      printf ("  no SYNC0 edges observed\n");
-   }
+   qsort (ns, iterations, sizeof (uint64_t), cmp_u64);
+   printf ("  min %6.1f us   median %6.1f us   mean %6.1f us\n",
+           (double)ns[0] / 1000.0,
+           (double)ns[iterations / 2] / 1000.0,
+           (double)sum / (double)iterations / 1000.0);
+   printf ("  p99 %6.1f us   max    %6.1f us   hw_fault=%d\n",
+           (double)ns[(iterations * 99) / 100] / 1000.0,
+           (double)ns[iterations - 1] / 1000.0,
+           ESC_hw_faulted ());
+   free (ns);
    return 0;
 }
 
@@ -432,7 +318,7 @@ int main (int argc, char * argv[])
 
    if (strcmp (mode, "dlstatus") == 0)
    {
-      return dlstatus_test ();
+      return dlstatus_test ((argc > 4) ? (uint32_t)strtoul (argv[4], NULL, 0) : 1000u);
    }
 
    if (strcmp (mode, "reset") == 0)
