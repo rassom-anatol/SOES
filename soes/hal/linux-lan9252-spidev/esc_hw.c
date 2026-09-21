@@ -229,7 +229,7 @@ static uint32_t frame_value (const uint8_t * f)
  */
 static int spi_xfer_frames (uint8_t * frames, int n)
 {
-   struct spi_ioc_transfer x[4];
+   struct spi_ioc_transfer x[8];
    int i;
 
    if (n < 1 || n > (int)(sizeof (x) / sizeof (x[0])))
@@ -364,6 +364,86 @@ static void ESC_write_csr (uint16_t address, void *buf, uint16_t len)
    {
       (void)wait_until (ESC_CSR_CMD_REG, ESC_CSR_CMD_BUSY, 0, "CSR write");
    }
+}
+
+/* --- CSR access paired with the AL event read ----------------------------
+ *
+ * Every ESC_read and ESC_write appends a read of the AL event register, to
+ * mimic an ET1100 which supplies it on every access. As two separate batched
+ * messages that doubles the ioctl count for what is usually a single register
+ * access. Both fit in one message: the CSR interface has a single command
+ * register, but frames execute in order within a message, so the first
+ * command's data is read before the second command is written.
+ *
+ * The speculative reads apply here too. If either busy flag comes back set,
+ * the second command may have overwritten a still-pending first one, so both
+ * accesses are discarded and redone on the slow path.
+ */
+static int csr_read_pair (uint16_t addr_a, void * buf_a, uint16_t len_a,
+                          uint16_t addr_b, void * buf_b, uint16_t len_b)
+{
+   uint8_t  f[6 * FRAME_LEN];
+   uint32_t va, vb;
+
+   frame_write (&f[0 * FRAME_LEN], ESC_CSR_CMD_REG,
+                ESC_CSR_CMD_READ | ESC_CSR_CMD_SIZE (len_a) | addr_a);
+   frame_read  (&f[1 * FRAME_LEN], ESC_CSR_CMD_REG);
+   frame_read  (&f[2 * FRAME_LEN], ESC_CSR_DATA_REG);
+   frame_write (&f[3 * FRAME_LEN], ESC_CSR_CMD_REG,
+                ESC_CSR_CMD_READ | ESC_CSR_CMD_SIZE (len_b) | addr_b);
+   frame_read  (&f[4 * FRAME_LEN], ESC_CSR_CMD_REG);
+   frame_read  (&f[5 * FRAME_LEN], ESC_CSR_DATA_REG);
+
+   if (spi_xfer_frames (f, 6) < 0)
+   {
+      return -1;
+   }
+
+   if ((frame_value (&f[1 * FRAME_LEN]) & ESC_CSR_CMD_BUSY) ||
+       (frame_value (&f[4 * FRAME_LEN]) & ESC_CSR_CMD_BUSY))
+   {
+      return 1;   /* caller redoes both individually */
+   }
+
+   va = frame_value (&f[2 * FRAME_LEN]);
+   vb = frame_value (&f[5 * FRAME_LEN]);
+   memcpy (buf_a, (uint8_t *)&va, len_a);
+   memcpy (buf_b, (uint8_t *)&vb, len_b);
+   return 0;
+}
+
+/* A CSR write followed by the AL event read, in one message. */
+static int csr_write_read_pair (uint16_t addr_a, void * buf_a, uint16_t len_a,
+                                uint16_t addr_b, void * buf_b, uint16_t len_b)
+{
+   uint8_t  f[6 * FRAME_LEN];
+   uint32_t va = 0, vb;
+
+   memcpy ((uint8_t *)&va, buf_a, len_a);
+
+   frame_write (&f[0 * FRAME_LEN], ESC_CSR_DATA_REG, va);
+   frame_write (&f[1 * FRAME_LEN], ESC_CSR_CMD_REG,
+                ESC_CSR_CMD_WRITE | ESC_CSR_CMD_SIZE (len_a) | addr_a);
+   frame_read  (&f[2 * FRAME_LEN], ESC_CSR_CMD_REG);
+   frame_write (&f[3 * FRAME_LEN], ESC_CSR_CMD_REG,
+                ESC_CSR_CMD_READ | ESC_CSR_CMD_SIZE (len_b) | addr_b);
+   frame_read  (&f[4 * FRAME_LEN], ESC_CSR_CMD_REG);
+   frame_read  (&f[5 * FRAME_LEN], ESC_CSR_DATA_REG);
+
+   if (spi_xfer_frames (f, 6) < 0)
+   {
+      return -1;
+   }
+
+   if ((frame_value (&f[2 * FRAME_LEN]) & ESC_CSR_CMD_BUSY) ||
+       (frame_value (&f[4 * FRAME_LEN]) & ESC_CSR_CMD_BUSY))
+   {
+      return 1;
+   }
+
+   vb = frame_value (&f[5 * FRAME_LEN]);
+   memcpy (buf_b, (uint8_t *)&vb, len_b);
+   return 0;
 }
 
 /* --------------------------------------------------------------- PRAM access */
@@ -633,7 +713,30 @@ void ESC_read (uint16_t address, void *buf, uint16_t len)
       while (len > 0)
       {
          uint16_t size = csr_chunk_size (address, len);
-         ESC_read_csr (address, temp_buf, size);
+
+         if ((uint16_t)(len - size) == 0)
+         {
+            /* Last chunk: carry the AL event read in the same message. */
+            int rc = csr_read_pair (address, temp_buf, size,
+                                    ESCREG_ALEVENT, (void *)&ESCvar.ALevent,
+                                    sizeof (ESCvar.ALevent));
+            if (rc == 0)
+            {
+               ESCvar.ALevent = etohs (ESCvar.ALevent);
+               return;
+            }
+            if (rc < 0)
+            {
+               memset (temp_buf, 0, size);
+               return;
+            }
+            /* Speculation failed; fall through to the separate slow path. */
+            ESC_read_csr (address, temp_buf, size);
+         }
+         else
+         {
+            ESC_read_csr (address, temp_buf, size);
+         }
 
          len = (uint16_t)(len - size);
          temp_buf += size;
@@ -670,7 +773,27 @@ void ESC_write (uint16_t address, void *buf, uint16_t len)
       while (len > 0)
       {
          uint16_t size = csr_chunk_size (address, len);
-         ESC_write_csr (address, temp_buf, size);
+
+         if ((uint16_t)(len - size) == 0)
+         {
+            int rc = csr_write_read_pair (address, temp_buf, size,
+                                          ESCREG_ALEVENT, (void *)&ESCvar.ALevent,
+                                          sizeof (ESCvar.ALevent));
+            if (rc == 0)
+            {
+               ESCvar.ALevent = etohs (ESCvar.ALevent);
+               return;
+            }
+            if (rc < 0)
+            {
+               return;
+            }
+            ESC_write_csr (address, temp_buf, size);
+         }
+         else
+         {
+            ESC_write_csr (address, temp_buf, size);
+         }
 
          len = (uint16_t)(len - size);
          temp_buf += size;
