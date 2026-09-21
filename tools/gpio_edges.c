@@ -37,6 +37,8 @@
 
 #define MAX_LINES 8
 
+#define MAX_IV 200000
+
 struct line
 {
    int      offset;
@@ -44,6 +46,9 @@ struct line
    uint64_t edges;
    uint64_t first_ns;
    uint64_t last_ns;
+   uint64_t prev_ns;
+   uint64_t iv[MAX_IV];     /* inter-edge intervals, kernel timestamped */
+   uint32_t niv;
 };
 
 /* Request a line for both-edge events with a pull-down, matching how the HAL
@@ -106,7 +111,7 @@ int main (int argc, char * argv[])
 {
    const char * chip = (argc > 1) ? argv[1] : "/dev/gpiochip0";
    int seconds = (argc > 2) ? atoi (argv[2]) : 3;
-   struct line lines[MAX_LINES];
+   static struct line lines[MAX_LINES];
    struct pollfd pfd[MAX_LINES];
    int n = 0, i;
    struct timespec deadline, now;
@@ -197,9 +202,19 @@ int main (int argc, char * argv[])
             int count = (got > 0) ? (int)(got / (ssize_t)sizeof (ev[0])) : 0;
             if (count > 0)
             {
+               int k;
                if (lines[i].first_ns == 0)
                {
                   lines[i].first_ns = ev[0].timestamp_ns;
+               }
+               for (k = 0; k < count; k++)
+               {
+                  if (lines[i].prev_ns != 0 && lines[i].niv < MAX_IV)
+                  {
+                     lines[i].iv[lines[i].niv++] =
+                        ev[k].timestamp_ns - lines[i].prev_ns;
+                  }
+                  lines[i].prev_ns = ev[k].timestamp_ns;
                }
                lines[i].last_ns = ev[count - 1].timestamp_ns;
                lines[i].edges += (uint64_t)count;
@@ -218,6 +233,25 @@ int main (int argc, char * argv[])
       if (span > 0.0)
       {
          printf ("  (%.0f/s over %.2f s)", (double)lines[i].edges / span, span);
+      }
+      if (lines[i].niv > 16)
+      {
+         uint64_t *v = lines[i].iv;
+         uint32_t m = lines[i].niv;
+         uint64_t sum = 0, j;
+         for (j = 0; j < m; j++) sum += v[j];
+         qsort (v, m, sizeof (uint64_t), cmp_u64);
+         printf ("    interval  min %.1f  median %.1f  mean %.1f  "
+                 "p99 %.1f  p99.9 %.1f  max %.1f us\n",
+                 (double)v[0] / 1000.0,
+                 (double)v[m / 2] / 1000.0,
+                 (double)sum / (double)m / 1000.0,
+                 (double)v[(m * 99) / 100] / 1000.0,
+                 (double)v[(uint32_t)((uint64_t)m * 999 / 1000)] / 1000.0,
+                 (double)v[m - 1] / 1000.0);
+         printf ("    jitter    p99 %+.1f us, worst %+.1f us from the median\n",
+                 ((double)v[(m * 99) / 100] - (double)v[m / 2]) / 1000.0,
+                 ((double)v[m - 1] - (double)v[m / 2]) / 1000.0);
       }
       printf ("\n");
       close (lines[i].fd);
