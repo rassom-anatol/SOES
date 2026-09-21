@@ -49,6 +49,11 @@ _Objects Obj;
 
 static void cb_state_change (uint8_t * as, uint8_t * an);
 
+/* Observed process data and callback counts, reported by the run loop. */
+static volatile uint8_t  rx_mirror = 0;
+static volatile uint64_t rx_calls = 0;
+static volatile uint64_t tx_calls = 0;
+
 static esc_hw_cfg_t hw_cfg =
 {
    .spidev        = "/dev/spidev1.0",
@@ -113,13 +118,30 @@ static void cb_state_change (uint8_t * as, uint8_t * an)
    (void)as;
 }
 
-/* The stack calls these; probe mode never reaches them, but they must link. */
-void cb_update_txpdo (void)
-{
-}
-
+/* Process data callbacks.
+ *
+ * The TxPDO mirrors the RxPDO, so whatever a master writes to the LED objects
+ * comes straight back on the Button objects. That makes one observation in the
+ * master prove both directions of the process image at once, and it exercises
+ * exactly the two callbacks renamed in Phase 2.
+ */
 void cb_apply_rxpdo (void)
 {
+   rx_mirror = (uint8_t)((Obj.LEDs.LED0 ? 0x01 : 0) | (Obj.LEDs.LED1 ? 0x02 : 0) |
+                         (Obj.LEDs.LED2 ? 0x04 : 0) | (Obj.LEDs.LED3 ? 0x08 : 0) |
+                         (Obj.LEDs.LED4 ? 0x10 : 0) | (Obj.LEDs.LED5 ? 0x20 : 0));
+   rx_calls++;
+}
+
+void cb_update_txpdo (void)
+{
+   Obj.Buttons.Button0 = Obj.LEDs.LED0;
+   Obj.Buttons.Button1 = Obj.LEDs.LED1;
+   Obj.Buttons.Button2 = Obj.LEDs.LED2;
+   Obj.Buttons.Button3 = Obj.LEDs.LED3;
+   Obj.Buttons.Button4 = Obj.LEDs.LED4;
+   Obj.Buttons.Button5 = Obj.LEDs.LED5;
+   tx_calls++;
 }
 
 static int probe (void)
@@ -503,9 +525,58 @@ int main (int argc, char * argv[])
          return 1;
       }
       printf ("stack init OK, entering cyclic loop\n");
-      for (;;)
       {
-         ecat_slv ();
+         /* Time each ecat_slv() call. This is the whole cyclic cost --
+          * AL event read, RxPDO fetch, callbacks, TxPDO write -- and is the
+          * figure the 1 ms SYNC0 budget in the roadmap depends on. Reported
+          * as a distribution because the tail is what decides feasibility.
+          */
+         enum { NS = 20000 };
+         static uint64_t samples[NS];
+         uint32_t n = 0;
+         struct timespec a, b, last;
+
+         clock_gettime (CLOCK_MONOTONIC, &last);
+         for (;;)
+         {
+            clock_gettime (CLOCK_MONOTONIC, &a);
+            ecat_slv ();
+            clock_gettime (CLOCK_MONOTONIC, &b);
+            if (n < NS)
+            {
+               samples[n++] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
+                              (uint64_t)(b.tv_nsec - a.tv_nsec);
+            }
+
+            if (b.tv_sec - last.tv_sec >= 5)
+            {
+               uint64_t sum = 0;
+               uint32_t i;
+               if (n > 0)
+               {
+                  uint64_t * srt = malloc (n * sizeof (uint64_t));
+                  if (srt != NULL)
+                  {
+                     memcpy (srt, samples, n * sizeof (uint64_t));
+                     for (i = 0; i < n; i++) sum += srt[i];
+                     qsort (srt, n, sizeof (uint64_t), cmp_u64);
+                     printf ("ecat_slv n=%u  min %.1f  median %.1f  mean %.1f  "
+                             "p99 %.1f  max %.1f us | rx=%llu tx=%llu leds=0x%02X\n",
+                             n, (double)srt[0] / 1000.0,
+                             (double)srt[n / 2] / 1000.0,
+                             (double)sum / (double)n / 1000.0,
+                             (double)srt[(n * 99) / 100] / 1000.0,
+                             (double)srt[n - 1] / 1000.0,
+                             (unsigned long long)rx_calls,
+                             (unsigned long long)tx_calls,
+                             rx_mirror);
+                     free (srt);
+                  }
+               }
+               n = 0;
+               last = b;
+            }
+         }
       }
    }
 
