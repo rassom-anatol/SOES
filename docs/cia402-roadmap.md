@@ -260,6 +260,19 @@ Copy `dc_checker()` from the scratch reference (`rtl_xmc4_dynpdo/main.c:48-56`):
 
 Objects to add: **0x10F1** (ErrorSettings; `:02` SyncErrorCounterLimit), **0x1C32** and **0x1C33** (SM2/SM3 sync parameters — `:01` sync mode, `:02` cycle time, `:05` minimum cycle time, `:0B` SMEventMissedCnt, `:20` SyncError).
 
+### 3.3.0 SYNC0 output must be enabled in the SII EEPROM
+
+**Enabling distributed clocks in the master is not sufficient to get a SYNC0 signal on a pin.** Measured on hardware: with TwinCAT configured for DC-Synchron at 1 ms, the ESC reported `0x0981 = 0x03` (cyclic unit and SYNC0 generation enabled), a 1,000,000 ns cycle time, and an advancing next-pulse time at `0x0990` — the sync unit was running correctly. The pin nonetheless sat at 1.5 V, floating.
+
+The cause is `0x0151`, the Sync/Latch PDI Configuration register, reading `0x00`: the SYNC0/LATCH0 pin is configured as a **latch input** rather than a sync output. That register is loaded from **SII EEPROM word 1**, which comes from the ESI's `<Eeprom><ConfigData>`. The demo ESI inherited here carries `8002000000000000` — word 0 `0x0280` is correct for the LAN9252 (PDI type `0x80`, on-chip bus), but word 1 is `0x0000`, which leaves the pin an input.
+
+Two consequences:
+
+* **`0x0151` is not writable from the PDI** (verified: wrote `0x04`, read back `0x00`), so this cannot be fixed in firmware or worked around at run time. The EEPROM must be reflashed.
+* **Adding `<Dc>` operation modes to the ESI does not change the SII.** DC op modes are master-side configuration; `ConfigData` is what determines the EEPROM image. Reflashing without changing `ConfigData` writes the same bytes.
+
+Phase 4's generator must therefore emit a `ConfigData` with the SYNC0 output enabled, and `0x0982` (SII word 2, sync pulse length) needs a deliberate value too — zero may mean level-until-acknowledged rather than a pulse.
+
 ### 3.3.1 Sync error counting — replace SOES's semantics with ETG.1020
 
 **The new HAL implements ETG.1020 semantics. SOES's existing behaviour is not carried over.**
