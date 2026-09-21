@@ -722,7 +722,14 @@ int ESC_hw_edge_open (const char * gpiochip, int line)
    memset (&req, 0, sizeof (req));
    req.offsets[0]   = (uint32_t)line;
    req.num_lines    = 1;
-   req.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_EDGE_RISING;
+   /* Bias low. The LAN9252 drives SYNC0 only while its sync unit is enabled
+    * and IRQ only while interrupts are enabled, so both pins are high-Z at
+    * other times. Measured: an unbiased input on a wired-but-undriven SYNC0
+    * produced roughly 90000 spurious edges per second. A pull-down does not
+    * fight a push-pull driver, so it is safe once the signal is live.
+    */
+   req.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_EDGE_RISING |
+                      GPIO_V2_LINE_FLAG_BIAS_PULL_DOWN;
    strncpy (req.consumer, "lan9252-edge", sizeof (req.consumer) - 1);
 
    if (ioctl (chip_fd, GPIO_V2_GET_LINE_IOCTL, &req) < 0)
