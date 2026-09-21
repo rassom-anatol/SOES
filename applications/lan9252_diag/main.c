@@ -659,6 +659,23 @@ int main (int argc, char * argv[])
                                 (unsigned)r_cyc,
                                 (unsigned long long)r_start,
                                 (unsigned long long)r_time);
+                        {
+                           /* Whether the SYNC0 *pin* is enabled as an output is
+                            * separate from whether the sync unit runs, and comes
+                            * from the SII EEPROM rather than from the master.
+                            * 0x0151 is the Sync/Latch PDI configuration, 0x0982
+                            * the pulse length (0 means level-until-acknowledged
+                            * rather than a pulse), 0x098E the SYNC0 status. */
+                           uint8_t  pdi = 0, sl = 0, st0 = 0;
+                           uint16_t plen = 0;
+                           ESC_read (0x0140, &pdi, sizeof (pdi));
+                           ESC_read (0x0151, &sl, sizeof (sl));
+                           ESC_read (0x0982, &plen, sizeof (plen));
+                           ESC_read (0x098E, &st0, sizeof (st0));
+                           printf ("   PIN: 0x0140 PDIctl=%02X  0x0151 SyncLatchCfg=%02X"
+                                   "  0x0982 pulselen=%u  0x098E sync0stat=%02X\n",
+                                   pdi, sl, (unsigned)plen, st0);
+                        }
                      }
                      if (n_sync > 0)
                      {
