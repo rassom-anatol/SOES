@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <inttypes.h>
+#include <pthread.h>
+#include <sched.h>
 
 #include "esc.h"
 #include "esc_hw.h"
@@ -51,6 +53,71 @@ static void cb_state_change (uint8_t * as, uint8_t * an);
 
 /* Observed process data and callback counts, reported by the run loop. */
 static int sync_pin_cfg = -1;   /* value to try writing to 0x0151 */
+static int sync_thread_prio = -1;  /* >=0 spawns the SYNC0 wake-latency thread */
+static pthread_t sync_tid;
+static int sync_thread_running = 0;
+
+/* Wake latency samples, written by the sync thread and read by the reporter.
+ * Deliberately lock-free and approximate: a torn read costs one wrong sample
+ * in a statistics run, and a mutex here would be the very interference the
+ * measurement is trying to characterise.
+ */
+#define LAT_MAX 100000
+static volatile uint64_t wl_ns[LAT_MAX];
+static volatile uint32_t wl_n = 0;
+static volatile uint64_t wl_timeouts = 0;
+static volatile int      sync_thread_stop = 0;
+
+/* Block on the SYNC0 edge and record how long after the kernel timestamped it
+ * this thread actually resumed.
+ *
+ * This is the figure that decides SyncErrorCounterLimit and whether a 1 ms
+ * cycle is safe: the signal itself is already known to be stable to +-4 us
+ * (roadmap 3.3.0), so what remains is scheduling. It cannot be measured from
+ * the cyclic thread, because a polling loop discovers the edge whenever it
+ * next looks rather than when it arrived.
+ */
+static void * sync_latency_thread (void * arg)
+{
+   int fd = *(int *)arg;
+   struct timespec now;
+
+   if (sync_thread_prio > 0)
+   {
+      struct sched_param sp;
+      memset (&sp, 0, sizeof (sp));
+      sp.sched_priority = sync_thread_prio;
+      if (pthread_setschedparam (pthread_self (), SCHED_FIFO, &sp) != 0)
+      {
+         printf ("sync thread: SCHED_FIFO %d refused, running SCHED_OTHER\n",
+                 sync_thread_prio);
+      }
+      else
+      {
+         printf ("sync thread: SCHED_FIFO %d\n", sync_thread_prio);
+      }
+   }
+
+   while (!sync_thread_stop)
+   {
+      uint64_t t_edge = 0, t_now;
+      int coalesced = 0;
+      int rc = ESC_hw_edge_wait (fd, 50000000ull, &t_edge, &coalesced);
+
+      if (rc == 0) { wl_timeouts++; continue; }
+      if (rc < 0)  { break; }
+
+      clock_gettime (CLOCK_MONOTONIC, &now);
+      t_now = (uint64_t)now.tv_sec * 1000000000ull + (uint64_t)now.tv_nsec;
+
+      if (t_now > t_edge && wl_n < LAT_MAX)
+      {
+         wl_ns[wl_n] = t_now - t_edge;
+         wl_n = wl_n + 1;
+      }
+   }
+   return NULL;
+}
 static volatile uint8_t  rx_mirror = 0;
 static volatile uint64_t rx_calls = 0;
 static volatile uint64_t tx_calls = 0;
@@ -532,7 +599,15 @@ int main (int argc, char * argv[])
        * at run time. Normally this is loaded from the SII EEPROM and is not
        * writable, but if the PDI can write it the correct value can be found
        * on a scope without flashing anything. Readback tells us which. */
-      if (argc > 5)
+      if (argc > 4 && strcmp (argv[4], "syncthread") == 0)
+      {
+         /* The stack keeps the cyclic loop running so the slave stays in OP
+          * and the master keeps generating SYNC0; a second thread owns the
+          * SYNC0 line and measures wake latency. The IRQ line is released. */
+         hw_cfg.irq_line = -1;
+         sync_thread_prio = (argc > 5) ? (int)strtoul (argv[5], NULL, 0) : 0;
+      }
+      else if (argc > 5)
       {
          sync_pin_cfg = (int)strtoul (argv[5], NULL, 0);
       }
@@ -578,6 +653,21 @@ int main (int argc, char * argv[])
                  hw_cfg.irq_line, irq_fd >= 0 ? "ok" : "FAILED",
                  hw_cfg.sync0_line, sync_fd >= 0 ? "ok" : "FAILED");
 
+         if (sync_thread_prio >= 0 && sync_fd >= 0)
+         {
+            static int tfd;
+            tfd = sync_fd;
+            if (pthread_create (&sync_tid, NULL, sync_latency_thread, &tfd) == 0)
+            {
+               sync_thread_running = 1;
+               printf ("sync thread: measuring SYNC0 wake latency\n");
+            }
+            else
+            {
+               printf ("sync thread: pthread_create failed\n");
+            }
+         }
+
          clock_gettime (CLOCK_MONOTONIC, &last);
          for (;;)
          {
@@ -618,7 +708,8 @@ int main (int argc, char * argv[])
              * kernel's event timestamps, so they measure the signal itself
              * rather than when this loop got around to looking.
              */
-            while (ESC_hw_edge_wait (sync_fd, 0, &t_edge, &coalesced) == 1)
+            while (!sync_thread_running &&
+                   ESC_hw_edge_wait (sync_fd, 0, &t_edge, &coalesced) == 1)
             {
                uint64_t nowns = (uint64_t)b.tv_sec * 1000000000ull +
                                 (uint64_t)b.tv_nsec;
@@ -715,6 +806,27 @@ int main (int argc, char * argv[])
                                    pdi, sl, (unsigned)plen, st0);
                         }
                      }
+                     if (sync_thread_running && wl_n > 16)
+                     {
+                        uint32_t m = (uint32_t)wl_n, k;
+                        uint64_t *w = malloc (m * sizeof (uint64_t));
+                        if (w != NULL)
+                        {
+                           uint64_t wsum = 0;
+                           for (k = 0; k < m; k++) { w[k] = wl_ns[k]; wsum += w[k]; }
+                           qsort (w, m, sizeof (uint64_t), cmp_u64);
+                           printf ("   WAKE n=%u  min %.1f  median %.1f  mean %.1f  "
+                                   "p99 %.1f  p99.9 %.1f  max %.1f us  (timeouts %llu)\n",
+                                   m, (double)w[0]/1000.0, (double)w[m/2]/1000.0,
+                                   (double)wsum/(double)m/1000.0,
+                                   (double)w[(m*99)/100]/1000.0,
+                                   (double)w[(uint32_t)((uint64_t)m*999/1000)]/1000.0,
+                                   (double)w[m-1]/1000.0,
+                                   (unsigned long long)wl_timeouts);
+                           free (w);
+                        }
+                        wl_n = 0;
+                     }
                      if (n_sync > 0)
                      {
                         printf ("   SYNC0 %llu edges, IRQ %llu",
@@ -742,7 +854,7 @@ int main (int argc, char * argv[])
                         printf ("   SYNC0 no edges (enable distributed clocks in the master)\n");
                      }
                      n_sync = 0; n_irq = 0; nv = 0;
-                     lat_sum = 0; lat_max = 0; lat_n = 0;
+                     lat_sum = 0; lat_max = 0; wl_n = 0;
                      free (srt);
                   }
                }
