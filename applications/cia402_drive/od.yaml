@@ -1,0 +1,222 @@
+# Object dictionary source of truth.
+#
+# tools/gen_od.py turns this into slave_objectlist.c, utypes.h and
+# ecat_options.h (and later the ESI and SII). Nothing downstream is
+# hand-edited: the SyncManager arithmetic, the PDO mapping words, the
+# ascending index order and the terminating sentinel are all things
+# ESC_checkSM23 or SDO_findobject punish silently when got wrong by hand,
+# and all of them are mechanical.
+#
+# See docs/cia402-roadmap.md section 4 for why this exists.
+
+device:
+  # Identity. The ETG evaluation range is a placeholder: an assigned Vendor ID
+  # is a prerequisite before any unit ships, because masters match on this and
+  # it is baked into both the ESI and the SII image.
+  vendor_id:    0x1337        # TODO: replace with an assigned ETG Vendor ID
+  vendor_name:  "cortexware"
+  product_code: 0x1000
+  revision:     0x0001
+  serial:       0
+  name:         "cmc_drive"
+  group:        "drives"
+  group_name:   "CiA402 Drives"
+
+axes:
+  # v1 ships one axis. The generator emits the indexed form regardless, so
+  # adding axes later needs no change here beyond `count`, and the SM layout
+  # is already reserved for `reserve` axes so the ESI does not have to change.
+  count:   1
+  reserve: 4
+  stride:  0x800              # CiA402: axis n at index + n*0x800
+
+mailbox:
+  size:       256             # up from the 128 the demo used: SDO-Info over a
+                              # large dictionary segments constantly at 128
+  size_boot:  256
+  buffers:    3
+
+sync_managers:
+  # Constraint from esc.c:752 -- SM2_sma + 3*length <= SM3_sma, because a
+  # buffered SM consumes three copies. Sizes below are per-axis * reserve.
+  mbx_out: 0x1000
+  mbx_in:  0x1100
+  outputs: 0x1200
+  inputs:  0x1300
+
+# ---------------------------------------------------------------------------
+# Process data. Order here is the wire order.
+#
+# Deliberately widest-first so every 32-bit value lands naturally aligned:
+# in index order, the single-byte modes-of-operation object pushes each
+# int32 onto an odd offset. Nothing in the protocol requires this ordering --
+# the master reads it from 0x1600/0x1A00 -- and it costs nothing.
+# ---------------------------------------------------------------------------
+
+rxpdo:
+  index: 0x1600
+  name: "RxPDO Drive"
+  entries:
+    - {object: 0x607A, name: TargetPosition}
+    - {object: 0x60FF, name: TargetVelocity}
+    - {object: 0x6040, name: Controlword}
+    - {object: 0x6071, name: TargetTorque}
+    - {object: 0x6072, name: MaxTorque}
+    - {object: 0x6060, name: ModesOfOperation}
+    - {pad: 8}
+
+txpdo:
+  index: 0x1A00
+  name: "TxPDO Drive"
+  entries:
+    - {object: 0x6064, name: PositionActual}
+    - {object: 0x606C, name: VelocityActual}
+    - {object: 0x60F4, name: FollowingErrorActual}
+    - {object: 0x2000, sub: 1, name: GateDriverFaults}
+    - {object: 0x2000, sub: 2, name: DriveStatusFlags}
+    - {object: 0x6041, name: Statusword}
+    - {object: 0x6077, name: TorqueActual}
+    - {object: 0x603F, name: ErrorCode}
+    - {object: 0x6061, name: ModesOfOperationDisplay}
+    - {pad: 8}
+
+# ---------------------------------------------------------------------------
+# Objects. `var` holds the C path under the generated Obj struct; objects
+# without one are constants served from the dictionary itself.
+# ---------------------------------------------------------------------------
+
+objects:
+
+  # --- communication ------------------------------------------------------
+  - {index: 0x1000, name: "Device Type",       type: u32, access: ro, value: 0x00020192}
+  - {index: 0x1008, name: "Device Name",       type: string, value: "cmc_drive"}
+  - {index: 0x1009, name: "Hardware Version",  type: string, value: "1.0"}
+  - {index: 0x100A, name: "Software Version",  type: string, value: "0.1"}
+
+  - index: 0x1018
+    name: "Identity Object"
+    type: record
+    subs:
+      - {sub: 1, name: "Vendor ID",     type: u32, access: ro, value: "@vendor_id"}
+      - {sub: 2, name: "Product Code",  type: u32, access: ro, value: "@product_code"}
+      - {sub: 3, name: "Revision",      type: u32, access: ro, value: "@revision"}
+      - {sub: 4, name: "Serial Number", type: u32, access: ro, var: "serial"}
+
+  - index: 0x10F1
+    name: "Error Settings"
+    type: record
+    subs:
+      - {sub: 1, name: "Local Error Reaction",     type: u32, access: rw, var: "ErrorSettings.LocalErrorReaction"}
+      - {sub: 2, name: "Sync Error Counter Limit", type: u16, access: rw, var: "ErrorSettings.SyncErrorCounterLimit", value: 24}
+
+  # --- CiA402, per axis ---------------------------------------------------
+  # `axis: true` makes the generator emit one copy per axis at index + n*stride,
+  # with the C variable becoming Obj.axis[n].<var>.
+  - {index: 0x603F, axis: true, name: "Error Code",              type: u16, access: ro, var: "ErrorCode"}
+  - {index: 0x6040, axis: true, name: "Controlword",             type: u16, access: rw, var: "Controlword"}
+  - {index: 0x6041, axis: true, name: "Statusword",              type: u16, access: ro, var: "Statusword"}
+  - {index: 0x605A, axis: true, name: "Quick Stop Option Code",  type: i16, access: rw, var: "QuickStopOptionCode", value: 2}
+  - {index: 0x6060, axis: true, name: "Modes of Operation",      type: i8,  access: rw, var: "ModesOfOperation"}
+  - {index: 0x6061, axis: true, name: "Modes of Operation Display", type: i8, access: ro, var: "ModesOfOperationDisplay"}
+  - {index: 0x6064, axis: true, name: "Position Actual Value",   type: i32, access: ro, var: "PositionActual"}
+  - {index: 0x606C, axis: true, name: "Velocity Actual Value",   type: i32, access: ro, var: "VelocityActual"}
+  - {index: 0x6071, axis: true, name: "Target Torque",           type: i16, access: rw, var: "TargetTorque"}
+  - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000}
+  - {index: 0x6076, axis: true, name: "Motor Rated Torque",      type: u32, access: rw, var: "MotorRatedTorque"}
+  - {index: 0x6077, axis: true, name: "Torque Actual Value",     type: i16, access: ro, var: "TorqueActual"}
+  - {index: 0x607A, axis: true, name: "Target Position",         type: i32, access: rw, var: "TargetPosition"}
+  - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
+  - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
+  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x000003A0}
+
+  # Scaling. SDO-only, but a master cannot convert increments to user units
+  # without them -- TwinCAT NC in particular.
+  - index: 0x608F
+    axis: true
+    name: "Position Encoder Resolution"
+    type: record
+    subs:
+      - {sub: 1, name: "Encoder Increments",  type: u32, access: rw, var: "EncoderIncrements", value: 65536}
+      - {sub: 2, name: "Motor Revolutions",   type: u32, access: rw, var: "MotorRevolutions", value: 1}
+  - index: 0x6091
+    axis: true
+    name: "Gear Ratio"
+    type: record
+    subs:
+      - {sub: 1, name: "Motor Revolutions",   type: u32, access: rw, var: "GearMotorRevolutions", value: 1}
+      - {sub: 2, name: "Shaft Revolutions",   type: u32, access: rw, var: "GearShaftRevolutions", value: 1}
+  - index: 0x6092
+    axis: true
+    name: "Feed Constant"
+    type: record
+    subs:
+      - {sub: 1, name: "Feed",                type: u32, access: rw, var: "Feed", value: 1}
+      - {sub: 2, name: "Shaft Revolutions",   type: u32, access: rw, var: "FeedShaftRevolutions", value: 1}
+
+  # --- vendor range -------------------------------------------------------
+  # Safety and task critical flags are cyclic; everything else is SDO-only.
+  # The gate driver word is a direct mirror of the TMC6200 GSTAT register so
+  # there is no translation layer to get wrong and the master sees exactly
+  # what the driver reports.
+  - index: 0x2000
+    axis: true
+    name: "Drive Faults and Status"
+    type: record
+    subs:
+      - {sub: 1, name: "Gate Driver Faults", type: u16, access: ro, var: "GateDriverFaults"}
+      - {sub: 2, name: "Drive Status Flags", type: u16, access: ro, var: "DriveStatusFlags"}
+
+  - index: 0x2001
+    axis: true
+    name: "Board Telemetry"
+    type: record
+    subs:
+      - {sub: 1, name: "Supply Voltage mV",   type: u32, access: ro, var: "SupplyVoltage_mV"}
+      - {sub: 2, name: "Motor Temp mC",       type: i32, access: ro, var: "MotorTemp_mC"}
+      - {sub: 3, name: "MOSFET Temp mC",      type: i32, access: ro, var: "MosfetTemp_mC"}
+
+  - index: 0x2002
+    axis: true
+    name: "Phase Currents"
+    type: record
+    subs:
+      - {sub: 1, name: "Current U", type: i16, access: ro, var: "CurrentU"}
+      - {sub: 2, name: "Current V", type: i16, access: ro, var: "CurrentV"}
+      - {sub: 3, name: "Current W", type: i16, access: ro, var: "CurrentW"}
+
+# ---------------------------------------------------------------------------
+# Bit assignments for the two cyclic vendor words. Documented here rather than
+# only in C so the master side and the drive side have one source.
+# ---------------------------------------------------------------------------
+
+bitfields:
+  GateDriverFaults:
+    # Direct mirror of TMC6200 GSTAT (see cmc include/tmc/TMC6200.hpp).
+    0:  reset
+    1:  drv_otpw          # over-temperature warning
+    2:  drv_ot            # over-temperature
+    3:  uv_cp             # charge pump undervoltage
+    4:  shortdet_u
+    5:  s2g_u             # short to ground, phase U
+    6:  s2vs_u            # short to supply, phase U
+    8:  shortdet_v
+    9:  s2g_v
+    10: s2vs_v
+    12: shortdet_w
+    13: s2g_w
+    14: s2vs_w
+
+  DriveStatusFlags:
+    # Board digital inputs (cmc include/bsp/BSP.hpp) plus the TMC4671 status
+    # bits that matter within a cycle rather than as diagnostics.
+    0:  drv_fault_pin     # BSP DRV_FAULT, BCM 27
+    1:  ctrl_sta_pin      # BSP CTRL_STA,  BCM 26
+    2:  is_ctrl_en_pin    # BSP IS_CTRL_EN, BCM 24
+    4:  adc_i_clipped     # current measurement saturated
+    5:  aenc_clipped
+    6:  pid_iq_output_limit
+    7:  pid_id_output_limit
+    8:  pwm_min
+    9:  pwm_max
+    10: enc_n             # encoder index seen
+    11: hall_error
