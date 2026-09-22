@@ -220,3 +220,24 @@ bitfields:
     9:  pwm_max
     10: enc_n             # encoder index seen
     11: hall_error
+
+# ---------------------------------------------------------------------------
+# EEPROM / SII image data.
+#
+# config_data is the first eight SII bytes, mapping onto ESC registers:
+#   byte 0-1 -> 0x0140/0x0141 PDI Control and ESC Configuration
+#   byte 2   -> 0x0150        PDI Configuration
+#   byte 3   -> 0x0151        Sync/Latch PDI Configuration
+#   byte 4-5 -> 0x0982/0x0983 Sync pulse length, in 10 ns units
+#
+# Byte 3 = 0x0E is what makes SYNC0 an output at all: bit 2 selects SYNC0
+# output over LATCH0 input, bits 1:0 select push-pull active high, and bit 3
+# maps SYNC0 into the AL event register. It is loaded from EEPROM at reset and
+# is not writable from the PDI, so the EEPROM must be reflashed and the device
+# power cycled for a change here to take effect. See roadmap section 3.3.0.
+# ---------------------------------------------------------------------------
+eeprom:
+  byte_size:       2048
+  config_data:     "8002000E64000000"
+  bootstrap:       "0010800080108000"
+  assign_activate: "#x300"      # cyclic unit + SYNC0, no SYNC1
