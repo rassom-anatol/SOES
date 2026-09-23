@@ -9,7 +9,7 @@
 #ifndef ECAT_OPTIONS_H
 #define ECAT_OPTIONS_H
 
-#define USE_FOE           1
+#define USE_FOE           0
 #define USE_EOE           0
 
 #define MBXSIZE           256

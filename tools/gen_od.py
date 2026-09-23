@@ -42,11 +42,39 @@ TYPES = {
     "string": ("DTYPE_VISIBLE_STRING", 0,  "char"),
 }
 
+# IEC 61131 type names as the ESI uses them. A master takes its PDO
+# interpretation from here, so this table has to follow the declared type and
+# not the bit width: describing a signed object as unsigned reaches OP without
+# complaint and then reports -1 as 4294967295.
+ESI_TYPES = {
+    "bool":   "BOOL",
+    "i8":     "SINT",
+    "u8":     "USINT",
+    "i16":    "INT",
+    "u16":    "UINT",
+    "i32":    "DINT",
+    "u32":    "UDINT",
+    "i64":    "LINT",
+    "u64":    "ULINT",
+    "real32": "REAL",
+}
+
 ACCESS = {
     "ro":    "ATYPE_RO",
     "rw":    "ATYPE_RW",
     "rwpre": "ATYPE_RWpre",
     "wo":    "ATYPE_WO",
+}
+
+# Object code, as the profile defines it for the object rather than as
+# something to infer from the shape of its sub-entries. Getting it wrong is
+# not merely a mislabelled code: for an ARRAY, esc_coe.c reports sub 0's data
+# type as the element type in the Get Object Description response, so a RECORD
+# described as an ARRAY is wrong twice over.
+OBJECT_CODES = {
+    "var":    "OTYPE_VAR",
+    "array":  "OTYPE_ARRAY",
+    "record": "OTYPE_RECORD",
 }
 
 
@@ -70,6 +98,14 @@ class Object:
         self.name = spec["name"]
         self.is_record = "subs" in spec
         self.subs = []
+
+        code = spec.get("object_code", "record" if self.is_record else "var")
+        if code not in OBJECT_CODES:
+            die(f"0x{index:04X}: unknown object_code {code!r}")
+        if (code == "var") != (not self.is_record):
+            die(f"0x{index:04X}: object_code {code!r} does not match whether "
+                f"the object has sub-entries")
+        self.otype = OBJECT_CODES[code]
 
         if self.is_record:
             for sub in spec["subs"]:
@@ -111,15 +147,6 @@ class Object:
     def maxsub(self):
         return max(s["sub"] for s in self.subs)
 
-    @property
-    def otype(self):
-        if not self.is_record:
-            return "OTYPE_VAR"
-        # An ARRAY is homogeneous; anything else is a RECORD. Getting this
-        # wrong changes how sub 0 is reported under complete access.
-        types = {s["type"] for s in self.subs if s["sub"] != 0}
-        return "OTYPE_ARRAY" if len(types) == 1 else "OTYPE_RECORD"
-
     def cname(self):
         return f"SDO{self.index:04X}"
 
@@ -160,7 +187,7 @@ def resolve_pdo(cfg, pdo, objs, axis):
     for e in pdo["entries"]:
         if "pad" in e:
             entries.append({"index": 0, "sub": 0, "bits": e["pad"],
-                            "name": "padding", "var": None})
+                            "name": "padding", "type": None, "var": None})
             bits += e["pad"]
             continue
 
@@ -175,7 +202,8 @@ def resolve_pdo(cfg, pdo, objs, axis):
         s = match[0]
 
         entries.append({"index": idx, "sub": sub, "bits": s["bits"],
-                        "name": e.get("name", s["name"]), "var": s["var"]})
+                        "name": e.get("name", s["name"]), "type": s["type"],
+                        "var": s["var"]})
         bits += s["bits"]
 
     if bits % 8:
@@ -257,6 +285,21 @@ def emit_objectlist(cfg, objs, rx, tx, src):
                        f"/* {e['name']} */")
         out.append("};")
 
+    # SyncManager Communication Type. A master enumerating a CoE device reads
+    # this to learn what each SM carries before it configures anything, so it
+    # is not optional even though nothing in the slave consults it. The four
+    # values are the fixed SOES layout: two mailbox SMs then outputs, inputs.
+    out.append('\nstatic const char acName1C00[] = "SM Communication Type";')
+    out.append("const _objd SDO1C00[] =\n{")
+    out.append("   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 4, NULL},")
+    for sub, (kind, what) in enumerate(((1, "mailbox receive"),
+                                        (2, "mailbox send"),
+                                        (3, "process data output"),
+                                        (4, "process data input")), 1):
+        out.append(f"   {{0x{sub:02X}, DTYPE_UNSIGNED8, 8, ATYPE_RO, "
+                   f"acName1C00, {kind}, NULL}},   /* {what} */")
+    out.append("};")
+
     # SyncManager assignment, likewise fixed.
     for idx, assigned in ((0x1C12, cfg["rxpdo"]["index"]),
                           (0x1C13, cfg["txpdo"]["index"])):
@@ -282,6 +325,12 @@ def emit_objectlist(cfg, objs, rx, tx, src):
                 data = f"&Obj.axis[{o.axis}].{s['var']}"
             val = s["value"]
             if s["type"] == "string":
+                # A string lives in the data pointer, never the value field.
+                # Anything longer than four bytes takes the normal-response
+                # path in esc_coe.c, which copy2mbx's from data -- so a NULL
+                # here is a memcpy from NULL during an ordinary master scan.
+                if not s["var"]:
+                    data = f'(void *)"{val}"'
                 val = 0
             elif isinstance(val, str):
                 val = 0
@@ -302,6 +351,7 @@ def emit_objectlist(cfg, objs, rx, tx, src):
     rows.append((cfg["txpdo"]["index"], "OTYPE_RECORD", len(tx),
                  f"acNamePDO{cfg['txpdo']['index']:04X}",
                  f"SDO{cfg['txpdo']['index']:04X}"))
+    rows.append((0x1C00, "OTYPE_ARRAY", 4, "acName1C00", "SDO1C00"))
     for idx in (0x1C12, 0x1C13):
         rows.append((idx, "OTYPE_ARRAY", 1, f"acNameSM{idx:04X}", f"SDO{idx:04X}"))
     rows.sort(key=lambda r: r[0])
@@ -367,7 +417,10 @@ def emit_options(cfg, rx_bytes, tx_bytes, rx_entries, tx_entries, sm, src):
     reserve = cfg["axes"]["reserve"]
     out = [BANNER.format(src=src)]
     out.append("#ifndef ECAT_OPTIONS_H\n#define ECAT_OPTIONS_H\n")
-    out.append("#define USE_FOE           1")
+    # FoE is off unless something calls FOE_config(): foe_cfg stays NULL and
+    # esc_foe.c dereferences it on the first request. The ESI is what invites
+    # that request, so the option and the description are emitted together.
+    out.append(f"#define USE_FOE           {1 if cfg['mailbox'].get('foe') else 0}")
     out.append("#define USE_EOE           0\n")
     out.append(f"#define MBXSIZE           {d['size']}")
     out.append(f"#define MBXSIZEBOOT       {d['size_boot']}")
@@ -425,6 +478,7 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
     s_ = cfg["sync_managers"]
     mbx = cfg["mailbox"]["size"]
     ee = cfg["eeprom"]
+    foe = cfg["mailbox"].get("foe")
 
     def pdo_block(tag, pdo, entries, sm_index):
         out = [f'      <{tag} Fixed="1" Sm="{sm_index}" Mandatory="1">']
@@ -437,7 +491,7 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
             out.append(f"          <BitLen>{e['bits']}</BitLen>")
             if e["index"] != 0:
                 out.append(f"          <Name>{e['name']}</Name>")
-                out.append(f"          <DataType>{esi_type(e['bits'])}</DataType>")
+                out.append(f"          <DataType>{esi_type(e)}</DataType>")
             out.append("        </Entry>")
         out.append(f"      </{tag}>")
         return out
@@ -473,12 +527,21 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
          f'StartAddress="#x{s_["outputs"]:04X}">Outputs</Sm>',
          f'      <Sm ControlByte="#x20" Enable="1" '
          f'StartAddress="#x{s_["inputs"]:04X}">Inputs</Sm>']
+    # FMMUs. Optional in EtherCATInfo.xsd, so nothing validates their
+    # absence, but a master that finds none configures no process data.
+    x.insert(x.index(f'      <Sm ControlByte="#x26" DefaultSize="{mbx}" Enable="1" '
+                     f'StartAddress="#x{s_["mbx_out"]:04X}">MBoxOut</Sm>'),
+             "      <Fmmu>Outputs</Fmmu>")
+    x.insert(x.index(f'      <Sm ControlByte="#x26" DefaultSize="{mbx}" Enable="1" '
+                     f'StartAddress="#x{s_["mbx_out"]:04X}">MBoxOut</Sm>'),
+             "      <Fmmu>Inputs</Fmmu>")
     x += pdo_block("RxPdo", cfg["rxpdo"], rx, 2)
     x += pdo_block("TxPdo", cfg["txpdo"], tx, 3)
     x += ['      <Mailbox DataLinkLayer="true">',
-          '        <CoE CompleteAccess="false" PdoUpload="false" SdoInfo="true"/>',
-          "        <FoE/>",
-          "      </Mailbox>",
+          '        <CoE CompleteAccess="false" PdoUpload="false" SdoInfo="true"/>']
+    if foe:
+        x.append("        <FoE/>")
+    x += ["      </Mailbox>",
           "      <Dc>"]
     # DC-Synchron first so it is the default operation mode; a master that
     # takes the first entry then gets DC rather than free-run.
@@ -494,9 +557,10 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
     x += ["      </Dc>",
           "      <Eeprom>",
           f'        <ByteSize>{ee["byte_size"]}</ByteSize>',
-          f'        <ConfigData>{ee["config_data"]}</ConfigData>',
-          f'        <BootStrap>{ee["bootstrap"]}</BootStrap>',
-          "      </Eeprom>",
+          f'        <ConfigData>{ee["config_data"]}</ConfigData>']
+    if foe:
+        x.append(f"        <BootStrap>{bootstrap(cfg)}</BootStrap>")
+    x += ["      </Eeprom>",
           "      </Device>",
           "    </Devices>",
           "  </Descriptions>",
@@ -504,8 +568,27 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
     return "\n".join(x) + "\n"
 
 
-def esi_type(bits):
-    return {1: "BOOL", 8: "USINT", 16: "UINT", 32: "UDINT", 64: "ULINT"}.get(bits, "UDINT")
+def bootstrap(cfg):
+    """The boot mailbox description, as four little-endian 16-bit words.
+
+    Derived rather than written down. ESC_checkmbx compares this against the
+    MBX*_b constants and refuses BOOT with ALERR_INVALIDBOOTMBXCONFIG on a
+    mismatch, and a hand-carried hex string is exactly the kind of restated
+    SyncManager arithmetic this generator exists to eliminate.
+    """
+    s = cfg["sync_managers"]
+    size = cfg["mailbox"]["size_boot"]
+    words = (s["mbx_out"], size, s["mbx_in"], size)
+    return "".join(w.to_bytes(2, "little").hex().upper() for w in words)
+
+
+def esi_type(entry):
+    t = ESI_TYPES.get(entry["type"])
+    if t is None:
+        die(f"0x{entry['index']:04X}:{entry['sub']:02X} has type "
+            f"{entry['type']!r}, which has no ESI equivalent and so cannot be "
+            f"mapped into a PDO")
+    return t
 
 
 def main():

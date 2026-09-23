@@ -35,6 +35,12 @@ mailbox:
                               # large dictionary segments constantly at 128
   size_boot:  256
   buffers:    3
+  foe:        false           # nothing calls FOE_config(), so foe_cfg is NULL
+                              # and the first FoE request dereferences it. The
+                              # ESI is what invites that request, so this key
+                              # drives USE_FOE, <FoE/> and <BootStrap> together
+                              # and they cannot disagree. Turn on with the
+                              # firmware update story, not before.
 
 sync_managers:
   # Constraint from esc.c:752 -- SM2_sma + 3*length <= SM3_sma, because a
@@ -83,6 +89,14 @@ txpdo:
 # ---------------------------------------------------------------------------
 # Objects. `var` holds the C path under the generated Obj struct; objects
 # without one are constants served from the dictionary itself.
+#
+# `object_code` is the CoE object code the profile defines for the object. It
+# defaults to `var` for a scalar and `record` for anything with sub-entries,
+# which is what the drive profile specifies for every object below; set it to
+# `array` only where the profile genuinely defines a homogeneous array, because
+# for an ARRAY esc_coe.c reports sub 0's UNSIGNED8 as the element type in the
+# object description. It is not inferred from the shape of the sub-entries:
+# that inference made 0x1018, 0x608F, 0x6091 and 0x6092 arrays.
 # ---------------------------------------------------------------------------
 
 objects:
@@ -127,7 +141,7 @@ objects:
   - {index: 0x607A, axis: true, name: "Target Position",         type: i32, access: rw, var: "TargetPosition"}
   - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
-  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x000003A0}
+  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00000380}
 
   # Scaling. SDO-only, but a master cannot convert increments to user units
   # without them -- TwinCAT NC in particular.
@@ -239,5 +253,4 @@ bitfields:
 eeprom:
   byte_size:       2048
   config_data:     "8002000E64000000"
-  bootstrap:       "0010800080108000"
   assign_activate: "#x300"      # cyclic unit + SYNC0, no SYNC1

@@ -20,6 +20,8 @@
       <Profile>
         <ProfileNo>402</ProfileNo>
       </Profile>
+      <Fmmu>Outputs</Fmmu>
+      <Fmmu>Inputs</Fmmu>
       <Sm ControlByte="#x26" DefaultSize="256" Enable="1" StartAddress="#x1000">MBoxOut</Sm>
       <Sm ControlByte="#x22" DefaultSize="256" Enable="1" StartAddress="#x1100">MBoxIn</Sm>
       <Sm ControlByte="#x24" Enable="1" StartAddress="#x1200">Outputs</Sm>
@@ -32,14 +34,14 @@
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
           <Name>TargetPosition</Name>
-          <DataType>UDINT</DataType>
+          <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x60FF</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
           <Name>TargetVelocity</Name>
-          <DataType>UDINT</DataType>
+          <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x6040</Index>
@@ -53,7 +55,7 @@
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
           <Name>TargetTorque</Name>
-          <DataType>UINT</DataType>
+          <DataType>INT</DataType>
         </Entry>
         <Entry>
           <Index>#x6072</Index>
@@ -67,7 +69,7 @@
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
           <Name>ModesOfOperation</Name>
-          <DataType>USINT</DataType>
+          <DataType>SINT</DataType>
         </Entry>
         <Entry>
           <Index>#x0000</Index>
@@ -83,21 +85,21 @@
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
           <Name>PositionActual</Name>
-          <DataType>UDINT</DataType>
+          <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x606C</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
           <Name>VelocityActual</Name>
-          <DataType>UDINT</DataType>
+          <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x60F4</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
           <Name>FollowingErrorActual</Name>
-          <DataType>UDINT</DataType>
+          <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x2000</Index>
@@ -125,7 +127,7 @@
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
           <Name>TorqueActual</Name>
-          <DataType>UINT</DataType>
+          <DataType>INT</DataType>
         </Entry>
         <Entry>
           <Index>#x603F</Index>
@@ -139,7 +141,7 @@
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
           <Name>ModesOfOperationDisplay</Name>
-          <DataType>USINT</DataType>
+          <DataType>SINT</DataType>
         </Entry>
         <Entry>
           <Index>#x0000</Index>
@@ -149,7 +151,6 @@
       </TxPdo>
       <Mailbox DataLinkLayer="true">
         <CoE CompleteAccess="false" PdoUpload="false" SdoInfo="true"/>
-        <FoE/>
       </Mailbox>
       <Dc>
         <OpMode>
@@ -170,7 +171,6 @@
       <Eeprom>
         <ByteSize>2048</ByteSize>
         <ConfigData>8002000E64000000</ConfigData>
-        <BootStrap>0010800080108000</BootStrap>
       </Eeprom>
       </Device>
     </Devices>

@@ -112,6 +112,16 @@ const _objd SDO1A00[] =
    {0x0A, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x00000008, NULL},   /* padding */
 };
 
+static const char acName1C00[] = "SM Communication Type";
+const _objd SDO1C00[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 4, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 1, NULL},   /* mailbox receive */
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 2, NULL},   /* mailbox send */
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 3, NULL},   /* process data output */
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 4, NULL},   /* process data input */
+};
+
 static const char acNameSM1C12[] = "SM assignment";
 const _objd SDO1C12[] =
 {
@@ -135,19 +145,19 @@ const _objd SDO1000[] =
 /* 0x1008 Device Name */
 const _objd SDO1008[] =
 {
-   {0x00, DTYPE_VISIBLE_STRING, 72, ATYPE_RO, acName1008_00, 0, NULL},
+   {0x00, DTYPE_VISIBLE_STRING, 72, ATYPE_RO, acName1008_00, 0, (void *)"cmc_drive"},
 };
 
 /* 0x1009 Hardware Version */
 const _objd SDO1009[] =
 {
-   {0x00, DTYPE_VISIBLE_STRING, 24, ATYPE_RO, acName1009_00, 0, NULL},
+   {0x00, DTYPE_VISIBLE_STRING, 24, ATYPE_RO, acName1009_00, 0, (void *)"1.0"},
 };
 
 /* 0x100A Software Version */
 const _objd SDO100A[] =
 {
-   {0x00, DTYPE_VISIBLE_STRING, 24, ATYPE_RO, acName100A_00, 0, NULL},
+   {0x00, DTYPE_VISIBLE_STRING, 24, ATYPE_RO, acName100A_00, 0, (void *)"0.1"},
 };
 
 /* 0x1018 Identity Object */
@@ -311,7 +321,7 @@ const _objd SDO60FF[] =
 /* 0x6502 Supported Drive Modes */
 const _objd SDO6502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 928, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 896, NULL},
 };
 
 /* Object list. Ascending index order is required by
@@ -322,15 +332,16 @@ const _objectlist SDOobjects[] =
    {0x1008, OTYPE_VAR, 0, 0, acName1008, SDO1008},
    {0x1009, OTYPE_VAR, 0, 0, acName1009, SDO1009},
    {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
-   {0x1018, OTYPE_ARRAY, 4, 0, acName1018, SDO1018},
+   {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
    {0x10F1, OTYPE_RECORD, 2, 0, acName10F1, SDO10F1},
    {0x1600, OTYPE_RECORD, 7, 0, acNamePDO1600, SDO1600},
    {0x1A00, OTYPE_RECORD, 10, 0, acNamePDO1A00, SDO1A00},
+   {0x1C00, OTYPE_ARRAY, 4, 0, acName1C00, SDO1C00},
    {0x1C12, OTYPE_ARRAY, 1, 0, acNameSM1C12, SDO1C12},
    {0x1C13, OTYPE_ARRAY, 1, 0, acNameSM1C13, SDO1C13},
-   {0x2000, OTYPE_ARRAY, 2, 0, acName2000, SDO2000},
+   {0x2000, OTYPE_RECORD, 2, 0, acName2000, SDO2000},
    {0x2001, OTYPE_RECORD, 3, 0, acName2001, SDO2001},
-   {0x2002, OTYPE_ARRAY, 3, 0, acName2002, SDO2002},
+   {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
@@ -344,9 +355,9 @@ const _objectlist SDOobjects[] =
    {0x6076, OTYPE_VAR, 0, 0, acName6076, SDO6076},
    {0x6077, OTYPE_VAR, 0, 0, acName6077, SDO6077},
    {0x607A, OTYPE_VAR, 0, 0, acName607A, SDO607A},
-   {0x608F, OTYPE_ARRAY, 2, 0, acName608F, SDO608F},
-   {0x6091, OTYPE_ARRAY, 2, 0, acName6091, SDO6091},
-   {0x6092, OTYPE_ARRAY, 2, 0, acName6092, SDO6092},
+   {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
+   {0x6091, OTYPE_RECORD, 2, 0, acName6091, SDO6091},
+   {0x6092, OTYPE_RECORD, 2, 0, acName6092, SDO6092},
    {0x60F4, OTYPE_VAR, 0, 0, acName60F4, SDO60F4},
    {0x60FF, OTYPE_VAR, 0, 0, acName60FF, SDO60FF},
    {0x6502, OTYPE_VAR, 0, 0, acName6502, SDO6502},
