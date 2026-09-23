@@ -4,20 +4,26 @@ env:
   BUILD_TYPE: Release
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    # ubuntu-20.04 was retired, which silently stopped this workflow running
+    # at all. Pin to a supported image rather than to a number that expires.
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+      - uses: actions/checkout@v4
 
-      - name: Configure
-        shell: bash
+      # The generated object dictionary is committed, so the first thing to
+      # establish is that it still matches its YAML source and that what the
+      # generator emits is internally consistent. See tools/check_od.sh.
+      - name: Check the object dictionary
         run: |
-          cmake -E make_directory $GITHUB_WORKSPACE/build
-          cmake -B $GITHUB_WORKSPACE/build -S $GITHUB_WORKSPACE \
-             -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          python3 -m pip install --quiet pyyaml
+          sh tools/check_od.sh
 
+      # One configuration per application: the soes library compiles against
+      # whichever one supplies ecat_options.h, so they cannot share a build.
       - name: Build
-        shell: bash
         run: |
-          cmake --build $GITHUB_WORKSPACE/build -j4
+          for app in applications/lan9252_diag applications/cia402_drive; do
+            cmake -B "build/$(basename "$app")" -S . \
+              -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSOES_DEMO="$app"
+            cmake --build "build/$(basename "$app")" -j4
+          done
