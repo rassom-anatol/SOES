@@ -97,11 +97,27 @@ static uint32_t timeout_ms = DEFAULT_TIMEOUT_MS;
  */
 static int hw_fault = 0;
 
+/* SPI accounting. Two clock_gettime calls per transfer, so roughly thirty per
+ * cycle -- under a microsecond in total through the vDSO, but it sits in the
+ * one path being tuned to microseconds, so it is switchable rather than
+ * permanent. On by default because the diagnostic application reports it and
+ * the cycle-time work still depends on it; build with -DESC_HW_SPI_STATS=0 to
+ * take it out of the hot path entirely.
+ */
+#ifndef ESC_HW_SPI_STATS
+#define ESC_HW_SPI_STATS 1
+#endif
+
+#if ESC_HW_SPI_STATS
 static uint64_t spi_ns = 0;
 static uint64_t spi_count = 0;
 
 uint64_t ESC_hw_spi_ns (void)    { return spi_ns; }
 uint64_t ESC_hw_spi_count (void) { return spi_count; }
+#else
+uint64_t ESC_hw_spi_ns (void)    { return 0; }
+uint64_t ESC_hw_spi_count (void) { return 0; }
+#endif
 
 int ESC_hw_faulted (void)
 {
@@ -173,20 +189,26 @@ static void hw_timeout (const char * what)
 static int spi_xfer (uint8_t * buf, uint32_t len)
 {
    struct spi_ioc_transfer xfer;
-   struct timespec a, b;
    int rc;
+#if ESC_HW_SPI_STATS
+   struct timespec a, b;
+#endif
 
    memset (&xfer, 0, sizeof (xfer));
    xfer.tx_buf = (unsigned long)buf;
    xfer.rx_buf = (unsigned long)buf;
    xfer.len    = len;
 
+#if ESC_HW_SPI_STATS
    clock_gettime (CLOCK_MONOTONIC, &a);
+#endif
    rc = ioctl (spi_fd, SPI_IOC_MESSAGE (1), &xfer);
+#if ESC_HW_SPI_STATS
    clock_gettime (CLOCK_MONOTONIC, &b);
    spi_ns += (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
              (uint64_t)(b.tv_nsec - a.tv_nsec);
    spi_count++;
+#endif
 
    if (rc < 0)
    {

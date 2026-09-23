@@ -79,6 +79,9 @@ int  ESC_hw_faulted (void);
  *  transfers. Lets a caller separate time the hardware actually took from time
  *  the process spent descheduled, which a wall-clock cycle measurement alone
  *  cannot distinguish.
+ *
+ *  Both return zero when the port is built with -DESC_HW_SPI_STATS=0, which
+ *  removes the two clock_gettime calls per transfer from the cyclic path.
  */
 uint64_t ESC_hw_spi_ns (void);
 uint64_t ESC_hw_spi_count (void);
