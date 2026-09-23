@@ -563,7 +563,7 @@ include/cia402/Transport.hpp           abstract: Poll(), Id(), IsCommanding()
 include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 ```
 
-`Cia402Sm` is a free function — `transition(controlword, current_state, fault) → {next_state, statusword}`. The nine states and the transition table come from the **ETG.6010 / CiA402 state diagram**, written from the specification. **This is the highest-value unit test in the project:** an exhaustive controlword × state table under `ament_add_gtest`, running in CI with no hardware.
+`Cia402Sm` is a free function — `transition(controlword, current_state, fault) → {next_state, statusword}`. The **eight** states and the transition table come from the **ETG.6010 / CiA402 state diagram**, written from the specification. Eight, not nine: the published diagram draws a *Start* pseudo-state as a ninth box, but it is an entry point rather than a state the drive can be in or report in the statusword, so it must not appear in the test table. **This is the highest-value unit test in the project:** an exhaustive controlword × state table under `ament_add_gtest`, running in CI with no hardware.
 
 `DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
 
@@ -657,5 +657,6 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 ## Open questions
 
 - **Maximum axis count** — §4.3 reserves SM space for four as a placeholder. This is the one number in the layout not derived from a decision already taken, and it must be fixed before the ESI ships.
+- **Whether this device also carries digital and analog I/O** — general-purpose I/O consumes PDO bytes from the same §4.3 reservation as the axes, so it shares the axis count's deadline: the byte budget has to absorb it before the ESI ships, even if the I/O itself is years away. The object ranges also collide, since CiA401 places its objects inside the CiA402 axis-0 range. See [`combined-device.md`](combined-device.md).
 - **`SyncErrorCounterLimit` value** — method settled (§3.3.1); the number waits on a `cyclictest` measurement under PREEMPT_RT on the real target.
 - **0x2000:01 bit assignments** — which cmc fault and status sources map to which bits of the one PDO-mapped vendor word (§4.2).
