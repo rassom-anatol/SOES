@@ -67,14 +67,21 @@ static esc_hw_cfg_t hw_cfg =
 static volatile uint64_t rx_calls = 0;
 static volatile uint64_t tx_calls = 0;
 
-/* Mailbox activity, counted per cycle from the AL event register. This splits
- * the one question worth asking when a master's CoE object list comes back
- * empty: whether the master is sending mailbox traffic that this stack fails to
- * answer, or whether it is sending nothing at all. The two have entirely
- * different causes and nothing else distinguishes them from here.
+/* Mailbox responses this slave has sent.
+ *
+ * Counted from transitions of ESCvar.mbxbackup, which ESC_writembx sets, rather
+ * than from the SM0 and SM1 bits of the AL event register. Counting the event
+ * bits does not work and is worth recording as a trap: ESC_mbxprocess reads the
+ * mailbox and thereby clears the SM0 event during the same ecat_slv() call, so
+ * by the time an application samples ESCvar.ALevent the evidence is gone and
+ * busy mailbox traffic reads as a flat zero. That reading once made a working
+ * mailbox look completely silent.
+ *
+ * For what actually arrives, build with ESC_DEBUG: ESC_coeprocess logs every
+ * CoE service before interpreting it, which is on the handling path and so
+ * cannot be defeated this way.
  */
-static uint64_t sm0_events = 0;
-static uint64_t sm1_events = 0;
+static uint64_t mbx_responses = 0;
 
 static void cb_state_change (uint8_t * as, uint8_t * an);
 
@@ -226,13 +233,17 @@ int main (int argc, char * argv[])
       ecat_slv ();
       clock_gettime (CLOCK_MONOTONIC, &b);
 
-      if (ESCvar.ALevent & ESCREG_ALEVENT_SM0)
       {
-         sm0_events++;
-      }
-      if (ESCvar.ALevent & ESCREG_ALEVENT_SM1)
-      {
-         sm1_events++;
+         static uint8_t backup_prev = 0;
+
+         if (ESCvar.mbxbackup != backup_prev)
+         {
+            if (ESCvar.mbxbackup != 0)
+            {
+               mbx_responses++;
+            }
+            backup_prev = ESCvar.mbxbackup;
+         }
       }
 
       if (n < NS)
@@ -325,13 +336,12 @@ int main (int argc, char * argv[])
             printf ("   MBX: run=%u xoe=%u outpost=%u backup=%u"
                     " | SM0 %04X len %u ctl %02X act %02X"
                     " | SM1 %04X len %u ctl %02X act %02X"
-                    " | events SM0=%llu SM1=%llu\n",
+                    " | responses=%llu\n",
                     ESCvar.MBXrun, ESCvar.xoe, ESCvar.mbxoutpost,
                     ESCvar.mbxbackup,
                     etohs (p0), (unsigned)etohs (l0), c0m, a0m,
                     etohs (p1), (unsigned)etohs (l1), c1m, a1m,
-                    (unsigned long long)sm0_events,
-                    (unsigned long long)sm1_events);
+                    (unsigned long long)mbx_responses);
          }
 
          /* The mirror, as the master should see it. Signed values are printed
