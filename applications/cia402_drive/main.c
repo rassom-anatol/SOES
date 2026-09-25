@@ -286,6 +286,31 @@ int main (int argc, char * argv[])
                  (unsigned long long)rx_calls, (unsigned long long)tx_calls);
 
          {
+            /* Whether the ESC came up at all, as distinct from whether a master
+             * is talking to it. 0x0110 bits 4/5 are the two ports' links and
+             * bit 0 is PDI operational; 0x0502 reports EEPROM loading, whose
+             * error bits are the first thing to check after writing an SII,
+             * because an image the ESC will not load leaves the device on the
+             * wire but not configurable. */
+            uint16_t dls = 0, eep = 0;
+            uint8_t pdi = 0;
+
+            ESC_read (ESCREG_DLSTATUS, &dls, sizeof (dls));
+            ESC_read (ESCREG_EECONTSTAT, &eep, sizeof (eep));
+            ESC_read (0x0140, &pdi, sizeof (pdi));
+            eep = etohs (eep);
+            printf ("   ESC: 0x0110 DL=%04X (link %s, PDI %s)"
+                    "  0x0140 PDIctl=%02X  0x0502 EEP=%04X%s%s%s%s\n",
+                    etohs (dls), (etohs (dls) & 0x0030) ? "up" : "DOWN",
+                    (etohs (dls) & 0x0001) ? "operational" : "NOT OPERATIONAL",
+                    pdi, eep,
+                    (eep & 0x0800) ? " CHECKSUM-ERROR" : "",
+                    (eep & 0x1000) ? " DEVICE-INFO-ERROR" : "",
+                    (eep & 0x2000) ? " CMD-ERROR" : "",
+                    (eep & 0x4000) ? " WRITE-ERROR" : "");
+         }
+
+         {
             uint8_t c0m = 0, a0m = 0, c1m = 0, a1m = 0;
             uint16_t l0 = 0, l1 = 0, p0 = 0, p1 = 0;
 
