@@ -83,57 +83,80 @@ static const char acName6502_00[] = "Supported Drive Modes";
 
 /* RxPDO Drive */
 static const char acNamePDO1600[] = "RxPDO Drive";
+static const char acNamePDO1600_01[] = "TargetPosition";
+static const char acNamePDO1600_02[] = "TargetVelocity";
+static const char acNamePDO1600_03[] = "Controlword";
+static const char acNamePDO1600_04[] = "TargetTorque";
+static const char acNamePDO1600_05[] = "MaxTorque";
+static const char acNamePDO1600_06[] = "ModesOfOperation";
+static const char acNamePDO1600_07[] = "padding";
 const _objd SDO1600[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNamePDO1600, 7, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x607A0020, NULL},   /* TargetPosition */
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x60FF0020, NULL},   /* TargetVelocity */
-   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x60400010, NULL},   /* Controlword */
-   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x60710010, NULL},   /* TargetTorque */
-   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x60720010, NULL},   /* MaxTorque */
-   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x60600008, NULL},   /* ModesOfOperation */
-   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600, 0x00000008, NULL},   /* padding */
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_01, 0x607A0020, NULL},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_02, 0x60FF0020, NULL},
+   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_03, 0x60400010, NULL},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_04, 0x60710010, NULL},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_05, 0x60720010, NULL},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_06, 0x60600008, NULL},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1600_07, 0x00000008, NULL},
 };
 
 /* TxPDO Drive */
 static const char acNamePDO1A00[] = "TxPDO Drive";
+static const char acNamePDO1A00_01[] = "PositionActual";
+static const char acNamePDO1A00_02[] = "VelocityActual";
+static const char acNamePDO1A00_03[] = "FollowingErrorActual";
+static const char acNamePDO1A00_04[] = "GateDriverFaults";
+static const char acNamePDO1A00_05[] = "DriveStatusFlags";
+static const char acNamePDO1A00_06[] = "Statusword";
+static const char acNamePDO1A00_07[] = "TorqueActual";
+static const char acNamePDO1A00_08[] = "ErrorCode";
+static const char acNamePDO1A00_09[] = "ModesOfOperationDisplay";
+static const char acNamePDO1A00_0A[] = "padding";
 const _objd SDO1A00[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNamePDO1A00, 10, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x60640020, NULL},   /* PositionActual */
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x606C0020, NULL},   /* VelocityActual */
-   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x60F40020, NULL},   /* FollowingErrorActual */
-   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x20000110, NULL},   /* GateDriverFaults */
-   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x20000210, NULL},   /* DriveStatusFlags */
-   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x60410010, NULL},   /* Statusword */
-   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x60770010, NULL},   /* TorqueActual */
-   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x603F0010, NULL},   /* ErrorCode */
-   {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x60610008, NULL},   /* ModesOfOperationDisplay */
-   {0x0A, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00, 0x00000008, NULL},   /* padding */
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_01, 0x60640020, NULL},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_02, 0x606C0020, NULL},
+   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_03, 0x60F40020, NULL},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_04, 0x20000110, NULL},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_05, 0x20000210, NULL},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_06, 0x60410010, NULL},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_07, 0x60770010, NULL},
+   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_08, 0x603F0010, NULL},
+   {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_09, 0x60610008, NULL},
+   {0x0A, DTYPE_UNSIGNED32, 32, ATYPE_RO, acNamePDO1A00_0A, 0x00000008, NULL},
 };
 
 static const char acName1C00[] = "SM Communication Type";
+static const char acName1C00_01[] = "Mailbox Receive";
+static const char acName1C00_02[] = "Mailbox Send";
+static const char acName1C00_03[] = "Process Data Output";
+static const char acName1C00_04[] = "Process Data Input";
 const _objd SDO1C00[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 4, NULL},
-   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 1, NULL},   /* mailbox receive */
-   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 2, NULL},   /* mailbox send */
-   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 3, NULL},   /* process data output */
-   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 4, NULL},   /* process data input */
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00_01, 1, NULL},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00_02, 2, NULL},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00_03, 3, NULL},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00_04, 4, NULL},
 };
 
-static const char acNameSM1C12[] = "SM assignment";
+static const char acNameSM1C12[] = "RxPDO Assignment";
+static const char acNameSM1C12_01[] = "Assigned PDO 1600";
 const _objd SDO1C12[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNameSM1C12, 1, NULL},
-   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM1C12, 0x1600, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM1C12_01, 0x1600, NULL},
 };
 
-static const char acNameSM1C13[] = "SM assignment";
+static const char acNameSM1C13[] = "TxPDO Assignment";
+static const char acNameSM1C13_01[] = "Assigned PDO 1A00";
 const _objd SDO1C13[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNameSM1C13, 1, NULL},
-   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM1C13, 0x1A00, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM1C13_01, 0x1A00, NULL},
 };
 
 /* 0x1000 Device Type */

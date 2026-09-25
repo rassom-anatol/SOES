@@ -243,6 +243,18 @@ declines the write, which is visible in a debug build as one `ignored` line per
 string object at start-up. Giving a string object a `var` would change that and
 would need real storage behind it.
 
+### 2.5b Every PDO mapping entry had the same name
+
+Found by looking at the object list a master actually displays, which is the only
+place it shows. The generator named all seven sub-entries of 0x1600 "RxPDO Drive" and
+all ten of 0x1A00 "TxPDO Drive", putting the useful name in a C comment that nothing
+downstream ever reads; 0x1C00, 0x1C12 and 0x1C13 fell back to the master's generic
+"SubIndex 001". The process image is the part of the device a person configuring it
+looks at most, and it read as a column of identical text.
+
+**Resolved.** Each mapping entry is named for the object it maps -- `TargetPosition`,
+`Controlword`, `padding` -- and the SyncManager objects carry real sub-entry names.
+
 ### 2.6 0x6502 advertises a mode that does not exist
 
 `0x000003A0` sets bit 5 — homing mode — alongside csp (7), csv (8) and cst (9). There
@@ -285,7 +297,12 @@ Object code is a property of the object as the profile defines it, not something
 infer from the shape of the sub-entries. It belongs in `od.yaml` as an explicit field
 with a sensible default.
 
-**Resolved.** The heuristic is deleted. `object_code` is an `od.yaml` field defaulting
+**Resolved, and verified in a master's object browser:** 0x1018, 0x10F1, 0x608F,
+0x6091, 0x6092 and 0x2000 to 0x2002 all expand as records with correctly typed
+sub-entries. That is the half `check_od.sh` cannot cover, since asserting
+`OTYPE_RECORD` on the generated side says nothing about what a master makes of it.
+
+The heuristic is deleted. `object_code` is an `od.yaml` field defaulting
 to `var` for a scalar and `record` for anything with sub-entries — which is what the
 profile specifies for every object currently in the dictionary, so nothing needs to
 state it explicitly yet. `array` is now opt-in, which is the right way round given what

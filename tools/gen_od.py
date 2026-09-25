@@ -307,14 +307,21 @@ def emit_objectlist(cfg, objs, rx, tx, src):
         idx = pdo["index"]
         out.append(f"\n/* {pdo['name']} */")
         out.append(f"static const char acNamePDO{idx:04X}[] = \"{pdo['name']}\";")
+        # Each mapping entry is named for the object it maps, not for the PDO
+        # that contains it. A master displays these names in its object browser,
+        # and naming all seven entries after the PDO -- with the useful name
+        # only in a C comment nobody downstream ever sees -- turns the process
+        # image into a column of identical text.
+        for i, e in enumerate(entries, 1):
+            out.append(f'static const char acNamePDO{idx:04X}_{i:02X}[] = '
+                       f'"{e["name"]}";')
         out.append(f"const _objd SDO{idx:04X}[] =\n{{")
         out.append(f"   {{0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNamePDO{idx:04X}, "
                    f"{len(entries)}, NULL}},")
         for i, e in enumerate(entries, 1):
             w = mapping_word(e)
             out.append(f"   {{0x{i:02X}, DTYPE_UNSIGNED32, 32, ATYPE_RO, "
-                       f"acNamePDO{idx:04X}, 0x{w:08X}, NULL}},   "
-                       f"/* {e['name']} */")
+                       f"acNamePDO{idx:04X}_{i:02X}, 0x{w:08X}, NULL}},")
         out.append("};")
 
     # SyncManager Communication Type. A master enumerating a CoE device reads
@@ -322,23 +329,26 @@ def emit_objectlist(cfg, objs, rx, tx, src):
     # is not optional even though nothing in the slave consults it. The four
     # values are the fixed SOES layout: two mailbox SMs then outputs, inputs.
     out.append('\nstatic const char acName1C00[] = "SM Communication Type";')
+    sm_kinds = ((1, "Mailbox Receive"), (2, "Mailbox Send"),
+                (3, "Process Data Output"), (4, "Process Data Input"))
+    for sub, (_, what) in enumerate(sm_kinds, 1):
+        out.append(f'static const char acName1C00_{sub:02X}[] = "{what}";')
     out.append("const _objd SDO1C00[] =\n{")
     out.append("   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00, 4, NULL},")
-    for sub, (kind, what) in enumerate(((1, "mailbox receive"),
-                                        (2, "mailbox send"),
-                                        (3, "process data output"),
-                                        (4, "process data input")), 1):
+    for sub, (kind, _) in enumerate(sm_kinds, 1):
         out.append(f"   {{0x{sub:02X}, DTYPE_UNSIGNED8, 8, ATYPE_RO, "
-                   f"acName1C00, {kind}, NULL}},   /* {what} */")
+                   f"acName1C00_{sub:02X}, {kind}, NULL}},")
     out.append("};")
 
     # SyncManager assignment, likewise fixed.
-    for idx, assigned in ((0x1C12, cfg["rxpdo"]["index"]),
-                          (0x1C13, cfg["txpdo"]["index"])):
-        out.append(f"\nstatic const char acNameSM{idx:04X}[] = \"SM assignment\";")
+    for idx, assigned, what in ((0x1C12, cfg["rxpdo"]["index"], "RxPDO Assignment"),
+                                (0x1C13, cfg["txpdo"]["index"], "TxPDO Assignment")):
+        out.append(f'\nstatic const char acNameSM{idx:04X}[] = "{what}";')
+        out.append(f'static const char acNameSM{idx:04X}_01[] = '
+                   f'"Assigned PDO {assigned:04X}";')
         out.append(f"const _objd SDO{idx:04X}[] =\n{{")
         out.append(f"   {{0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNameSM{idx:04X}, 1, NULL}},")
-        out.append(f"   {{0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM{idx:04X}, "
+        out.append(f"   {{0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM{idx:04X}_01, "
                    f"0x{assigned:04X}, NULL}},")
         out.append("};")
 
