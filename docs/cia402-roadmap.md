@@ -236,7 +236,8 @@ Model on [`soes/hal/rt-kernel-xmc4/esc_hw.c:214-262`](../soes/hal/rt-kernel-xmc4
 
 ```
 loop:
-  esc_hw_irq_wait(2 * cycle_ns)
+  if esc_hw_irq_wait(2 * cycle_ns) == TIMEOUT and dcsync:
+      ALstatusgotoerror(SAFEOP|ERROR, ALERR_FATALSYNCERROR)   /* DC liveness */
   ESC_read(ESCREG_ALEVENT, &ESCvar.ALevent, 2)     /* explicit, see below */
   if ALevent & (SM2|SM3):
       if dcsync == 0:  DIG_process(RXPDO | APP_HOOK | TXPDO)
@@ -252,11 +253,13 @@ loop:
 
 **Two threads, not one.** Mailbox/CoE/FoE work is unbounded and must never sit in front of a SYNC0 deadline — hand it to a normal-priority worker via semaphore, as the xmc4 HAL does.
 
-One LAN9252 difference from the xmc4: ALEVENT is memory-mapped and free there, but costs a full CSR cycle over SPI here. **Do not rely on the piggybacked ALEVENT tail read** (`esc_hw.c:373-376`) inside the loop — that value is from the *previous* transaction.
+One LAN9252 difference from the xmc4: ALEVENT is memory-mapped and free there, but costs a full CSR cycle over SPI here. **Do not rely on the piggybacked ALEVENT tail read** inside the loop — that value is from the *previous* transaction. The tail is now suppressed on an ALEVENT read and on the two process data transfers, so the explicit read above is the only one that happens.
+
+**The wait timeout is the DC liveness check, and this is the only sensible place for it.** [`stack-review.md`](stack-review.md) §1.2 asks for a check distinct from the sync error counter, because the counter tracks the *balance* between SM2 events and SYNC0 edges and therefore cannot notice both stopping together. It does not belong in `DIG_process`: a polled loop runs at an unrelated rate, so a cycle count there means nothing, and expressing the check in time would need a clock the stack does not abstract. Here it is free — the loop already has to bound its wait, and a wait that expires with DC active *is* a dead sync unit. That is `ALERR_FATALSYNCERROR` (0x002C), not the counter drift that gives `ALERR_SYNCERROR` (0x001A).
 
 ### 3.3 Configuration and objects
 
-Copy `dc_checker()` from the scratch reference (`rtl_xmc4_dynpdo/main.c:48-56`): set `ESCvar.dcsync = 1` and `synccounterlimit` from 0x10F1:02. Set `.use_interrupt = 1`, both interrupt hooks, `.esc_check_dc_handler`, and `.watchdog_cnt = INT32_MAX` (use the ESC hardware SM watchdog rather than the software counter). Also copy `cb_state_change`'s PREOP→SAFEOP branch — **without an initial TxPDO write, SM3 never fires and the master stalls at SAFEOP**.
+Copy `dc_checker()` from the scratch reference (`rtl_xmc4_dynpdo/main.c:48-56`): set `ESCvar.dcsync = 1` and `synccounterlimit` from 0x10F1:02. Set `.use_interrupt = 1`, both interrupt hooks, `.esc_check_dc_handler`, and `.use_hw_watchdog = 1`. That last one is now real rather than aspirational: `DIG_process` reads 0x0440 and drops to SAFEOP+ERROR with `ALERR_WATCHDOG` on expiry, and it first checks that the master actually armed the watchdog (0x0400 divider and 0x0420 process data time both non-zero), falling back to the software counter if it did not. **Do not set `.watchdog_cnt = INT32_MAX`** as this section previously advised: the software counter is the fallback for exactly that case, so disabling it removes the protection the fallback exists to provide. Also copy `cb_state_change`'s PREOP→SAFEOP branch — **without an initial TxPDO write, SM3 never fires and the master stalls at SAFEOP**.
 
 Objects to add: **0x10F1** (ErrorSettings; `:02` SyncErrorCounterLimit), **0x1C32** and **0x1C33** (SM2/SM3 sync parameters — `:01` sync mode, `:02` cycle time, `:05` minimum cycle time, `:0B` SMEventMissedCnt, `:20` SyncError).
 
