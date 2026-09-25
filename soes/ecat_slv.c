@@ -197,7 +197,8 @@ void APP_setwatchdog (int watchdogcnt)
 static enum
 {
    HW_WD_UNCHECKED = 0,   /* configuration not read since outputs came up */
-   HW_WD_ARMED,           /* master armed it; 0x0440 is authoritative */
+   HW_WD_WAITING,         /* armed by the master, but not yet fed even once */
+   HW_WD_RUNNING,         /* fed at least once; 0x0440 is now authoritative */
    HW_WD_DISABLED,        /* master disabled it; fall back to the counter */
 } hw_wd_state = HW_WD_UNCHECKED;
 
@@ -216,6 +217,13 @@ static enum
  * check, because it looks like protection. So the configuration is read once
  * per entry into an output state and, if the master left us unprotected, the
  * software counter takes over rather than the device refusing to run.
+ *
+ * The watchdog is fed by the master's writes to SM2, which means it reads
+ * *expired* at the moment outputs become active, before the first output frame
+ * has arrived. Acting on that is a guaranteed false trip that never lets the
+ * device reach OP at all. So expiry only counts once the watchdog has been seen
+ * running at least once: until the master has sent one frame of process data
+ * there is no setpoint being held, and so nothing for the watchdog to protect.
  *
  * @return 1 if the hardware watchdog is in charge, 0 if the caller should fall
  *         back to the software counter.
@@ -251,7 +259,7 @@ static int hw_watchdog_check (void)
       {
          DPRINT ("hw watchdog: armed, %u ticks of (%u+2)*40 ns\n",
                  pdtime, divider);
-         hw_wd_state = HW_WD_ARMED;
+         hw_wd_state = HW_WD_WAITING;
       }
    }
 
@@ -260,7 +268,15 @@ static int hw_watchdog_check (void)
       return 0;
    }
 
-   if ((ESC_WDstatus () & ESCREG_WDSTATUS_OK) == 0)
+   if ((ESC_WDstatus () & ESCREG_WDSTATUS_OK) != 0)
+   {
+      if (hw_wd_state == HW_WD_WAITING)
+      {
+         DPRINT ("hw watchdog: first process data frame seen, now enforcing\n");
+         hw_wd_state = HW_WD_RUNNING;
+      }
+   }
+   else if (hw_wd_state == HW_WD_RUNNING)
    {
       DPRINT ("hw watchdog expired\n");
       ESC_ALstatusgotoerror ((ESCsafeop | ESCerror), ALERR_WATCHDOG);
