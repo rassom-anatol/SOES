@@ -537,6 +537,12 @@ The populated PDO length still reflects the axes actually present, so a single-a
 
 Generator idempotent under a CI diff check; the master's PDO map byte-for-byte matches `od.yaml` including padding; SDO read/write of every RW object and a full SDO-Info OD list (which validates `MBXSIZE 256`); a master write to 0x1C12 or 0x1600 is rejected, confirming the mapping really is read-only; `xmllint --schema EtherCATInfo.xsd` on the ESI. **If a `SMRESULT_ERRSM2/3` appears, fix the generator, never the output.**
 
+**Deployed and reached OP against TwinCAT.** The ESI was imported and the SII written from it, and the device came up `INIT -> PREOP -> SAFEOP -> OP` with no AL status code on the first attempt: the generated mailbox configuration passed `ESC_checkmbx` and the generated SyncManager layout passed `ESC_checkSM23`, which together are the whole reason §4.1 exists. Cycle cost 9.8 transfers and 91.2 us median, indistinguishable from the diagnostic application's 9.5 and 93.1 us, so the larger dictionary costs nothing cyclically.
+
+**The signedness fix is confirmed by observation, not inspection.** With `applications/cia402_drive` mirroring each setpoint into its matching actual value, a master write of `-100000` to 0x607A read back as `-100000` in 0x6064. Under the `UDINT` the generator emitted before [`stack-review.md`](stack-review.md) §2.1 was fixed, the same write would have arrived as 4294867296 with the state machine still reaching OP and nothing reporting a fault. That is the defect in that review which failed silently, and this is the test that catches it: **any change to `esi_type` or to a mapped object's declared type should be re-checked this way, because no AL status code will ever complain about it.**
+
+Still outstanding here: the SDO-Info walk over the full dictionary, which is what validates `MBXSIZE 256`, the string objects in §2.5 and the object codes in §2.8 in one pass.
+
 ---
 
 ## Phase 5 — cmc integration
