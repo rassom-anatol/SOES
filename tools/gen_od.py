@@ -619,6 +619,11 @@ def bootstrap(cfg):
     return "".join(w.to_bytes(2, "little").hex().upper() for w in words)
 
 
+def esi_name(cfg):
+    """Filename for the ESI: the device name, as a master will show it."""
+    return f"{cident(cfg['device']['name'])}.xml"
+
+
 def esi_type(entry):
     t = ESI_TYPES.get(entry["type"])
     if t is None:
@@ -653,7 +658,14 @@ def main():
         "slave_objectlist.c": emit_objectlist(cfg, objs, rx, tx, src),
         "utypes.h": emit_utypes(cfg, objs, src),
         "ecat_options.h": emit_options(cfg, rx_bytes, tx_bytes, rx, tx, sm, src),
-        "slave.xml": emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src),
+        # Named after the device, not "slave.xml". The ESI is the one generated
+        # artifact that leaves this repository: it is copied onto removable
+        # media and dropped into a master's device description folder, where a
+        # generic name is a real hazard rather than an untidiness. Two devices
+        # in this tree once both had an ESI called slave.xml, differing in
+        # identity, mailbox size and SyncManager layout, and the failure mode of
+        # confusing them is a flashed EEPROM.
+        esi_name(cfg): emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src),
     }
     for name, text in files.items():
         with open(os.path.join(outdir, name), "w") as fh:

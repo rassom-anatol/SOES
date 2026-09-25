@@ -26,8 +26,17 @@ trap 'rm -rf "$tmp"' EXIT
 echo "== regenerating to a scratch directory =="
 python3 "$root/tools/gen_od.py" "$yaml" "$tmp" >/dev/null
 
+# The ESI is named after the device rather than generically, so ask the
+# generator what it called it rather than restating the rule here.
+esi=$(python3 -c "
+import sys, yaml
+sys.path.insert(0, '$root/tools')
+from gen_od import esi_name
+print(esi_name(yaml.safe_load(open('$yaml'))))
+")
+
 fail=0
-for f in slave_objectlist.c utypes.h ecat_options.h slave.xml; do
+for f in slave_objectlist.c utypes.h ecat_options.h "$esi"; do
     if ! diff -q "$gen/$f" "$tmp/$f" >/dev/null 2>&1; then
         echo "FAIL: $f differs from what the YAML generates"
         diff -u "$gen/$f" "$tmp/$f" | head -20 || true
@@ -47,10 +56,10 @@ gcc -c -o /dev/null -Wall -Wextra -Wno-unused-parameter \
 echo "  compiles clean"
 
 echo "== inspecting the generated artifacts =="
-python3 - "$gen" <<'PY'
+python3 - "$gen" "$esi" <<'PY'
 import os, re, sys
 
-gen = sys.argv[1]
+gen, esi_file = sys.argv[1], sys.argv[2]
 
 
 def rd(name):
@@ -58,7 +67,7 @@ def rd(name):
         return fh.read()
 
 
-esi, opt, c = rd("slave.xml"), rd("ecat_options.h"), rd("slave_objectlist.c")
+esi, opt, c = rd(esi_file), rd("ecat_options.h"), rd("slave_objectlist.c")
 
 fails = []
 
