@@ -274,17 +274,39 @@ check("FoE support is described consistently", bad)
 # configures SMs from the ESI and the slave checks them against its own build.
 
 sm_esi = {}
-for m in re.finditer(r'<Sm[^>]*StartAddress="#x([0-9A-Fa-f]+)"[^>]*>(\w+)</Sm>', esi):
-    sm_esi[m.group(2)] = int(m.group(1), 16)
+for m in re.finditer(r"<Sm\b[^>]*>(\w+)</Sm>", esi):
+    attrs = m.group(0)
+    addr = re.search(r'StartAddress="#x([0-9A-Fa-f]+)"', attrs)
+    ctl = re.search(r'ControlByte="#x([0-9A-Fa-f]+)"', attrs)
+    sm_esi[m.group(1)] = (int(addr.group(1), 16) if addr else None,
+                          int(ctl.group(1), 16) if ctl else None)
 
 bad = []
-for esi_name, c_name in (("MBoxOut", "MBX0_sma"), ("MBoxIn", "MBX1_sma"),
-                         ("Outputs", "SM2_sma"), ("Inputs", "SM3_sma")):
-    a, b = sm_esi.get(esi_name), define(c_name)
-    if a != b:
-        bad.append(f"{esi_name} is 0x{a:04X} in the ESI, "
-                   f"{c_name} is 0x{b:04X}")
-check("SyncManager addresses agree between the ESI and the build", bad)
+for esi_name, a_name, c_name in (("MBoxOut", "MBX0_sma", "MBX0_smc"),
+                                 ("MBoxIn", "MBX1_sma", "MBX1_smc"),
+                                 ("Outputs", "SM2_sma", "SM2_smc"),
+                                 ("Inputs", "SM3_sma", "SM3_smc")):
+    esi_addr, esi_ctl = sm_esi.get(esi_name, (None, None))
+    for got, want, what in ((esi_addr, define(a_name), a_name),
+                            (esi_ctl, define(c_name), c_name)):
+        if got != want:
+            bad.append(f"{esi_name}: the ESI says 0x{got:04X}, "
+                       f"{what} says 0x{want:04X}")
+check("SyncManager addresses and control bytes agree with the build", bad)
+
+# --- 10. the output SyncManager feeds the watchdog --------------------------
+#
+# Bit 6 of SM2's control byte is Watchdog Trigger Enable. Without it the
+# SyncManager does not feed the ESC process data watchdog, 0x0440 reads expired
+# however much process data arrives, and any watchdog reaction built on it can
+# never fire. Measured on hardware before this check existed.
+
+_, smc_out = sm_esi.get("Outputs", (None, None))
+bad = []
+if smc_out is not None and not (smc_out & 0x40):
+    bad.append(f"SM2 control byte is 0x{smc_out:02X}: bit 6 clear, so the "
+               f"process data watchdog is never fed")
+check("the output SyncManager triggers the watchdog", bad)
 
 if fails:
     print(f"\n{len(fails)} check(s) failed")

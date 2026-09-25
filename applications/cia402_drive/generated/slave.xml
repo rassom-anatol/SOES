@@ -24,7 +24,7 @@
       <Fmmu>Inputs</Fmmu>
       <Sm ControlByte="#x26" DefaultSize="256" Enable="1" StartAddress="#x1000">MBoxOut</Sm>
       <Sm ControlByte="#x22" DefaultSize="256" Enable="1" StartAddress="#x1100">MBoxIn</Sm>
-      <Sm ControlByte="#x24" Enable="1" StartAddress="#x1200">Outputs</Sm>
+      <Sm ControlByte="#x64" Enable="1" StartAddress="#x1200">Outputs</Sm>
       <Sm ControlByte="#x20" Enable="1" StartAddress="#x1300">Inputs</Sm>
       <RxPdo Fixed="1" Sm="2" Mandatory="1">
         <Index>#x1600</Index>

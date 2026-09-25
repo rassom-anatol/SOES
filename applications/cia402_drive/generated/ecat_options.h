@@ -38,8 +38,10 @@
    so adding axes needs no ESI change. SM3 must start at or after
    SM2 + 3*64 = 0x12C0;
    the reservation ends at 0x1420, inside the 0x2000 top. */
+/* SM2 control bit 6 enables the watchdog trigger, without which
+   the ESC process data watchdog at 0x0440 is never fed. */
 #define SM2_sma           0x1200
-#define SM2_smc           0x24
+#define SM2_smc           0x64
 #define SM2_act           1
 #define SM3_sma           0x1300
 #define SM3_smc           0x20

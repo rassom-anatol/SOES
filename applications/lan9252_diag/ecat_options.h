@@ -27,7 +27,14 @@
 #define MBX1_smc_b       0x22
 
 #define SM2_sma          0x1100
-#define SM2_smc          0x24
+/* Bit 6 is Watchdog Trigger Enable. Without it this SyncManager never feeds
+ * the ESC process data watchdog, so 0x0440 reads expired however much process
+ * data arrives and the watchdog reaction in DIG_process can never fire. It must
+ * match the ControlByte in slave.xml, because ESC_checkSM23 compares what the
+ * master wrote from the ESI against this constant and refuses SAFEOP if they
+ * differ -- so changing one means re-importing the ESI in the master.
+ */
+#define SM2_smc          0x64
 #define SM2_act          1
 #define SM3_sma          0x1180
 #define SM3_smc          0x20

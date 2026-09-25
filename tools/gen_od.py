@@ -212,6 +212,38 @@ def resolve_pdo(cfg, pdo, objs, axis):
     return entries, bits // 8
 
 
+# SyncManager control byte, per ETG.1000.4 register 0x0804+n*8:
+#   bits 1:0  operation mode   00 buffered, 10 mailbox
+#   bits 3:2  direction        00 read by master, 01 written by master
+#   bit  4    interrupt in ECAT
+#   bit  5    interrupt in PDI
+#   bit  6    watchdog trigger enable
+SMC_OUTPUTS = 0x24              # buffered, master writes, PDI interrupt
+SMC_INPUTS = 0x20               # buffered, master reads, PDI interrupt
+SMC_WATCHDOG = 0x40
+
+
+def sm_control(cfg):
+    """Control bytes for the two process data SyncManagers.
+
+    The watchdog trigger bit is the whole reason this is computed rather than
+    written down. Without it the SyncManager does not feed the ESC process data
+    watchdog, so register 0x0440 reads expired no matter how much process data
+    arrives and any watchdog check built on it is inert -- measured on hardware,
+    where SM2 read back 0x24 and 0x0440 stayed 0 while frames flowed every 2 ms
+    against a 100 ms timeout.
+
+    It has to be right in two places at once: ESC_checkSM23 compares the byte
+    the master wrote, which comes from the ESI, against the compiled constant,
+    and refuses PREOP->SAFEOP if they differ. Emitting both from here is what
+    makes that impossible to get wrong.
+    """
+    out = SMC_OUTPUTS
+    if cfg["sync_managers"].get("watchdog", True):
+        out |= SMC_WATCHDOG
+    return out, SMC_INPUTS
+
+
 def compute_sm(cfg, rx_bytes, tx_bytes):
     """Check the SyncManager layout against the constraint esc.c enforces.
 
@@ -445,11 +477,15 @@ def emit_options(cfg, rx_bytes, tx_bytes, rx_entries, tx_entries, sm, src):
     out.append(f"   so adding axes needs no ESI change. SM3 must start at or after")
     out.append(f"   SM2 + 3*{sm['rx_reserved']} = 0x{s['outputs'] + 3*sm['rx_reserved']:04X};")
     out.append(f"   the reservation ends at 0x{sm['top']:04X}, inside the 0x2000 top. */")
+    smc_out, smc_in = sm_control(cfg)
+    if smc_out & SMC_WATCHDOG:
+        out.append("/* SM2 control bit 6 enables the watchdog trigger, without which")
+        out.append("   the ESC process data watchdog at 0x0440 is never fed. */")
     out.append(f"#define SM2_sma           0x{s['outputs']:04X}")
-    out.append(f"#define SM2_smc           0x24")
+    out.append(f"#define SM2_smc           0x{smc_out:02X}")
     out.append(f"#define SM2_act           1")
     out.append(f"#define SM3_sma           0x{s['inputs']:04X}")
-    out.append(f"#define SM3_smc           0x20")
+    out.append(f"#define SM3_smc           0x{smc_in:02X}")
     out.append(f"#define SM3_act           1\n")
     out.append(f"#define MAX_MAPPINGS_SM2  {max(8, len(rx_entries) * reserve)}")
     out.append(f"#define MAX_MAPPINGS_SM3  {max(8, len(tx_entries) * reserve)}\n")
@@ -479,6 +515,7 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
     mbx = cfg["mailbox"]["size"]
     ee = cfg["eeprom"]
     foe = cfg["mailbox"].get("foe")
+    smc_out, smc_in = sm_control(cfg)
 
     def pdo_block(tag, pdo, entries, sm_index):
         out = [f'      <{tag} Fixed="1" Sm="{sm_index}" Mandatory="1">']
@@ -523,9 +560,9 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
          f'StartAddress="#x{s_["mbx_out"]:04X}">MBoxOut</Sm>',
          f'      <Sm ControlByte="#x22" DefaultSize="{mbx}" Enable="1" '
          f'StartAddress="#x{s_["mbx_in"]:04X}">MBoxIn</Sm>',
-         f'      <Sm ControlByte="#x24" Enable="1" '
+         f'      <Sm ControlByte="#x{smc_out:02X}" Enable="1" '
          f'StartAddress="#x{s_["outputs"]:04X}">Outputs</Sm>',
-         f'      <Sm ControlByte="#x20" Enable="1" '
+         f'      <Sm ControlByte="#x{smc_in:02X}" Enable="1" '
          f'StartAddress="#x{s_["inputs"]:04X}">Inputs</Sm>']
     # FMMUs. Optional in EtherCATInfo.xsd, so nothing validates their
     # absence, but a master that finds none configures no process data.

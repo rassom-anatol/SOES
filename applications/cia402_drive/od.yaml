@@ -49,6 +49,13 @@ sync_managers:
   mbx_in:  0x1100
   outputs: 0x1200
   inputs:  0x1300
+  # Set bit 6 of SM2's control byte, Watchdog Trigger Enable. Without it the
+  # SyncManager never feeds the ESC process data watchdog, 0x0440 reads expired
+  # however much data arrives, and the watchdog reaction in DIG_process can
+  # never fire -- verified on hardware. The byte has to agree between the ESI
+  # and ecat_options.h or ESC_checkSM23 refuses PREOP->SAFEOP, which is why it
+  # is one key here rather than two constants.
+  watchdog: true
 
 # ---------------------------------------------------------------------------
 # Process data. Order here is the wire order.
