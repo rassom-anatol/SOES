@@ -202,6 +202,20 @@ static enum
    HW_WD_DISABLED,        /* master disabled it; fall back to the counter */
 } hw_wd_state = HW_WD_UNCHECKED;
 
+/* Consecutive cycles with no SM2 event.
+ *
+ * The ESC process data watchdog is fed by the master's writes to SM2, and the
+ * SM2 AL event bit is set by those same writes. So a cycle that saw an SM2
+ * event cannot be a cycle in which the watchdog expired, and asking the chip is
+ * a wasted bus access -- which on this port is a third of the cyclic budget.
+ * The register is only worth reading once process data has gone quiet, which in
+ * healthy operation never happens. The cost of the delay is bounded and small:
+ * detection is late by at most this many cycles, on top of the watchdog timeout
+ * the master itself chose.
+ */
+#define HW_WD_QUIET_CYCLES 16
+static uint16_t hw_wd_quiet = 0;
+
 /* Check the ESC hardware process data watchdog.
  *
  * The ESC does not change AL state by itself when the SM watchdog expires: it
@@ -236,6 +250,7 @@ static int hw_watchdog_check (void)
       /* No outputs, so nothing resets the watchdog and it would read expired.
        * Also the point at which the latched verdict stops being valid. */
       hw_wd_state = HW_WD_UNCHECKED;
+      hw_wd_quiet = 0;
       return 1;
    }
 
@@ -268,18 +283,34 @@ static int hw_watchdog_check (void)
       return 0;
    }
 
-   if ((ESC_WDstatus () & ESCREG_WDSTATUS_OK) != 0)
+   if ((ESCvar.ALevent & ESCREG_ALEVENT_SM2) != 0)
    {
+      /* Process data arrived this cycle, so the watchdog has just been fed.
+       * This is also the first moment at which enforcing it is safe: until the
+       * master has sent one output frame there is no setpoint being held, and
+       * 0x0440 reads expired simply because nothing has started it yet. */
       if (hw_wd_state == HW_WD_WAITING)
       {
          DPRINT ("hw watchdog: first process data frame seen, now enforcing\n");
          hw_wd_state = HW_WD_RUNNING;
       }
+      hw_wd_quiet = 0;
+      return 1;
    }
-   else if (hw_wd_state == HW_WD_RUNNING)
+
+   if (hw_wd_quiet < HW_WD_QUIET_CYCLES)
    {
-      DPRINT ("hw watchdog expired\n");
-      ESC_ALstatusgotoerror ((ESCsafeop | ESCerror), ALERR_WATCHDOG);
+      hw_wd_quiet++;
+      return 1;
+   }
+
+   if ((ESC_WDstatus () & ESCREG_WDSTATUS_OK) == 0)
+   {
+      if (hw_wd_state == HW_WD_RUNNING)
+      {
+         DPRINT ("hw watchdog expired\n");
+         ESC_ALstatusgotoerror ((ESCsafeop | ESCerror), ALERR_WATCHDOG);
+      }
    }
 
    return 1;

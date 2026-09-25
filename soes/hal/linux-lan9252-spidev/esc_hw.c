@@ -628,6 +628,11 @@ static uint16_t csr_chunk_size (uint16_t address, uint16_t len)
  *     precondition.
  *   - The SM3 process data write. That branch of DIG_process does not consult
  *     ESCvar.ALevent at all.
+ *   - The watchdog status register. DIG_process reads it before it tests
+ *     ESCvar.ALevent, so a tail here would refresh a value the caller is about
+ *     to use -- but ecat_slv_poll has already refreshed it this cycle, and
+ *     several accesses in between carry their own tail, so there is nothing
+ *     stale to correct and the access is pure cost.
  *
  * Mailbox transfers live in PRAM too and are deliberately excluded: the CoE
  * and FoE paths have not been audited for ALevent freshness and are not on the
@@ -636,6 +641,7 @@ static uint16_t csr_chunk_size (uint16_t address, uint16_t len)
 static int alevent_tail_needed (uint16_t address)
 {
    return !(address == ESCREG_ALEVENT ||
+            address == ESCREG_WDSTATUS ||
             address == ESC_SM2_sma ||
             address == ESC_SM3_sma);
 }
