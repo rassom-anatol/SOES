@@ -1340,6 +1340,7 @@ void ESC_config (esc_cfg_t * cfg)
    /* Configure stack */
    ESCvar.use_interrupt = cfg->use_interrupt;
    ESCvar.watchdogcnt = cfg->watchdog_cnt;
+   ESCvar.use_hw_watchdog = (cfg->use_hw_watchdog != 0);
 
    ESCvar.mb[0] = mb0;
    ESCvar.mb[1] = mb1;

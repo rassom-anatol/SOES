@@ -187,30 +187,122 @@ void APP_setwatchdog (int watchdogcnt)
    CC_ATOMIC_SET(ESCvar.watchdogcnt, watchdogcnt);
 }
 
+/* --------------------------------------------------------- watchdog ------ */
+
+/* State of the hardware watchdog check, latched while outputs are active.
+ * Re-evaluated from scratch each time the application leaves an output state,
+ * because the master rewrites the watchdog configuration as part of bringing
+ * the slave back up.
+ */
+static enum
+{
+   HW_WD_UNCHECKED = 0,   /* configuration not read since outputs came up */
+   HW_WD_ARMED,           /* master armed it; 0x0440 is authoritative */
+   HW_WD_DISABLED,        /* master disabled it; fall back to the counter */
+} hw_wd_state = HW_WD_UNCHECKED;
+
+/* Check the ESC hardware process data watchdog.
+ *
+ * The ESC does not change AL state by itself when the SM watchdog expires: it
+ * clears bit 0 of 0x0440 and expects the application to react. Nothing in this
+ * stack read that register, so a configuration that disabled the software
+ * counter in favour of the hardware one had no watchdog at all, and a master
+ * that stopped sending frames produced no reaction -- the drive simply held its
+ * last commanded setpoint.
+ *
+ * The configuration is the master's to write and ours to check. A process data
+ * time of zero disables the watchdog, after which the status bit reads "active
+ * or disabled" forever; trusting it in that state is worse than not having the
+ * check, because it looks like protection. So the configuration is read once
+ * per entry into an output state and, if the master left us unprotected, the
+ * software counter takes over rather than the device refusing to run.
+ *
+ * @return 1 if the hardware watchdog is in charge, 0 if the caller should fall
+ *         back to the software counter.
+ */
+static int hw_watchdog_check (void)
+{
+   if (((CC_ATOMIC_GET (ESCvar.App.state) & APPSTATE_OUTPUT) == 0) ||
+       (ESCvar.ESC_SM2_sml == 0))
+   {
+      /* No outputs, so nothing resets the watchdog and it would read expired.
+       * Also the point at which the latched verdict stops being valid. */
+      hw_wd_state = HW_WD_UNCHECKED;
+      return 1;
+   }
+
+   if (hw_wd_state == HW_WD_UNCHECKED)
+   {
+      uint16_t divider = 0;
+      uint16_t pdtime = 0;
+
+      ESC_read (ESCREG_WDDIVIDER, &divider, sizeof (divider));
+      ESC_read (ESCREG_WDTIMEPDATA, &pdtime, sizeof (pdtime));
+      divider = etohs (divider);
+      pdtime = etohs (pdtime);
+
+      if ((pdtime == 0) || (divider == 0))
+      {
+         DPRINT ("hw watchdog: master left it disabled (divider %u, time %u), "
+                 "using the software counter\n", divider, pdtime);
+         hw_wd_state = HW_WD_DISABLED;
+      }
+      else
+      {
+         DPRINT ("hw watchdog: armed, %u ticks of (%u+2)*40 ns\n",
+                 pdtime, divider);
+         hw_wd_state = HW_WD_ARMED;
+      }
+   }
+
+   if (hw_wd_state == HW_WD_DISABLED)
+   {
+      return 0;
+   }
+
+   if ((ESC_WDstatus () & ESCREG_WDSTATUS_OK) == 0)
+   {
+      DPRINT ("hw watchdog expired\n");
+      ESC_ALstatusgotoerror ((ESCsafeop | ESCerror), ALERR_WATCHDOG);
+   }
+
+   return 1;
+}
+
 /* Function to update local I/O, call read ethercat outputs, call
  * write ethercat inputs. Implement watch-dog counter to count-out if we have
  * made state change affecting the App.state.
  */
 void DIG_process (uint8_t flags)
 {
-   /* Handle watchdog */
+   /* Handle watchdog.
+    *
+    * Exactly one of the two watchdogs is in charge per cycle. The hardware one
+    * measures what actually matters -- whether process data frames are still
+    * arriving -- so when it is available the software counter is not merely
+    * redundant but harmful: nothing would decrement it, and a zero
+    * ESCvar.watchdogcnt then reads as permanently expired.
+    */
    if((flags & DIG_PROCESS_WD_FLAG) > 0)
    {
-      if (CC_ATOMIC_GET(watchdog) > 0)
+      if (!ESCvar.use_hw_watchdog || !hw_watchdog_check ())
       {
-         CC_ATOMIC_SUB(watchdog, 1);
-      }
+         if (CC_ATOMIC_GET(watchdog) > 0)
+         {
+            CC_ATOMIC_SUB(watchdog, 1);
+         }
 
-      if ((CC_ATOMIC_GET(watchdog) <= 0) &&
-          ((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) > 0) &&
-           (ESCvar.ESC_SM2_sml > 0))
-      {
-         DPRINT("DIG_process watchdog expired\n");
-         ESC_ALstatusgotoerror((ESCsafeop | ESCerror), ALERR_WATCHDOG);
-      }
-      else if(((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) == 0))
-      {
-         CC_ATOMIC_SET(watchdog, ESCvar.watchdogcnt);
+         if ((CC_ATOMIC_GET(watchdog) <= 0) &&
+             ((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) > 0) &&
+              (ESCvar.ESC_SM2_sml > 0))
+         {
+            DPRINT("DIG_process watchdog expired\n");
+            ESC_ALstatusgotoerror((ESCsafeop | ESCerror), ALERR_WATCHDOG);
+         }
+         else if(((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) == 0))
+         {
+            CC_ATOMIC_SET(watchdog, ESCvar.watchdogcnt);
+         }
       }
    }
 

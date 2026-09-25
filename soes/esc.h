@@ -38,7 +38,16 @@
 #define ESCREG_ALEVENT_SM1          0x0200
 #define ESCREG_ALEVENT_SM2          0x0400
 #define ESCREG_ALEVENT_SM3          0x0800
+/* Watchdog registers. The divider turns the ESC clock into watchdog ticks and
+ * the process data time is the timeout in those ticks; both are written by the
+ * master. A process data time of zero disables the watchdog, which bit 0 of the
+ * status register then reports as "active or disabled" indefinitely -- so the
+ * status register alone cannot distinguish a healthy master from no protection.
+ */
+#define ESCREG_WDDIVIDER            0x0400
+#define ESCREG_WDTIMEPDATA          0x0420
 #define ESCREG_WDSTATUS             0x0440
+#define ESCREG_WDSTATUS_OK          0x0001
 #define ESCREG_EECONTSTAT           0x0502
 #define ESCREG_EEDATA               0x0508
 #define ESCREG_SM0                  0x0800
@@ -312,6 +321,14 @@ typedef struct esc_cfg
    void * user_arg;
    int use_interrupt;
    int watchdog_cnt;
+   /* Check the ESC hardware process data watchdog (0x0440) rather than relying
+    * on the software counter above. The hardware watchdog is reset by the
+    * master's own writes to SM2 and so measures the thing that matters -- are
+    * process data frames still arriving -- without the application having to
+    * guess a cycle count. If the master turns out to have disabled it, the
+    * stack falls back to the software counter rather than running unprotected.
+    */
+   int use_hw_watchdog;
    bool skip_default_initialization;
    void (*set_defaults_hook) (void);
    void (*pre_state_change_hook) (uint8_t * as, uint8_t * an);
@@ -505,6 +522,7 @@ typedef struct
    _ESCsm SM[4];
    /* Volatile since it may be read from ISR */
    volatile int watchdogcnt;
+   uint8_t use_hw_watchdog;
    /* No longer maintained by the stack: ecat_slv_poll used to refresh this
     * from ESCREG_LOCALTIME every cycle and nothing read it, so the read was
     * removed. An application that wants the ESC local time must read 0x0910

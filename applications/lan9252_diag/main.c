@@ -140,7 +140,13 @@ static esc_cfg_t config =
 {
    .user_arg = &hw_cfg,
    .use_interrupt = 0,
+   /* The software counter stays as a fallback for a master that disables the
+    * hardware watchdog. 150 polls of a loop that runs as fast as it can is not
+    * a meaningful timeout, which is the reason to prefer the hardware one:
+    * 0x0440 is reset by the master's own SM2 writes, so it measures elapsed
+    * time rather than iterations of whatever loop happens to be calling us. */
    .watchdog_cnt = 150,
+   .use_hw_watchdog = 1,
    .set_defaults_hook = NULL,
    .pre_state_change_hook = NULL,
    .post_state_change_hook = cb_state_change,
