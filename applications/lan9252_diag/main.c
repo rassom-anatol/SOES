@@ -835,6 +835,23 @@ int main (int argc, char * argv[])
                                    (dls & 0x0030) ? "up" : "DOWN",
                                    (unsigned)wdd, (unsigned)wdp, wd);
                         }
+                        {
+                           /* What the master actually wrote to the two process
+                            * data SyncManagers. Bit 6 of the control byte is
+                            * Watchdog Trigger Enable: without it the SM does not
+                            * feed the process data watchdog, so 0x0440 stays
+                            * expired however much data flows. The control byte
+                            * comes from the ESI, so this is a property of the
+                            * device description rather than of the master. */
+                           uint8_t c2 = 0, c3 = 0, a2 = 0, a3 = 0;
+                           ESC_read (0x0804, &c2, sizeof (c2));
+                           ESC_read (0x0806, &a2, sizeof (a2));
+                           ESC_read (0x080C, &c3, sizeof (c3));
+                           ESC_read (0x080E, &a3, sizeof (a3));
+                           printf ("   SM: SM2 ctl=%02X act=%02X (wd trigger %s)"
+                                   "  SM3 ctl=%02X act=%02X\n",
+                                   c2, a2, (c2 & 0x40) ? "ON" : "off", c3, a3);
+                        }
                      }
                      if (sync_thread_running && wl_n > 16)
                      {
