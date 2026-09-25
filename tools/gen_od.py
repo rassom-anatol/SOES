@@ -574,8 +574,15 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
              "      <Fmmu>Inputs</Fmmu>")
     x += pdo_block("RxPdo", cfg["rxpdo"], rx, 2)
     x += pdo_block("TxPdo", cfg["txpdo"], tx, 3)
+    # CoE capabilities, which describe what esc_coe.c actually implements
+    # rather than a conservative guess. Complete access is real -- both
+    # SDO_upload_complete_access and SDO_download_complete_access are wired into
+    # the service dispatch -- and declaring it false understates the device.
+    # PdoUpload stays false because the mapping is fixed and read-only, so there
+    # is nothing for a master to read back.
+    ca = "true" if cfg["mailbox"].get("complete_access", True) else "false"
     x += ['      <Mailbox DataLinkLayer="true">',
-          '        <CoE CompleteAccess="false" PdoUpload="false" SdoInfo="true"/>']
+          f'        <CoE CompleteAccess="{ca}" PdoUpload="false" SdoInfo="true"/>']
     if foe:
         x.append("        <FoE/>")
     x += ["      </Mailbox>",

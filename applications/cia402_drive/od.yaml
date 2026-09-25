@@ -35,6 +35,9 @@ mailbox:
                               # large dictionary segments constantly at 128
   size_boot:  256
   buffers:    3
+  complete_access: true       # esc_coe.c implements SDO upload and download
+                              # with complete access and dispatches both, so
+                              # the ESI should say so
   foe:        false           # nothing calls FOE_config(), so foe_cfg is NULL
                               # and the first FoE request dereferences it. The
                               # ESI is what invites that request, so this key

@@ -150,7 +150,7 @@
         </Entry>
       </TxPdo>
       <Mailbox DataLinkLayer="true">
-        <CoE CompleteAccess="false" PdoUpload="false" SdoInfo="true"/>
+        <CoE CompleteAccess="true" PdoUpload="false" SdoInfo="true"/>
       </Mailbox>
       <Dc>
         <OpMode>
