@@ -4,9 +4,9 @@ A read of the tree as it stands, against the plan in [`cia402-roadmap.md`](cia40
 Ordered by what it changes, not by where it lives. Line references are to the
 current working tree.
 
-Findings carry a **Resolved** note where the work has since been done. Sections 2, 3 and
-4 are closed, as is the process data watchdog half of §1.2. What remains is the threading
-model (§1.1), which is a decision rather than a defect, and the protocol features in §5.
+Findings carry a **Resolved** note where the work has since been done. Sections 1 to 4
+are closed. What remains is the protocol features in §5, each of which is a decision to
+schedule or consciously drop rather than a defect.
 
 Two findings turned out to be wrong or incomplete as written, and both are annotated in
 place rather than quietly corrected: §3.1's proposed substitution saves nothing on its
@@ -50,6 +50,14 @@ Two ways out, and the choice belongs in §3.2 before any of it is written:
 The second is smaller and removes the problem rather than managing it. The reason
 §3.2 rejected it — that mailbox work is unbounded — is about *total* latency, not
 per-cycle cost, and a step-per-cycle bound addresses the part that matters.
+
+**Decided: the second.** Mailbox handling stays on the cyclic thread, bounded at one
+mailbox step per cycle, and the two-thread design in roadmap §3.2 is dropped. The
+consequence worth stating plainly is that **no lock is needed anywhere** — not on the
+bus, not on `ESCvar`, not on `Obj` — which is the whole point of choosing this option
+over serialising access. The cost is SDO-Info throughput at PREOP, where nothing has a
+deadline. Recorded in roadmap §3.2 along with what to do if that throughput ever does
+become the constraint.
 
 ### 1.2 `watchdog_cnt = INT32_MAX` leaves the drive with no watchdog
 
@@ -458,9 +466,9 @@ depth is the thing to look at, not the mailbox size.
 
 **Before any hardware run in OP**
 
-1. Decide the threading model (§1.1) — it determines whether a lock is needed
-   everywhere or nowhere. **Still open, and now on the critical path:** the Phase 3 loop
-   is where both the DC liveness check and the SYNC0 measurement have to live.
+1. ~~Decide the threading model (§1.1) — it determines whether a lock is needed
+   everywhere or nowhere.~~ Decided: single-threaded, one mailbox step per cycle, so no
+   lock is needed anywhere.
 2. ~~Wire a real watchdog: 0x0440 check, DC liveness check, watchdog configuration
    validation (§1.2).~~ Process data watchdog and configuration validation done and
    verified on hardware; DC liveness relocated to the Phase 3 loop, where it is free.

@@ -248,10 +248,16 @@ loop:
       DIG_process(APP_HOOK | TXPDO)
       ESC_read(ESCREG_DCSYNCSTAT, ...)             /* ack the SYNC0 latch */
   if ALevent & (CONTROL|SMCHANGE|SM0|SM1|EEP):
-      signal the low-priority worker               /* NOT in this thread */
+      one mailbox step                             /* in this thread; see below */
 ```
 
-**Two threads, not one.** Mailbox/CoE/FoE work is unbounded and must never sit in front of a SYNC0 deadline — hand it to a normal-priority worker via semaphore, as the xmc4 HAL does.
+**One thread, not two — decided.** The earlier plan here was a `SCHED_FIFO` cyclic thread plus a normal-priority worker for mailbox/CoE work, on the reasoning that mailbox work is unbounded and must not sit in front of a SYNC0 deadline. That is rejected, because over SPI it is not safe: see [`stack-review.md`](stack-review.md) §1.1. A CSR access on this port is a stateful three-frame sequence through a single command register inside the chip, so interleaving two contexts corrupts both transactions, and the same exposure extends to `ESCvar`, the `MBX[]` buffers and the application's `Obj`. The rt-kernel XMC4 HAL the two-thread design was modelled on does not have this problem only because its ESC is memory-mapped, where one access is one atomic bus cycle. Nothing replaces that property here, and SOES offers `CC_ATOMIC_*` for individual scalars but no critical-section abstraction a port could fill in.
+
+So mailbox handling stays on the cyclic thread, bounded at **one mailbox step per cycle**. The objection that mailbox work is unbounded is about *total* SDO latency, not per-cycle cost: a single step is one mailbox transfer, at most `MBXSIZE` bytes of PRAM, which is bounded SPI time and therefore bounded cycle time. `ecat_slv_poll` already has this shape — `ESC_mbxprocess()` followed by one `ESC_coeprocess()`/`ESC_xoeprocess()` pass — so the decision is mostly about what *not* to build.
+
+What it costs is SDO-Info throughput: walking a four-axis dictionary at one step per millisecond takes seconds rather than milliseconds. That is scan-time work, it happens at PREOP, and no deadline depends on it. What it buys is that no lock is needed anywhere — not on the bus, not on `ESCvar`, not on `Obj` — and that the priority inversion analysis in §5.4 has nothing to analyse.
+
+**If that throughput ever becomes the problem, the answer is not a second thread.** It is to allow more than one mailbox step per cycle while the slave is in PREOP, where there is no SYNC0 deadline to miss.
 
 One LAN9252 difference from the xmc4: ALEVENT is memory-mapped and free there, but costs a full CSR cycle over SPI here. **Do not rely on the piggybacked ALEVENT tail read** inside the loop — that value is from the *previous* transaction. The tail is now suppressed on an ALEVENT read and on the two process data transfers, so the explicit read above is the only one that happens.
 
