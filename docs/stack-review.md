@@ -4,9 +4,14 @@ A read of the tree as it stands, against the plan in [`cia402-roadmap.md`](cia40
 Ordered by what it changes, not by where it lives. Line references are to the
 current working tree.
 
-Findings carry a **Resolved** note where the work has since been done. Section 2
-and section 4 are closed; sections 1, 3 and 5 are not, and the reason in each
-case is that verifying the change needs a master and a LAN9252 on the wire.
+Findings carry a **Resolved** note where the work has since been done. Sections 2, 3 and
+4 are closed, as is the process data watchdog half of §1.2. What remains is the threading
+model (§1.1), which is a decision rather than a defect, and the protocol features in §5.
+
+Two findings turned out to be wrong or incomplete as written, and both are annotated in
+place rather than quietly corrected: §3.1's proposed substitution saves nothing on its
+own, and §1.2 understated the problem — the register it asks us to read was never going
+to report anything, because the SyncManager was not configured to feed it.
 
 ---
 
@@ -75,6 +80,41 @@ What is needed, cyclically, before OP is entered on hardware:
   cannot tell.
 
 This is the most safety-relevant gap in the tree and it is not in the roadmap.
+
+**Resolved for the process data watchdog, and the gap was deeper than described.**
+`DIG_process` now reads 0x0440 and calls
+`ESC_ALstatusgotoerror (ESCsafeop | ESCerror, ALERR_WATCHDOG)` on expiry, under a new
+`use_hw_watchdog` configuration flag. Three things had to be got right that are not
+obvious from reading the register description:
+
+- **The SyncManager was not feeding the watchdog at all.** Bit 6 of SM2's control byte
+  is Watchdog Trigger Enable and it was clear, so 0x0440 read expired no matter how much
+  process data arrived — measured on hardware with frames every 2 ms against a 100 ms
+  timeout. A reaction built on that register would have been inert, and would have looked
+  correct in a code review. The byte is now `0x64`, derived in `gen_od.py` from one
+  `sync_managers.watchdog` key so that the ESI and `ecat_options.h` cannot disagree;
+  `ESC_checkSM23` compares them and refuses SAFEOP if they do, which is itself how the
+  change was confirmed to be taking effect.
+- **The watchdog reads expired at the moment outputs become active,** before the master's
+  first output frame, so acting on it immediately is a guaranteed false trip that never
+  reaches OP. Expiry only counts once the watchdog has been seen running.
+- **A master may disable it,** after which the status bit reads "active or disabled"
+  forever. The configuration (0x0400 divider, 0x0420 process data time) is read once per
+  entry into an output state, and if the master left the device unprotected the software
+  counter takes over rather than the device refusing to run. This is why the roadmap's
+  `.watchdog_cnt = INT32_MAX` advice was removed: it disables the fallback.
+
+Verified end to end against TwinCAT with the cable pulled: `0x0440` went `1` to `0`,
+`APP_safe_state` fired, and the slave went `SAFEOP -> SAFEOP (ERROR)` with
+`ALerror 0x001B`.
+
+**The DC liveness check is not here, deliberately.** In a polled loop a cycle count is
+meaningless and expressing the check in time needs a clock the stack does not abstract.
+It belongs in the Phase 3 wake loop, where bounding the wait is mandatory anyway and a
+wait that expires with DC active *is* a dead sync unit — free, and `ALERR_FATALSYNCERROR`
+rather than the counter's `ALERR_SYNCERROR`. Recorded in roadmap §3.2.
+
+**Watchdog configuration validation** is the third bullet above. Still open.
 
 ---
 
@@ -239,14 +279,22 @@ are the baseline these are measured against.
 
 ### 3.1 The per-cycle local-time read is dead weight
 
-**Correction, and not resolved.** The saving described below does not exist as stated.
+**Correction, then resolved with a measured 34% cut.** The saving described below does
+not exist as stated.
 `ESC_ALeventread()` is itself `ESC_read (ESCREG_ALEVENT, ...)`
 ([`esc.c:129`](../soes/esc.c#L129)), and this HAL appends an ALEVENT tail read to
 *every* `ESC_read` — so the substitution costs 3 frames for the CSR access plus 3 for
 the tail, exactly the 6 it replaces, and reads ALEVENT twice in the process. The
 opportunity is real but it is one change, not two: the local-time read has to go *and*
 the tail has to be suppressed on the replacement, which is the mechanism §3.2
-describes. Left for the hardware session, because the whole claim is a measurement.
+describes. Done in the hardware session, because the whole claim is a measurement.
+
+**Measured in OP against the same master minutes apart: 15.9 transfers per cycle and a
+median of 140.7 us became 9.5 transfers and 93.1 us, with p99 222 us to 148 us.** That is
+§3.1 and §3.2 together, plus the tail dropped from the watchdog status read §1.2 added.
+The first attempt measured 15.6 transfers and looked like nothing had changed at all: the
+new per-cycle 0x0440 read cost precisely what the removals saved. Both halves and the
+correction are one change, as stated above.
 
 [`ecat_slv_poll()`](../soes/ecat_slv.c#L306) reads `ESCREG_LOCALTIME` into `ESCvar.Time`
 every cycle. **Nothing in this tree reads `ESCvar.Time`** — the only other occurrence is
@@ -277,6 +325,14 @@ That audit is not needed for the **process-data** path specifically:
 
 A per-call suppression flag on the two PRAM transfers recovers a further ~6 transfers
 per cycle with no reasoning about `esc.c` required. The general case can stay deferred.
+
+**Resolved.** No flag was needed in the end: the HAL decides from the address, in one
+predicate listing the four accesses that do not need a tail — the AL event register
+itself, the watchdog status register, and the two process data transfers. Mailbox
+transfers are in PRAM too and deliberately keep theirs, since the CoE and FoE paths are
+exactly the unaudited general case. The preconditions above were re-checked against the
+current tree before relying on them: `DIG_process` tests the SM2 event before both of its
+PRAM reads, and the TxPDO branch does not consult `ALevent`.
 
 ### 3.3 Unconditional timing instrumentation on the hot path
 
@@ -403,9 +459,11 @@ depth is the thing to look at, not the mailbox size.
 **Before any hardware run in OP**
 
 1. Decide the threading model (§1.1) — it determines whether a lock is needed
-   everywhere or nowhere.
-2. Wire a real watchdog: 0x0440 check, DC liveness check, watchdog configuration
-   validation (§1.2).
+   everywhere or nowhere. **Still open, and now on the critical path:** the Phase 3 loop
+   is where both the DC liveness check and the SYNC0 measurement have to live.
+2. ~~Wire a real watchdog: 0x0440 check, DC liveness check, watchdog configuration
+   validation (§1.2).~~ Process data watchdog and configuration validation done and
+   verified on hardware; DC liveness relocated to the Phase 3 loop, where it is free.
 
 **Before the ESI ships** — all in `gen_od.py`. ~~Done.~~
 
@@ -419,13 +477,11 @@ depth is the thing to look at, not the mailbox size.
 10. ~~Extend `check_od.sh` to the table in §4; make `cia402_drive` build; fix the CI
     runner image.~~
 
-**Cheap performance — needs hardware after all**
+**Cheap performance — needed hardware after all. ~~Done.~~**
 
-11. Delete the local-time read *and* suppress the tail on whatever replaces it. Not the
-    two-line change §3.1 described; see the correction there. Both halves are one
-    change and the benefit is a measurement, so it belongs in a session with the
-    LAN9252 attached.
-12. Suppress the ALEVENT tail on PRAM transfers (§3.2). Same session.
+11. ~~Delete the local-time read *and* suppress the tail on whatever replaces it.~~
+12. ~~Suppress the ALEVENT tail on PRAM transfers (§3.2).~~ Measured together: 15.9
+    transfers and 140.7 us median became 9.5 and 93.1 us.
 
 **Decide, then schedule**
 

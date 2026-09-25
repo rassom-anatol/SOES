@@ -294,7 +294,7 @@ The pulse is 1 us wide, confirming `0x0982` counts in 10 ns units (`0x0064` = 10
 
 This measures the *signal*, not thread responsiveness: the timestamp is taken in the kernel's GPIO interrupt handler, so it covers DC hardware jitter plus kernel IRQ latency and nothing above that. Wakeup latency — the delay from edge to the cyclic thread resuming — still needs a blocking-wait measurement, and that is the figure real-time priority affects and the one that sizes `SyncErrorCounterLimit` (§3.3.1).
 
-With 141 us median / 220 us p99 of cycle work (§3.4) against a trigger this stable, roughly 780 us of a 1 ms period remains for scheduling. The signal is not the constraint.
+With 93 us median / 148 us p99 of cycle work (§3.4) against a trigger this stable, roughly 850 us of a 1 ms period remains for scheduling. The signal is not the constraint.
 
 ### 3.3.0.1 Why the SYNC0 pin is an input by default
 
@@ -371,6 +371,12 @@ The cost is **ioctls, not bits**. One CSR access is three SPI transactions (writ
 
 **Measured in OP against TwinCAT at 25 MHz: median 141 us, p99 220 us, max ~250 us** for a complete `ecat_slv()`. 99% of that is inside SPI ioctls, over roughly 15.7 transfers per cycle, so the cycle cost is essentially the SPI cost and the earlier 200-400 us estimate was close for the median but said nothing useful about the tail.
 
+**Then reduced to a measured median 93 us, p99 148 us, over 9.5 transfers** by not asking the chip for things already known. Three redundant AL event tail reads went — on an AL event read, on the SM2 read and on the SM3 write — and the per-cycle local time read that nothing consumed was replaced by the AL event read the cycle actually needs. A 34% cut, taken in one A/B against the same master minutes apart, which is the only way it should be quoted: the first attempt measured 15.6 transfers and looked like no change at all, because a watchdog status read added in the same session cost exactly what the removals saved.
+
+**That near-miss is the general lesson for this budget: a check that costs a bus access must not run every cycle if a cheaper signal already answers it.** The watchdog status read now happens only after 16 consecutive cycles with no SM2 event, because the watchdog is fed by the master's SM2 writes and the SM2 AL event bit is set by those same writes — a cycle that saw the event cannot be a cycle in which the watchdog expired. In healthy operation the register is never read at all, and detection is late by at most 16 cycles on top of the timeout the master itself chose.
+
+The remaining 9.5 transfers are the state machine, the SM activation check and the mailbox poll, each of which still carries a tail. Those are not on the audited list and are not worth the risk for a further ~20%; the next real win is fast-read for PRAM bursts.
+
 **`SCHED_FIFO` made no measurable difference** in free-run polling: median 140.9 vs 139.3 us, p99 220 vs 220. The process is blocked in a syscall for almost the whole cycle, leaving little for the scheduler to preempt. Real-time priority is still needed for Phase 3, but for SYNC0 edge *wakeup* latency rather than SPI throughput, and that is a separate measurement not yet taken.
 
 **Target SYNC0 = 1 ms.** This is the cycle time a CiA402 drive in cyclic synchronous position, velocity or torque mode is expected to sustain — a conservative figure, given that commercial servo drives commonly run at 250 µs or below. The target comes from the profile, not from any downstream consumer. The period itself is set by the master, so it is configurable by construction; the slave's obligations are to publish an honest floor in 0x1C32:05 and to size `SyncErrorCounterLimit` for the period actually in use.
@@ -423,7 +429,7 @@ No third-party EDS or reference implementation is used as input. GPL-licensed Ci
 
 This departs from what the vendor survey shows Beckhoff doing, and the departure is deliberate. A survey of the ELM72xx and EL72xx ESI files (23 CiA402 devices, via [`tools/esi_survey.py`](../tools/esi_survey.py)) found **93% of their 3,633 PDOs carry exactly one object** — 0x1610 Controlword, 0x1611 Target position, 0x1612 Target velocity and so on — with only 575 pre-bound to a SyncManager and the rest assembled by the master through 0x1C12/0x1C13. That granularity exists so one firmware can serve any process image a customer asks for. A single-purpose drive has no such requirement.
 
-**Zero-copy was considered and rejected.** Setting `MAX_MAPPINGS_SM2`/`_SM3` to 0 makes `rxpdo`/`txpdo` extern symbols the application supplies ([`soes/ecat_slv.c:25-35`](../soes/ecat_slv.c#L25-L35)), so the stack skips `COE_pdoPack`/`Unpack` and reads process data straight into the application struct — the `xmc4300_slavedemo` model. It saves a few microseconds of bit-slicing per cycle, which is noise beside the ~141 us of SPI measured per cycle in §3.4, and it buys that with silent fragility: the C struct layout must match the wire layout exactly, and CiA402's mixed widths (u16, i8, i32, i16) produce natural padding unless packed, while packing invites unaligned accesses on ARM. A layout error corrupts data rather than failing to compile. **Keep `MAX_MAPPINGS` non-zero**, sized to the actual entry count rather than the default 16.
+**Zero-copy was considered and rejected.** Setting `MAX_MAPPINGS_SM2`/`_SM3` to 0 makes `rxpdo`/`txpdo` extern symbols the application supplies ([`soes/ecat_slv.c:25-35`](../soes/ecat_slv.c#L25-L35)), so the stack skips `COE_pdoPack`/`Unpack` and reads process data straight into the application struct — the `xmc4300_slavedemo` model. It saves a few microseconds of bit-slicing per cycle, which is noise beside the ~93 us of SPI measured per cycle in §3.4, and it buys that with silent fragility: the C struct layout must match the wire layout exactly, and CiA402's mixed widths (u16, i8, i32, i16) produce natural padding unless packed, while packing invites unaligned accesses on ARM. A layout error corrupts data rather than failing to compile. **Keep `MAX_MAPPINGS` non-zero**, sized to the actual entry count rather than the default 16.
 
 #### v1 object set (CSP / CSV / CST), single axis
 
@@ -570,15 +576,15 @@ include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
 
 `DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
 
-**The cyclic SPI budget.** The EtherCAT half costs a measured 141 us median / 220 us p99 per cycle at 25 MHz (§3.4). The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
+**The cyclic SPI budget.** The EtherCAT half costs a measured 93 us median / 148 us p99 per cycle at 25 MHz (§3.4). The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
 
 **Measured on SPI0** with [`tools/spidev_bench.c`](../tools/spidev_bench.c), 20000 iterations per shape, medians:
 
 | TMC4671 config | per access | 6 accesses | + EtherCAT | total in a 1 ms cycle |
 |---|---|---|---|---|
-| 1 MHz single (current) | 67.1 us | 403 us | 141 us | **544 us** |
-| 2 MHz single | 26.8 us | 161 us | 141 us | **302 us** |
-| 8 MHz split read | 13.3 us | 80 us | 141 us | **221 us** |
+| 1 MHz single (current) | 67.1 us | 403 us | 93 us | **496 us** |
+| 2 MHz single | 26.8 us | 161 us | 93 us | **254 us** |
+| 8 MHz split read | 13.3 us | 80 us | 93 us | **173 us** |
 
 **The split transfer is cheap on SPI0 — about 3 us** (13.3 vs 10.3 us at 8 MHz), so the TMC4671's 8 MHz read mode is viable and roughly halves the cost of 2 MHz single datagrams. This does *not* carry over from the AUX controller, where multi-transfer messages measured much worse (§3.4); the difference is that SPI0 uses a hardware chip select while the AUX bus uses a GPIO the driver toggles.
 
