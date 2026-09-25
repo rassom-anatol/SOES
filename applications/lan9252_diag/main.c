@@ -844,10 +844,10 @@ int main (int argc, char * argv[])
                             * comes from the ESI, so this is a property of the
                             * device description rather than of the master. */
                            uint8_t c2 = 0, c3 = 0, a2 = 0, a3 = 0;
-                           ESC_read (0x0804, &c2, sizeof (c2));
-                           ESC_read (0x0806, &a2, sizeof (a2));
-                           ESC_read (0x080C, &c3, sizeof (c3));
-                           ESC_read (0x080E, &a3, sizeof (a3));
+                           ESC_read (ESCREG_SM2 + 4, &c2, sizeof (c2));
+                           ESC_read (ESCREG_SM2 + 6, &a2, sizeof (a2));
+                           ESC_read (ESCREG_SM3 + 4, &c3, sizeof (c3));
+                           ESC_read (ESCREG_SM3 + 6, &a3, sizeof (a3));
                            printf ("   SM: SM2 ctl=%02X act=%02X (wd trigger %s)"
                                    "  SM3 ctl=%02X act=%02X\n",
                                    c2, a2, (c2 & 0x40) ? "ON" : "off", c3, a3);
