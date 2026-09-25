@@ -67,6 +67,15 @@ static esc_hw_cfg_t hw_cfg =
 static volatile uint64_t rx_calls = 0;
 static volatile uint64_t tx_calls = 0;
 
+/* Mailbox activity, counted per cycle from the AL event register. This splits
+ * the one question worth asking when a master's CoE object list comes back
+ * empty: whether the master is sending mailbox traffic that this stack fails to
+ * answer, or whether it is sending nothing at all. The two have entirely
+ * different causes and nothing else distinguishes them from here.
+ */
+static uint64_t sm0_events = 0;
+static uint64_t sm1_events = 0;
+
 static void cb_state_change (uint8_t * as, uint8_t * an);
 
 /** Master outputs have arrived: SM2 has been read and unpacked into Obj.
@@ -217,6 +226,15 @@ int main (int argc, char * argv[])
       ecat_slv ();
       clock_gettime (CLOCK_MONOTONIC, &b);
 
+      if (ESCvar.ALevent & ESCREG_ALEVENT_SM0)
+      {
+         sm0_events++;
+      }
+      if (ESCvar.ALevent & ESCREG_ALEVENT_SM1)
+      {
+         sm1_events++;
+      }
+
       if (n < NS)
       {
          xfers[n] = ESC_hw_spi_count () - c0;
@@ -266,6 +284,30 @@ int main (int argc, char * argv[])
                  "(wd trigger %s) 0x0440=%04X | rx=%llu tx=%llu\n",
                  alctl, alsts, alerr, smc2, (smc2 & 0x40) ? "ON" : "off", wd,
                  (unsigned long long)rx_calls, (unsigned long long)tx_calls);
+
+         {
+            uint8_t c0m = 0, a0m = 0, c1m = 0, a1m = 0;
+            uint16_t l0 = 0, l1 = 0, p0 = 0, p1 = 0;
+
+            ESC_read (ESCREG_SM0, &p0, sizeof (p0));
+            ESC_read (ESCREG_SM0 + 2, &l0, sizeof (l0));
+            ESC_read (ESCREG_SM0 + 4, &c0m, sizeof (c0m));
+            ESC_read (ESCREG_SM0 + 6, &a0m, sizeof (a0m));
+            ESC_read (ESCREG_SM1, &p1, sizeof (p1));
+            ESC_read (ESCREG_SM1 + 2, &l1, sizeof (l1));
+            ESC_read (ESCREG_SM1 + 4, &c1m, sizeof (c1m));
+            ESC_read (ESCREG_SM1 + 6, &a1m, sizeof (a1m));
+            printf ("   MBX: run=%u xoe=%u outpost=%u backup=%u"
+                    " | SM0 %04X len %u ctl %02X act %02X"
+                    " | SM1 %04X len %u ctl %02X act %02X"
+                    " | events SM0=%llu SM1=%llu\n",
+                    ESCvar.MBXrun, ESCvar.xoe, ESCvar.mbxoutpost,
+                    ESCvar.mbxbackup,
+                    etohs (p0), (unsigned)etohs (l0), c0m, a0m,
+                    etohs (p1), (unsigned)etohs (l1), c1m, a1m,
+                    (unsigned long long)sm0_events,
+                    (unsigned long long)sm1_events);
+         }
 
          /* The mirror, as the master should see it. Signed values are printed
           * as signed on purpose: this line is the readout for stack-review
