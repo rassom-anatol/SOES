@@ -182,7 +182,8 @@ Sync Manager Communication Type is present in both retained demos
 and is expected by masters enumerating a CoE device. The generator has no concept of it.
 
 **Resolved.** Emitted as an ARRAY of four `UNSIGNED8`, describing the fixed SOES
-layout: two mailbox SyncManagers, then outputs and inputs.
+layout: two mailbox SyncManagers, then outputs and inputs. Confirmed read by
+TwinCAT during an object dictionary walk.
 
 ### 2.4 The BootStrap block contradicts the boot mailbox configuration
 
@@ -229,6 +230,18 @@ the string literal goes in the `data` field.
 **Resolved.** A string object with no backing variable now emits
 `(void *)"cmc_drive"` as its data pointer, and `check_od.sh` fails on any
 `DTYPE_VISIBLE_STRING` entry left with a NULL one.
+
+**Verified against TwinCAT**, which is the only way this one can be: a master
+reading 0x1008 is precisely the failing case, so the test is to let one do it.
+During a full SDO-Info walk the master read 0x1008, 0x1009 and 0x100A twice each
+and the slave stayed in OP with no abort and no AL status code.
+
+Note that the data pointer aims at a string literal, so the storage is read
+only. Nothing writes through it today -- the objects are `ATYPE_RO`, and
+`COE_setValue` has no case for `DTYPE_VISIBLE_STRING` so its `default:` branch
+declines the write, which is visible in a debug build as one `ignored` line per
+string object at start-up. Giving a string object a `var` would change that and
+would need real storage behind it.
 
 ### 2.6 0x6502 advertises a mode that does not exist
 
