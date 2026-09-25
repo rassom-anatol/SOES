@@ -1467,6 +1467,16 @@ void ESC_coeprocess (void)
       coesdo = (_COEsdo *) &MBX[0];
       coeobjdesc = (_COEobjdesc *) &MBX[0];
       service = etohs (coesdo->coeheader.numberservice) >> 12;
+      /* Every CoE service that reaches the stack, before any of it is
+       * interpreted. This is the one place that distinguishes "the master never
+       * asked" from "the master asked and we answered badly", which is
+       * otherwise invisible: an SDO upload leaves no trace, and a master that
+       * dislikes a response simply shows an empty list rather than reporting an
+       * error. Costs nothing unless ESC_DEBUG is defined.
+       */
+      DPRINT ("coe service %u cmd %02X opcode %02X index %04X:%02X\n",
+              service, coesdo->command, coeobjdesc->infoheader.opcode,
+              etohs (coesdo->index), coesdo->subindex);
       if (service == COE_SDOREQUEST)
       {
          if ((SDO_COMMAND(coesdo->command) == COE_COMMAND_UPLOADREQUEST)
