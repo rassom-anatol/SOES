@@ -805,6 +805,30 @@ int main (int argc, char * argv[])
                                    "  0x0982 pulselen=%u  0x098E sync0stat=%02X\n",
                                    pdi, sl, (unsigned)plen, st0);
                         }
+                        {
+                           /* Who is holding the state machine back. AL control
+                            * is written by the master and AL status by us, so
+                            * control==1 means the master is not asking for a
+                            * transition, while control>status means we refused
+                            * one and the code says why. DL status distinguishes
+                            * that from having no link to be asked over: bit 0
+                            * is PDI operational, bits 4/5 the two ports. */
+                           uint16_t alctl = 0, alsts = 0, alcode = 0, dls = 0;
+                           uint16_t wd = 0, wdp = 0, wdd = 0;
+                           ESC_read (ESCREG_ALCONTROL, &alctl, sizeof (alctl));
+                           ESC_read (ESCREG_ALSTATUS, &alsts, sizeof (alsts));
+                           ESC_read (ESCREG_ALERROR, &alcode, sizeof (alcode));
+                           ESC_read (ESCREG_DLSTATUS, &dls, sizeof (dls));
+                           ESC_read (0x0400, &wdd, sizeof (wdd));
+                           ESC_read (0x0420, &wdp, sizeof (wdp));
+                           ESC_read (0x0440, &wd, sizeof (wd));
+                           printf ("   AL: ctl=%04X sts=%04X err=%04X "
+                                   "0x0110 DL=%04X (link %s) | WD div=%u "
+                                   "pdt=%u 0x0440=%04X\n",
+                                   alctl, alsts, alcode, dls,
+                                   (dls & 0x0030) ? "up" : "DOWN",
+                                   (unsigned)wdd, (unsigned)wdp, wd);
+                        }
                      }
                      if (sync_thread_running && wl_n > 16)
                      {
