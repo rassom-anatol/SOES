@@ -505,6 +505,11 @@ typedef struct
    _ESCsm SM[4];
    /* Volatile since it may be read from ISR */
    volatile int watchdogcnt;
+   /* No longer maintained by the stack: ecat_slv_poll used to refresh this
+    * from ESCREG_LOCALTIME every cycle and nothing read it, so the read was
+    * removed. An application that wants the ESC local time must read 0x0910
+    * itself. Kept so the structure layout does not change.
+    */
    volatile uint32_t Time;
    volatile uint32_t ALevent;
    volatile int8_t synccounter;

@@ -611,6 +611,35 @@ static uint16_t csr_chunk_size (uint16_t address, uint16_t len)
    return size;
 }
 
+/* Whether an AL event tail read is worth doing after an access to `address`.
+ *
+ * The tail exists to mimic the ET1x00, which returns the AL event register in
+ * the status byte of every access and so keeps ESCvar.ALevent fresh for free.
+ * Over SPI it is not free: it is a whole second CSR access, three more frames,
+ * and on a cyclic path measured in tens of microseconds that is the single
+ * largest avoidable cost.
+ *
+ * Three accesses do not need it:
+ *
+ *   - The AL event register itself. The tail would read the same register a
+ *     second time in one call.
+ *   - The SM2 process data read. DIG_process tests ESCvar.ALevent for the SM2
+ *     event *before* it reads SM2, so the read cannot invalidate its own
+ *     precondition.
+ *   - The SM3 process data write. That branch of DIG_process does not consult
+ *     ESCvar.ALevent at all.
+ *
+ * Mailbox transfers live in PRAM too and are deliberately excluded: the CoE
+ * and FoE paths have not been audited for ALevent freshness and are not on the
+ * cyclic path, so there is nothing to win by risking it.
+ */
+static int alevent_tail_needed (uint16_t address)
+{
+   return !(address == ESCREG_ALEVENT ||
+            address == ESC_SM2_sma ||
+            address == ESC_SM3_sma);
+}
+
 /** ESC read function used by the Slave stack.
  *
  * @param[in]   address     = address of ESC register to read
@@ -619,6 +648,10 @@ static uint16_t csr_chunk_size (uint16_t address, uint16_t len)
  */
 void ESC_read (uint16_t address, void *buf, uint16_t len)
 {
+   /* The chunk loop below advances `address`, so keep what was asked for. */
+   const uint16_t start = address;
+   const uint16_t want = len;
+
    if (hw_fault || spi_fd < 0)
    {
       memset (buf, 0, len);
@@ -645,9 +678,24 @@ void ESC_read (uint16_t address, void *buf, uint16_t len)
       }
    }
 
+   if (start == ESCREG_ALEVENT && want >= sizeof (uint32_t))
+   {
+      /* The caller asked for the AL event register, so the value is already in
+       * hand. Publish it rather than fetching the same register again. */
+      uint32_t ev;
+      memcpy (&ev, buf, sizeof (ev));
+      ESCvar.ALevent = etohl (ev);
+      return;
+   }
+
+   if (!alevent_tail_needed (start))
+   {
+      return;
+   }
+
    /* To mimic the ET1100 always providing AlEvent on every read or write */
    ESC_read_csr (ESCREG_ALEVENT, (void *)&ESCvar.ALevent, sizeof (ESCvar.ALevent));
-   ESCvar.ALevent = etohs (ESCvar.ALevent);
+   ESCvar.ALevent = etohl (ESCvar.ALevent);
 }
 
 /** ESC write function used by the Slave stack.
@@ -658,6 +706,8 @@ void ESC_read (uint16_t address, void *buf, uint16_t len)
  */
 void ESC_write (uint16_t address, void *buf, uint16_t len)
 {
+   const uint16_t start = address;
+
    if (hw_fault || spi_fd < 0)
    {
       return;
@@ -683,9 +733,14 @@ void ESC_write (uint16_t address, void *buf, uint16_t len)
       }
    }
 
+   if (!alevent_tail_needed (start))
+   {
+      return;
+   }
+
    /* To mimic the ET1x00 always providing AlEvent on every read or write */
    ESC_read_csr (ESCREG_ALEVENT, (void *)&ESCvar.ALevent, sizeof (ESCvar.ALevent));
-   ESCvar.ALevent = etohs (ESCvar.ALevent);
+   ESCvar.ALevent = etohl (ESCvar.ALevent);
 }
 
 /* ------------------------------------------------------------------ GPIO reset */

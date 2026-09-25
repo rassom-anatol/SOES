@@ -302,9 +302,17 @@ void ecat_slv_worker (uint32_t event_mask)
  */
 void ecat_slv_poll (void)
 {
-   /* Read local time from ESC*/
-   ESC_read (ESCREG_LOCALTIME, (void *) &ESCvar.Time, sizeof (ESCvar.Time));
-   ESCvar.Time = etohl (ESCvar.Time);
+   /* Refresh the AL event register.
+    *
+    * This was a read of ESCREG_LOCALTIME into ESCvar.Time, which nothing in
+    * this stack or its applications reads. What the cycle actually depends on
+    * is ESCvar.ALevent, which that read only refreshed by accident, because a
+    * port may append an AL event read to every access to mimic the ET1x00.
+    * Asking for the register the cycle needs costs no more than asking for one
+    * it does not, and on a port where the tail is a second bus access it costs
+    * half as much as asking for both.
+    */
+   CC_ATOMIC_SET (ESCvar.ALevent, ESC_ALeventread ());
 
    /* Check the state machine */
    ESC_state();
