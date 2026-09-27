@@ -18,12 +18,18 @@ jobs:
           python3 -m pip install --quiet pyyaml
           sh tools/check_od.sh
 
-      # One configuration per application: the soes library compiles against
-      # whichever one supplies ecat_options.h, so they cannot share a build.
+      # One configuration per application, and per dictionary variant: the soes
+      # library compiles against whichever one supplies ecat_options.h, so they
+      # cannot share a build directory. Every variant is built because a defect
+      # that only appears in the four-axis image is exactly the kind that
+      # otherwise reaches hardware.
       - name: Build
         run: |
-          for app in applications/lan9252_diag applications/cia402_drive; do
-            cmake -B "build/$(basename "$app")" -S . \
-              -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSOES_DEMO="$app"
-            cmake --build "build/$(basename "$app")" -j4
+          cmake -B build/lan9252_diag -S . -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          cmake --build build/lan9252_diag -j4
+          for v in applications/cia402_drive/variants/*.yaml; do
+            name=$(basename "$v" .yaml)
+            cmake -B "build/$name" -S . -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+              -DSOES_DEMO=applications/cia402_drive -DCMC_VARIANT="$name"
+            cmake --build "build/$name" -j4
           done

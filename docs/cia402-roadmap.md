@@ -525,13 +525,27 @@ MAX_MAPPINGS_SM3 32      /* 8 entries per axis at 4 axes, plus headroom */
 
 **Four is a placeholder and needs confirming.** It is the one number in this layout not derived from a decision already taken. Pick the real maximum before the ESI ships; after that it is expensive to change, and until then it is a single key in `od.yaml`. 0x1420 leaves roughly 2.9 KB of DPRAM spare, so a larger count is affordable if the answer is more than four.
 
-### 4.4 Multi-axis
+### 4.4 Multi-axis and hardware variants
 
-**v1 ships one axis, but the generator emits the indexed form from the start.** This is the reason §4.1 pays for itself: adding axes later must not require re-deriving the SM arithmetic, regenerating the ESI or re-scanning in TwinCAT, and with the layout reserved above it does not.
+CMC ships as one-, two- and four-axis boards, each with I/O. They are **separate devices**, not one device configured differently, and the generator treats them that way: `applications/cia402_drive/od.yaml` is a shared base declaring every object, and `variants/cmc_drive_{1,2,4}ax.yaml` override only the axis count, product code and name.
 
-Axis *n* sits at `index + n*0x800` — axis 0 at 0x6040, axis 1 at 0x6840, axis 2 at 0x7040. In `od.yaml` this is one `axes:` key; in the generator a loop; in `utypes.h` it becomes `Obj.axis[n]`. Write the generator to take the count as a parameter from the outset rather than special-casing a single axis, since retrofitting the indexed form is the change this structure exists to avoid.
+**Each variant needs its own Product Code.** A master matches on Vendor ID, Product Code and Revision. Two variants sharing an identity while presenting different process images is the worst failure available: the master configures from whichever ESI it holds and the slave refuses at SAFEOP with a code naming none of this — the same shape as the control-byte mismatch in §3.3.0. The low nibble carries the axis count (0x1001, 0x1002, 0x1004) so a device and its description are hard to mismatch by eye, and `check_od.sh` fails if any two variants collide. Related trap: 0x1018 is served from the *compiled* dictionary while the scan identity comes from the *flashed* SII, so a board built against the wrong variant reports one identity at scan and another over CoE.
 
-The populated PDO length still reflects the axes actually present, so a single-axis v1 puts 16 and 24 bytes on the wire regardless of the reservation.
+**One PDO per axis, not one wide PDO.** Axis *n* gets 0x1600+*n* and 0x1A00+*n*, all assigned to the same SyncManager through 0x1C12/0x1C13. The wire image is identical either way, but separate PDOs mean an axis's layout does not depend on how many axes exist or on what else is mapped beside it. 0x1C12 sub 0 then tells a master how many axes the device presents.
+
+**I/O is an extra PDO pair, declared as `rxpdo_extra` / `txpdo_extra`** — never entries appended to the axis template. That keeps the axis image byte-identical across variants and independent of a carrier decision that has not been made yet. The mechanism is in the generator; the channel counts wait for the motherboard design, since anything decided now would be revisited then.
+
+**The ceiling is 8 axes, and it is not DPRAM.** The 0x800 stride puts axis 7 at 0x9800–0x9FFF and axis 8 at 0xA000, outside the CiA402 profile area. Eight axes plus a 32-byte I/O block needs about 0x4A0 bytes of the LAN9252's 4 KB, so process RAM is nowhere near the constraint — the index space is.
+
+**`utypes.h` is generated per variant, and that costs nothing provided consuming code never hard-codes the count.** The generator emits `#define CMC_AXIS_COUNT` beside `_Axis axis[N]`, and the contract cmc builds against is "an array whose length is discoverable", not "exactly four axes". A literal `Obj.axis[0]`, or a per-axis resource sized independently of that macro, is what would make a cmc build variant-specific. `applications/cia402_drive/main.c` follows the rule deliberately, as the worked example.
+
+The rejected alternative was one dictionary always carrying four axes so that `utypes.h` would be byte-identical everywhere. It was rejected because a one-axis drive advertising objects for axes 1–3 is a device misrepresenting itself, which is the same defect as 0x6502 claiming a homing mode that does not exist. It also bought nothing: deriving the count removes the churn it was meant to avoid.
+
+**Selecting a variant is a build option, not a branch**, so a consumer pins one commit of this repository and chooses at configure time:
+
+```
+cmake -B build -S . -DSOES_DEMO=applications/cia402_drive -DCMC_VARIANT=cmc_drive_4ax
+```
 
 ### 4.5 Verification
 
