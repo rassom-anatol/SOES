@@ -256,8 +256,12 @@ static esc_cfg_t config =
    .post_object_download_hook = NULL,
    .rxpdo_override = NULL,
    .txpdo_override = NULL,
-   .esc_hw_interrupt_enable = NULL,
-   .esc_hw_interrupt_disable = NULL,
+   /* Without these the AL event mask never gains the SM2, SM3 and SYNC0 bits
+    * and the LAN9252's interrupt output is never switched on, so its IRQ pin
+    * stays idle and every wait in the cyclic loop times out. The symptom is
+    * the DC liveness check firing on a bus that is in fact perfectly healthy. */
+   .esc_hw_interrupt_enable = ESC_interrupt_enable,
+   .esc_hw_interrupt_disable = ESC_interrupt_disable,
    .esc_hw_eep_handler = NULL,
    .esc_check_dc_handler = dc_checker,
    .esc_hw_wait = ESC_hw_wait,
