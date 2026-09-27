@@ -414,6 +414,27 @@ int main (int argc, char * argv[])
             printf ("   EVT: wakes=%u  sm=%u  sync0=%u  mbx=%u  idle=%u\n",
                     w, sm, s0, mb, id);
          }
+         {
+            /* 0x0204 AL Event Mask selects which events may drive the IRQ pin.
+             * 0x0151 is the Sync/Latch PDI configuration, loaded from SII
+             * EEPROM word 1 and not writable from the PDI: as well as making
+             * the pin an output it controls whether a SYNC0 pulse is mapped
+             * into the AL Event Request register at all. A pulse that is
+             * visible on a scope but absent from 0x0220 points here. */
+            uint32_t almask = 0;
+            uint8_t slcfg = 0, syncact = 0, sync0stat = 0;
+
+            ESC_read (ESCREG_ALEVENTMASK, &almask, sizeof (almask));
+            ESC_read (0x0151, &slcfg, sizeof (slcfg));
+            ESC_read (ESCREG_SYNC_ACT, &syncact, sizeof (syncact));
+            ESC_read (ESCREG_SYNC0_STATUS, &sync0stat, sizeof (sync0stat));
+            printf ("   SYNC: 0x0204 mask=%08X (sync0 %s)  0x0151=%02X"
+                    "  0x0981=%02X  0x098E=%02X\n",
+                    (unsigned)etohl (almask),
+                    (etohl (almask) & ESCREG_ALEVENT_DC_SYNC0) ? "unmasked"
+                                                              : "MASKED",
+                    slcfg, syncact, sync0stat);
+         }
          printf ("   DC: dcsync=%u sync0=%u ns  synccounter=%d limit=%u"
                  "  missed=%u syncerror=%u\n",
                  ESCvar.dcsync, (unsigned)sync0_period_ns,
