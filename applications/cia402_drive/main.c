@@ -87,6 +87,13 @@ static uint64_t mbx_responses = 0;
  * its wait at twice this, which is what identifies a stopped sync unit. */
 static uint32_t sync0_period_ns = 0;
 
+/* Edges seen on the SYNC0 pin itself, counted independently of the AL event
+ * register. The two can disagree, and which way they disagree is the whole
+ * diagnosis: no edges means the sync unit is not pulsing, while edges without
+ * events means the pulse is not mapped into the AL Event Request register. */
+static int sync0_fd = -1;
+static uint64_t sync0_edges = 0;
+
 static void cb_state_change (uint8_t * as, uint8_t * an);
 
 /** esc_cfg_t.esc_check_dc_handler: vet the DC configuration the master wrote.
@@ -324,6 +331,10 @@ int main (int argc, char * argv[])
    }
    printf ("stack init OK, entering cyclic loop\n");
 
+   sync0_fd = ESC_hw_edge_open (hw_cfg.gpiochip, hw_cfg.sync0_line);
+   printf ("SYNC0 pin: line %d %s\n", hw_cfg.sync0_line,
+           (sync0_fd >= 0) ? "watched" : "NOT AVAILABLE");
+
    clock_gettime (CLOCK_MONOTONIC, &last);
    for (;;)
    {
@@ -362,6 +373,13 @@ int main (int argc, char * argv[])
          spi_work[n] = ESC_hw_spi_ns () - s0;
          samples[n++] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
                         (uint64_t)(b.tv_nsec - a.tv_nsec);
+      }
+
+      /* Drain without blocking: this measures the signal, not our latency. */
+      while ((sync0_fd >= 0) &&
+             (ESC_hw_edge_wait (sync0_fd, 0, NULL, NULL) == 1))
+      {
+         sync0_edges++;
       }
 
       if (b.tv_sec - last.tv_sec >= 5)
@@ -428,8 +446,9 @@ int main (int argc, char * argv[])
             ESC_read (0x0151, &slcfg, sizeof (slcfg));
             ESC_read (ESCREG_SYNC_ACT, &syncact, sizeof (syncact));
             ESC_read (ESCREG_SYNC0_STATUS, &sync0stat, sizeof (sync0stat));
-            printf ("   SYNC: 0x0204 mask=%08X (sync0 %s)  0x0151=%02X"
-                    "  0x0981=%02X  0x098E=%02X\n",
+            printf ("   SYNC: pin edges=%llu | 0x0204 mask=%08X (sync0 %s)"
+                    "  0x0151=%02X  0x0981=%02X  0x098E=%02X\n",
+                    (unsigned long long)sync0_edges,
                     (unsigned)etohl (almask),
                     (etohl (almask) & ESCREG_ALEVENT_DC_SYNC0) ? "unmasked"
                                                               : "MASKED",
