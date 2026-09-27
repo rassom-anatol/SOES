@@ -3,6 +3,8 @@
  * LICENSE file in the project root for full license information
  */
 #include <stddef.h>
+#include <inttypes.h>
+
 #include "esc.h"
 #include "esc_coe.h"
 #include "esc_foe.h"
@@ -185,6 +187,70 @@ static void rxpdo_read_sm2 (void)
 void APP_setwatchdog (int watchdogcnt)
 {
    CC_ATOMIC_SET(ESCvar.watchdogcnt, watchdogcnt);
+}
+
+/* ------------------------------------------------- sync error counting ---- */
+
+/* ETG.1020 sync error counting, called once per SYNC0 event.
+ *
+ * This deliberately does not reproduce what SOES did before, which kept a
+ * signed balance of (process data events) minus (SYNC0 pulses) and tripped on
+ * its magnitude. That balance has no decay: one missed frame costs -1 forever,
+ * while a good cycle nets zero, so a drive losing a single frame an hour still
+ * accumulates monotonically and trips after `limit` hours. It is a
+ * lifetime-total policy where a drive needs a rate policy.
+ *
+ * The decisive objection is not the flaw but interoperability. 0x10F1:02 is a
+ * standardised object and a master writes it expecting ETG semantics, so
+ * implementing something else silently makes the configured value mean
+ * something far stricter than the master intended.
+ *
+ * The +3 / -1 weighting gives the limit a statable meaning: the counter only
+ * grows while the error rate exceeds 25%, and the limit then controls how long
+ * a burst above that rate is tolerated. Below 25% it drains to zero and the
+ * drive runs indefinitely. In time terms, limit/3 is the number of consecutive
+ * fully missed cycles tolerated before dropping to SAFEOP.
+ *
+ * @param[in] sm_event_seen = whether process data arrived since the previous
+ *                            SYNC0, i.e. whether this cycle was served
+ */
+void ecat_slv_sync0_account (int sm_event_seen)
+{
+   int32_t counter = CC_ATOMIC_GET (ESCvar.synccounter);
+
+   if (sm_event_seen)
+   {
+      /* Floored at zero rather than allowed negative: a run of good cycles
+       * must not buy credit against a future burst of bad ones, which is
+       * exactly the accumulation behaviour being replaced. */
+      if (counter > 0)
+      {
+         counter -= 1;
+      }
+   }
+   else
+   {
+      counter += 3;
+      if (ESCvar.smeventmissed < UINT16_MAX)
+      {
+         ESCvar.smeventmissed++;
+      }
+   }
+
+   CC_ATOMIC_SET (ESCvar.synccounter, (int16_t)counter);
+
+   if ((ESCvar.synccounterlimit > 0) &&
+       (counter > (int32_t)ESCvar.synccounterlimit))
+   {
+      DPRINT ("sync error counter %d over limit %u\n",
+              (int)counter, (unsigned)ESCvar.synccounterlimit);
+      ESCvar.syncerror = 1;
+      /* Reset before signalling: the AL state change is what the master acts
+       * on, and leaving the counter above the limit would re-trip immediately
+       * on the next SYNC0 after any recovery attempt. */
+      CC_ATOMIC_SET (ESCvar.synccounter, 0);
+      ESC_ALstatusgotoerror ((ESCsafeop | ESCerror), ALERR_SYNCERROR);
+   }
 }
 
 /* --------------------------------------------------------- watchdog ------ */
@@ -484,6 +550,107 @@ void ecat_slv_poll (void)
 /*
  * Poll all events in a free-run application
  */
+/** One iteration of the distributed-clock cyclic loop.
+ *
+ * The SYNC0-driven counterpart to ecat_slv(), which free-runs. Structurally it
+ * is the two interrupt handlers of the rt-kernel XMC4 port folded into a single
+ * thread, and single is deliberate: on a port where one ESC access is a
+ * multi-frame SPI sequence through one command register inside the chip, a
+ * second context touching the bus corrupts both transactions, and SOES offers
+ * no critical section a port could fill in. So mailbox work stays here too,
+ * bounded to one step per cycle. See docs/cia402-roadmap.md section 3.2.
+ *
+ * @param[in] timeout_ns = how long to wait for an interrupt. Bound it at about
+ *                         twice the SYNC0 period: expiring with DC active is
+ *                         what identifies a stopped sync unit, and that check
+ *                         exists nowhere else -- the sync error counter tracks
+ *                         the balance between process data and SYNC0, so when
+ *                         both stop together it never trips.
+ */
+void ecat_slv_run_dc (uint64_t timeout_ns)
+{
+   /* Whether process data arrived during the SYNC0 period now ending. */
+   static int sm_event_seen = 0;
+   int rc;
+
+   rc = (ESCvar.esc_hw_wait != NULL) ? ESCvar.esc_hw_wait (timeout_ns) : -1;
+
+   if ((rc == 0) && (ESCvar.dcsync > 0) &&
+       ((CC_ATOMIC_GET (ESCvar.App.state) & APPSTATE_OUTPUT) > 0))
+   {
+      DPRINT ("no ESC interrupt within %" PRIu64 " ns with DC active\n",
+              timeout_ns);
+      ESCvar.syncerror = 1;
+      ESC_ALstatusgotoerror ((ESCsafeop | ESCerror), ALERR_FATALSYNCERROR);
+      return;
+   }
+   if (rc < 0)
+   {
+      return;
+   }
+
+   CC_ATOMIC_SET (ESCvar.ALevent, ESC_ALeventread ());
+
+   /* Process data. Under DC the outputs are applied here but the inputs are
+    * deferred to the SYNC0 edge, so that what the master reads was sampled at
+    * a known instant rather than whenever a frame happened to arrive. */
+   if (ESCvar.ALevent & (ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3))
+   {
+      if (ESCvar.dcsync == 0)
+      {
+         DIG_process (DIG_PROCESS_WD_FLAG | DIG_PROCESS_RXPDO_FLAG |
+                      DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_TXPDO_FLAG);
+      }
+      else
+      {
+         sm_event_seen = 1;
+         DIG_process (DIG_PROCESS_WD_FLAG | DIG_PROCESS_RXPDO_FLAG);
+      }
+   }
+
+   if (ESCvar.ALevent & ESCREG_ALEVENT_DC_SYNC0)
+   {
+      ecat_slv_sync0_account (sm_event_seen);
+      sm_event_seen = 0;
+      DIG_process (DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_TXPDO_FLAG);
+
+      /* Reading the SYNC0 status register acknowledges the latch; without it
+       * the event stays asserted and the next wait returns immediately. */
+      {
+         uint8_t status;
+         ESC_read (ESCREG_SYNC0_STATUS, &status, sizeof (status));
+      }
+   }
+
+   /* Everything else -- AL control, SyncManager changes, mailbox, EEPROM --
+    * on this same thread, one step per cycle. */
+   if (ESCvar.ALevent & (ESCREG_ALEVENT_CONTROL | ESCREG_ALEVENT_SMCHANGE |
+                         ESCREG_ALEVENT_SM0 | ESCREG_ALEVENT_SM1 |
+                         ESCREG_ALEVENT_EEP))
+   {
+      ESC_state ();
+      ESC_sm_act_event ();
+
+      if (ESC_mbxprocess ())
+      {
+         ESC_coeprocess ();
+#if USE_FOE
+         ESC_foeprocess ();
+#endif
+#if USE_EOE
+         ESC_eoeprocess ();
+#endif
+         ESC_xoeprocess ();
+      }
+
+      if ((ESCvar.ALevent & ESCREG_ALEVENT_EEP) &&
+          (ESCvar.esc_hw_eep_handler != NULL))
+      {
+         (ESCvar.esc_hw_eep_handler) ();
+      }
+   }
+}
+
 void ecat_slv (void)
 {
    ecat_slv_poll();

@@ -65,6 +65,9 @@
 #define ESCREG_SYNC_SYNC1_EN        0x04
 #define ESCREG_SYNC_AUTO_ACTIVATED  0x08
 #define ESCREG_SYNC0_CYCLE_TIME     0x09A0
+/* Reading this acknowledges the SYNC0 latch. Without the read the AL event
+ * stays asserted and a blocking wait returns immediately, spinning the loop. */
+#define ESCREG_SYNC0_STATUS         0x098E
 #define ESCREG_SYNC1_CYCLE_TIME     0x09A4
 #define ESCREG_SMENABLE_BIT         0x01
 #define ESCREG_AL_STATEMASK         0x001f
@@ -358,6 +361,13 @@ typedef struct esc_cfg
    void (*esc_hw_eep_handler) (void);
    uint16_t (*esc_check_dc_handler) (void);
    int (*get_device_id) (uint16_t * device_id);
+   /* Block until an ESC interrupt arrives or the timeout expires: 1 on an
+    * interrupt, 0 on timeout, negative on error. Supplying this is what makes
+    * ecat_slv_run_dc usable -- the loop is stack policy but the waiting is
+    * per-port, and a timeout with DC active is the only way to notice that the
+    * sync unit has stopped (see docs/stack-review.md 1.2).
+    */
+   int (*esc_hw_wait) (uint64_t timeout_ns);
 } esc_cfg_t;
 
 typedef struct
@@ -483,6 +493,7 @@ typedef struct
    void (*esc_hw_eep_handler) (void);
    uint16_t (*esc_check_dc_handler) (void);
    int (*get_device_id) (uint16_t * device_id);
+   int (*esc_hw_wait) (uint64_t timeout_ns);
    uint8_t MBXrun;
    uint32_t activembxsize;
    sm_cfg_t * activemb0;
@@ -530,7 +541,21 @@ typedef struct
     */
    volatile uint32_t Time;
    volatile uint32_t ALevent;
-   volatile int8_t synccounter;
+   /* ETG.1020 sync error counter. Widened from int8_t because the +3 weighting
+    * in ecat_slv_sync0_account overflows a signed byte at a limit of only 42,
+    * while 0x10F1:02 is a uint16_t a master may legitimately set far higher.
+    */
+   volatile int16_t synccounter;
+   /* 0x1C32:0B. Counts SYNC0 periods in which no process data arrived. An
+    * application mirrors it into its own dictionary storage; the stack owns
+    * the count because the stack is what observes the events.
+    */
+   volatile uint16_t smeventmissed;
+   /* 0x1C32:20. Latched when the counter passes the limit, cleared when DC is
+    * reactivated, so a master reading it after a drop to SAFEOP can tell a
+    * sync failure from any other reason for the same state.
+    */
+   volatile uint8_t syncerror;
    volatile _App App;
    uint8_t mbxdata[PREALLOC_BUFFER_SIZE];
 } _ESCvar;

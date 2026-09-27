@@ -64,6 +64,8 @@ void ecat_slv_worker (uint32_t event_mask);
  * application
  */
 void ecat_slv_poll (void);
+void ecat_slv_sync0_account (int sm_event_seen);
+void ecat_slv_run_dc (uint64_t timeout_ns);
 
 /**
  * Poll all events in a free-run application

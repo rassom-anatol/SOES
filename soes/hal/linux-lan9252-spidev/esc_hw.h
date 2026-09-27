@@ -65,6 +65,14 @@ typedef struct
    uint32_t    op_timeout_ms;
 } esc_hw_cfg_t;
 
+/** esc_cfg_t.esc_hw_wait: block until the LAN9252 asserts its IRQ pin.
+ *
+ * Returns 1 on an interrupt, 0 on timeout, negative on error. Wire it into
+ * esc_cfg_t and call ecat_slv_run_dc() instead of ecat_slv() to run the cyclic
+ * loop off the interrupt rather than free-running.
+ */
+int  ESC_hw_wait (uint64_t timeout_ns);
+
 void ESC_interrupt_enable (uint32_t mask);
 void ESC_interrupt_disable (uint32_t mask);
 

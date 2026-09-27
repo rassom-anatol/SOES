@@ -97,6 +97,11 @@ static uint32_t timeout_ms = DEFAULT_TIMEOUT_MS;
  */
 static int hw_fault = 0;
 
+/* Which GPIO carries the LAN9252 IRQ, captured in ESC_init so that
+ * ESC_hw_wait can open it lazily on first use. */
+static const char * irq_chip = NULL;
+static int irq_offset = -1;
+
 /* SPI accounting. Two clock_gettime calls per transfer, so roughly thirty per
  * cycle -- under a microsecond in total through the vDSO, but it sits in the
  * one path being tuned to microseconds, so it is switchable rather than
@@ -936,6 +941,10 @@ int ESC_init (const esc_cfg_t * config)
       return -1;
    }
 
+   /* Kept for ESC_hw_wait, which opens the line lazily on first use. */
+   irq_chip = hw->gpiochip;
+   irq_offset = hw->irq_line;
+
    timeout_ms = (hw->op_timeout_ms != 0) ? hw->op_timeout_ms : DEFAULT_TIMEOUT_MS;
    reset_pulse_us = (hw->reset_pulse_us != 0) ? hw->reset_pulse_us : 500u;
    mode  = hw->spi_mode;
@@ -1003,6 +1012,41 @@ int ESC_init (const esc_cfg_t * config)
 
 /* ------------------------------------------------------------------ interrupts */
 
+/* The IRQ line, held open for the lifetime of the process.
+ *
+ * Opened lazily on the first wait rather than during ESC_init, because an
+ * application that never runs the DC loop should not claim the line -- the
+ * diagnostic hands it to an external observer, and a gpiochip line can only be
+ * requested once.
+ */
+static int irq_wait_fd = -1;
+
+/** esc_cfg_t.esc_hw_wait: block until the LAN9252 asserts its IRQ pin.
+ *
+ * The kernel chardev edge wait, called from whichever thread runs the cyclic
+ * loop. That directness is the point: an event library with its own dispatch
+ * thread would add a scheduling hop and a pipe round trip in front of a SYNC0
+ * deadline, for a mechanism this already is.
+ */
+int ESC_hw_wait (uint64_t timeout_ns)
+{
+   if (irq_wait_fd < 0)
+   {
+      if (irq_offset < 0 || irq_chip == NULL)
+      {
+         return -1;
+      }
+      irq_wait_fd = ESC_hw_edge_open (irq_chip, irq_offset);
+      if (irq_wait_fd < 0)
+      {
+         DPRINT ("lan9252: cannot watch IRQ line %d\n", irq_offset);
+         return -1;
+      }
+   }
+
+   return ESC_hw_edge_wait (irq_wait_fd, timeout_ns, NULL, NULL);
+}
+
 void ESC_interrupt_enable (uint32_t mask)
 {
    uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 |
@@ -1014,7 +1058,9 @@ void ESC_interrupt_enable (uint32_t mask)
    }
 
    /* LAN9252 IRQ pin as push-pull active high, then enable the interrupt.
-    * Nothing observes the line until the Phase 3 gpiochip edge wait exists.
+    * ESC_hw_wait watches the line; rising edge is correct because of this
+    * configuration, so a board that wires the pin open-drain active-low needs
+    * the edge sense flipped to match.
     */
    lan9252_write_32 (ESC_CMD_IRQ_CFG, 0x00000111);
    lan9252_write_32 (ESC_CMD_INT_EN, 0x00000001);

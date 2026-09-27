@@ -289,6 +289,8 @@ uint16_t ESC_checkDC (void)
    {
       ESCvar.dcsync = 0;
       ESCvar.synccounter = 0;
+      ESCvar.smeventmissed = 0;
+      ESCvar.syncerror = 0;
    }
 
    return ret;
@@ -1364,4 +1366,5 @@ void ESC_config (esc_cfg_t * cfg)
    ESCvar.esc_hw_eep_handler = cfg->esc_hw_eep_handler;
    ESCvar.esc_check_dc_handler = cfg->esc_check_dc_handler;
    ESCvar.get_device_id = cfg->get_device_id;
+   ESCvar.esc_hw_wait = cfg->esc_hw_wait;
 }
