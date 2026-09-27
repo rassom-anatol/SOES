@@ -586,6 +586,7 @@ void ecat_slv_dc_counters (uint32_t * wake, uint32_t * sm, uint32_t * sync0,
 
 void ecat_slv_run_dc (uint64_t timeout_ns)
 {
+   uint32_t events;
    int rc;
 
    rc = (ESCvar.esc_hw_wait != NULL) ? ESCvar.esc_hw_wait (timeout_ns) : -1;
@@ -604,12 +605,17 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
       return;
    }
 
+   /* Capture once. ESCvar.ALevent is not stable across the branches below: a
+    * port may refresh it on every ESC access to mimic the ET1x00, so testing
+    * it three times can dispatch three different cycles' worth of events. The
+    * cycle is decided by the value read here and nothing else. */
    CC_ATOMIC_SET (ESCvar.ALevent, ESC_ALeventread ());
+   events = ESCvar.ALevent;
    dc_evt_wake++;
-   if ((ESCvar.ALevent & (ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3 |
-                          ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_CONTROL |
-                          ESCREG_ALEVENT_SMCHANGE | ESCREG_ALEVENT_SM0 |
-                          ESCREG_ALEVENT_SM1 | ESCREG_ALEVENT_EEP)) == 0)
+   if ((events & (ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3 |
+                 ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_CONTROL |
+                 ESCREG_ALEVENT_SMCHANGE | ESCREG_ALEVENT_SM0 |
+                 ESCREG_ALEVENT_SM1 | ESCREG_ALEVENT_EEP)) == 0)
    {
       dc_evt_idle++;
    }
@@ -617,7 +623,7 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
    /* Process data. Under DC the outputs are applied here but the inputs are
     * deferred to the SYNC0 edge, so that what the master reads was sampled at
     * a known instant rather than whenever a frame happened to arrive. */
-   if (ESCvar.ALevent & (ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3))
+   if (events & (ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3))
    {
       if (ESCvar.dcsync == 0)
       {
@@ -632,7 +638,14 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
       }
    }
 
-   if (ESCvar.ALevent & ESCREG_ALEVENT_DC_SYNC0)
+   /* Under DC the wait itself is the SYNC0 edge, so a successful wake is the
+    * cycle boundary whether or not the pulse also reached the AL event
+    * register -- on this ESC it does not, despite 0x0151 bit 3 enabling the
+    * mapping and the pin visibly pulsing. Blocking on the signal rather than
+    * on a report of it also gives the kernel timestamp the jitter histogram
+    * in roadmap 3.6 needs. */
+   if ((events & ESCREG_ALEVENT_DC_SYNC0) ||
+       ((ESCvar.dcsync > 0) && (rc == 1)))
    {
       dc_evt_sync0++;
       ecat_slv_sync0_account (ESCvar.sm_event_seen);
@@ -649,9 +662,9 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
 
    /* Everything else -- AL control, SyncManager changes, mailbox, EEPROM --
     * on this same thread, one step per cycle. */
-   if (ESCvar.ALevent & (ESCREG_ALEVENT_CONTROL | ESCREG_ALEVENT_SMCHANGE |
-                         ESCREG_ALEVENT_SM0 | ESCREG_ALEVENT_SM1 |
-                         ESCREG_ALEVENT_EEP))
+   if (events & (ESCREG_ALEVENT_CONTROL | ESCREG_ALEVENT_SMCHANGE |
+                 ESCREG_ALEVENT_SM0 | ESCREG_ALEVENT_SM1 |
+                 ESCREG_ALEVENT_EEP))
    {
       dc_evt_mbx++;
       ESC_state ();
@@ -669,7 +682,7 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
          ESC_xoeprocess ();
       }
 
-      if ((ESCvar.ALevent & ESCREG_ALEVENT_EEP) &&
+      if ((events & ESCREG_ALEVENT_EEP) &&
           (ESCvar.esc_hw_eep_handler != NULL))
       {
          (ESCvar.esc_hw_eep_handler) ();

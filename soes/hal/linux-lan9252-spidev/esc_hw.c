@@ -101,6 +101,7 @@ static int hw_fault = 0;
  * ESC_hw_wait can open it lazily on first use. */
 static const char * irq_chip = NULL;
 static int irq_offset = -1;
+static int sync0_offset = -1;
 
 /* SPI accounting. Two clock_gettime calls per transfer, so roughly thirty per
  * cycle -- under a microsecond in total through the vDSO, but it sits in the
@@ -944,6 +945,7 @@ int ESC_init (const esc_cfg_t * config)
    /* Kept for ESC_hw_wait, which opens the line lazily on first use. */
    irq_chip = hw->gpiochip;
    irq_offset = hw->irq_line;
+   sync0_offset = hw->sync0_line;
 
    timeout_ms = (hw->op_timeout_ms != 0) ? hw->op_timeout_ms : DEFAULT_TIMEOUT_MS;
    reset_pulse_us = (hw->reset_pulse_us != 0) ? hw->reset_pulse_us : 500u;
@@ -1020,6 +1022,7 @@ int ESC_init (const esc_cfg_t * config)
  * requested once.
  */
 static int irq_wait_fd = -1;
+static int sync0_wait_fd = -1;
 
 /** esc_cfg_t.esc_hw_wait: block until the LAN9252 asserts its IRQ pin.
  *
@@ -1028,23 +1031,46 @@ static int irq_wait_fd = -1;
  * thread would add a scheduling hop and a pipe round trip in front of a SYNC0
  * deadline, for a mechanism this already is.
  */
-int ESC_hw_wait (uint64_t timeout_ns)
+static int hw_wait_on (int * fd, int offset, const char * what,
+                       uint64_t timeout_ns)
 {
-   if (irq_wait_fd < 0)
+   if (*fd < 0)
    {
-      if (irq_offset < 0 || irq_chip == NULL)
+      if (offset < 0 || irq_chip == NULL)
       {
          return -1;
       }
-      irq_wait_fd = ESC_hw_edge_open (irq_chip, irq_offset);
-      if (irq_wait_fd < 0)
+      *fd = ESC_hw_edge_open (irq_chip, offset);
+      if (*fd < 0)
       {
-         DPRINT ("lan9252: cannot watch IRQ line %d\n", irq_offset);
+         DPRINT ("lan9252: cannot watch %s line %d\n", what, offset);
          return -1;
       }
    }
 
-   return ESC_hw_edge_wait (irq_wait_fd, timeout_ns, NULL, NULL);
+   return ESC_hw_edge_wait (*fd, timeout_ns, NULL, NULL);
+}
+
+int ESC_hw_wait (uint64_t timeout_ns)
+{
+   return hw_wait_on (&irq_wait_fd, irq_offset, "IRQ", timeout_ns);
+}
+
+/** esc_cfg_t.esc_hw_wait: block on a rising edge of the SYNC0 pin.
+ *
+ * The alternative to ESC_hw_wait for a distributed-clock loop, and on this
+ * board the one that works: the LAN9252 pulses SYNC0 correctly but does not
+ * set AL Event Request bit 2 for it, even with bit 3 of the Sync/Latch PDI
+ * configuration (0x0151) enabling that mapping and the event unmasked in
+ * 0x0204. Waiting on the pin is also waiting on the real signal rather than on
+ * the chip's report of it, which is what carries a kernel timestamp.
+ *
+ * Process data and mailbox events still arrive through the AL event register,
+ * which the loop reads every cycle regardless of what woke it.
+ */
+int ESC_hw_wait_sync0 (uint64_t timeout_ns)
+{
+   return hw_wait_on (&sync0_wait_fd, sync0_offset, "SYNC0", timeout_ns);
 }
 
 void ESC_interrupt_enable (uint32_t mask)

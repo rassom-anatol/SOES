@@ -73,6 +73,14 @@ typedef struct
  */
 int  ESC_hw_wait (uint64_t timeout_ns);
 
+/** As ESC_hw_wait, but blocking on the SYNC0 pin instead of the IRQ pin.
+ *
+ * Use this for a distributed-clock loop. On the LAN9252 the SYNC0 pulse does
+ * not reach the AL event register even when 0x0151 bit 3 enables the mapping,
+ * so waiting on the IRQ pin never sees the cycle boundary.
+ */
+int  ESC_hw_wait_sync0 (uint64_t timeout_ns);
+
 void ESC_interrupt_enable (uint32_t mask);
 void ESC_interrupt_disable (uint32_t mask);
 
