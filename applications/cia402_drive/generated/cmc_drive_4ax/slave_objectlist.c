@@ -28,6 +28,18 @@ static const char acName1018_04[] = "Serial Number";
 static const char acName10F1[] = "Error Settings";
 static const char acName10F1_01[] = "Local Error Reaction";
 static const char acName10F1_02[] = "Sync Error Counter Limit";
+static const char acName1C32[] = "SM2 Sync Parameters";
+static const char acName1C32_01[] = "Sync Mode";
+static const char acName1C32_02[] = "Cycle Time";
+static const char acName1C32_05[] = "Minimum Cycle Time";
+static const char acName1C32_0B[] = "SM Event Missed Count";
+static const char acName1C32_20[] = "Sync Error";
+static const char acName1C33[] = "SM3 Sync Parameters";
+static const char acName1C33_01[] = "Sync Mode";
+static const char acName1C33_02[] = "Cycle Time";
+static const char acName1C33_05[] = "Minimum Cycle Time";
+static const char acName1C33_0B[] = "SM Event Missed Count";
+static const char acName1C33_20[] = "Sync Error";
 static const char acName2000[] = "Drive Faults and Status";
 static const char acName2000_01[] = "Gate Driver Faults";
 static const char acName2000_02[] = "Drive Status Flags";
@@ -511,6 +523,28 @@ const _objd SDO10F1[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName10F1, 2, NULL},
    {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName10F1_01, 0, &Obj.ErrorSettings.LocalErrorReaction},
    {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName10F1_02, 24, &Obj.ErrorSettings.SyncErrorCounterLimit},
+};
+
+/* 0x1C32 SM2 Sync Parameters */
+const _objd SDO1C32[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C32, 32, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName1C32_01, 0, &Obj.SM2Sync.SyncMode},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName1C32_02, 0, &Obj.SM2Sync.CycleTime},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_05, 250000, NULL},
+   {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C32_0B, 0, &Obj.SM2Sync.SMEventMissed},
+   {0x20, DTYPE_BOOLEAN, 1, ATYPE_RO, acName1C32_20, 0, &Obj.SM2Sync.SyncError},
+};
+
+/* 0x1C33 SM3 Sync Parameters */
+const _objd SDO1C33[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C33, 32, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName1C33_01, 0, &Obj.SM3Sync.SyncMode},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName1C33_02, 0, &Obj.SM3Sync.CycleTime},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_05, 250000, NULL},
+   {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C33_0B, 0, &Obj.SM3Sync.SMEventMissed},
+   {0x20, DTYPE_BOOLEAN, 1, ATYPE_RO, acName1C33_20, 0, &Obj.SM3Sync.SyncError},
 };
 
 /* 0x2000 Drive Faults and Status */
@@ -1118,6 +1152,8 @@ const _objectlist SDOobjects[] =
    {0x1C00, OTYPE_ARRAY, 4, 0, acName1C00, SDO1C00},
    {0x1C12, OTYPE_ARRAY, 1, 0, acNameSM1C12, SDO1C12},
    {0x1C13, OTYPE_ARRAY, 1, 0, acNameSM1C13, SDO1C13},
+   {0x1C32, OTYPE_RECORD, 32, 0, acName1C32, SDO1C32},
+   {0x1C33, OTYPE_RECORD, 32, 0, acName1C33, SDO1C33},
    {0x2000, OTYPE_RECORD, 2, 0, acName2000, SDO2000},
    {0x2001, OTYPE_RECORD, 3, 0, acName2001, SDO2001},
    {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},

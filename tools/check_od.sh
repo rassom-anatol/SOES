@@ -346,6 +346,29 @@ for assign, lo, hi, what in ((0x1C12, 0x1600, 0x17FF, "RxPDO"),
                        f"0x{int(got['value'], 0):04X}, expected 0x{idx:04X}")
 check("SyncManager assignment matches the PDOs defined", bad)
 
+# --- 12. a device that offers DC describes what it can sustain ------------
+#
+# The ESI advertises a DC-Synchron operation mode, so a master may configure
+# SYNC0 at whatever period it likes. 0x1C32:05 is the only place the device
+# states a floor, and validating the master's period against it is what turns
+# an unsustainable cycle into a specific AL status code instead of a drive that
+# silently misses deadlines. A zero floor is not a floor.
+
+bad = []
+if "<OpMode>" in esi and "DcSync0" in esi:
+    for idx, what in ((0x1C32, "SM2"), (0x1C33, "SM3")):
+        subs = blocks.get(idx)
+        if subs is None:
+            bad.append(f"the ESI offers DC but 0x{idx:04X} ({what} sync "
+                       f"parameters) is not in the object list")
+            continue
+        floor = subs.get(0x05)
+        if floor is None:
+            bad.append(f"0x{idx:04X} has no :05 minimum cycle time")
+        elif int(floor["value"], 0) == 0:
+            bad.append(f"0x{idx:04X}:05 declares a minimum cycle time of 0")
+check("DC-capable device declares a sustainable cycle time", bad)
+
 if fails:
     print(f"\n{len(fails)} check(s) failed")
     sys.exit(1)

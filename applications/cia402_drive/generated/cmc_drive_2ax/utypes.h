@@ -53,6 +53,20 @@ typedef struct
       uint32_t   LocalErrorReaction;
       uint16_t   SyncErrorCounterLimit;
    } ErrorSettings;
+   struct
+   {
+      uint32_t   CycleTime;
+      uint16_t   SMEventMissed;
+      uint8_t    SyncError;
+      uint16_t   SyncMode;
+   } SM2Sync;
+   struct
+   {
+      uint32_t   CycleTime;
+      uint16_t   SMEventMissed;
+      uint8_t    SyncError;
+      uint16_t   SyncMode;
+   } SM3Sync;
    _Axis      axis[2];
 } _Objects;
 
