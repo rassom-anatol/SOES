@@ -216,6 +216,8 @@ Because the XMC4 and TI HALs are retained (§1.2), the rename must reach them to
 
 ## Phase 3 — Interrupts and Distributed Clocks
 
+**Implemented, not yet validated on hardware.** `ecat_slv_run_dc()` in [`ecat_slv.c`](../soes/ecat_slv.c) is the cyclic loop; `ESC_hw_wait()` in the HAL is the blocking edge wait behind a new `esc_cfg_t.esc_hw_wait` hook; `ecat_slv_sync0_account()` implements the ETG.1020 counting in §3.3.1; `dc_checker()` in the drive application validates what the master configured; 0x1C32 and 0x1C33 are in the dictionary. What remains is running it against a master with DC enabled, and the real-time setup in §3.5.
+
 ### The gate
 
 [`soes/esc.c:833-837`](../soes/esc.c#L833-L837) returns early when `use_interrupt == 0`, before `ESC_checkDC()` and before the `ESCREG_ALEVENT_DC_SYNC0` mask bit is ever set. Setting `use_interrupt = 1` is not an optimisation — it is the precondition for DC existing at all.
@@ -250,6 +252,8 @@ loop:
   if ALevent & (CONTROL|SMCHANGE|SM0|SM1|EEP):
       one mailbox step                             /* in this thread; see below */
 ```
+
+**Implemented as `ecat_slv_run_dc()`,** which takes the wait timeout and is called in place of `ecat_slv()` once DC is active. The application supplies `esc_hw_wait` and decides the timeout from the period the master configured.
 
 **One thread, not two — decided.** The earlier plan here was a `SCHED_FIFO` cyclic thread plus a normal-priority worker for mailbox/CoE work, on the reasoning that mailbox work is unbounded and must not sit in front of a SYNC0 deadline. That is rejected, because over SPI it is not safe: see [`stack-review.md`](stack-review.md) §1.1. A CSR access on this port is a stateful three-frame sequence through a single command register inside the chip, so interleaving two contexts corrupts both transactions, and the same exposure extends to `ESCvar`, the `MBX[]` buffers and the application's `Obj`. The rt-kernel XMC4 HAL the two-thread design was modelled on does not have this problem only because its ESC is memory-mapped, where one access is one atomic bus cycle. Nothing replaces that property here, and SOES offers `CC_ATOMIC_*` for individual scalars but no critical-section abstraction a port could fill in.
 
