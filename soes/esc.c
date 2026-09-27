@@ -291,6 +291,7 @@ uint16_t ESC_checkDC (void)
       ESCvar.synccounter = 0;
       ESCvar.smeventmissed = 0;
       ESCvar.syncerror = 0;
+      ESCvar.sm_event_seen = 0;
    }
 
    return ret;

@@ -569,8 +569,6 @@ void ecat_slv_poll (void)
  */
 void ecat_slv_run_dc (uint64_t timeout_ns)
 {
-   /* Whether process data arrived during the SYNC0 period now ending. */
-   static int sm_event_seen = 0;
    int rc;
 
    rc = (ESCvar.esc_hw_wait != NULL) ? ESCvar.esc_hw_wait (timeout_ns) : -1;
@@ -603,15 +601,15 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
       }
       else
       {
-         sm_event_seen = 1;
+         ESCvar.sm_event_seen = 1;
          DIG_process (DIG_PROCESS_WD_FLAG | DIG_PROCESS_RXPDO_FLAG);
       }
    }
 
    if (ESCvar.ALevent & ESCREG_ALEVENT_DC_SYNC0)
    {
-      ecat_slv_sync0_account (sm_event_seen);
-      sm_event_seen = 0;
+      ecat_slv_sync0_account (ESCvar.sm_event_seen);
+      ESCvar.sm_event_seen = 0;
       DIG_process (DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_TXPDO_FLAG);
 
       /* Reading the SYNC0 status register acknowledges the latch; without it

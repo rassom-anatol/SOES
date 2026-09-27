@@ -556,6 +556,12 @@ typedef struct
     * sync failure from any other reason for the same state.
     */
    volatile uint8_t syncerror;
+   /* Whether process data arrived during the SYNC0 period now in progress.
+    * Lives here rather than as a static inside the loop so that ESC_checkDC
+    * can clear it: on re-entry to DC a stale flag would let the first SYNC0
+    * be accounted against the previous activation.
+    */
+   volatile uint8_t sm_event_seen;
    volatile _App App;
    uint8_t mbxdata[PREALLOC_BUFFER_SIZE];
 } _ESCvar;
