@@ -567,6 +567,23 @@ void ecat_slv_poll (void)
  *                         the balance between process data and SYNC0, so when
  *                         both stop together it never trips.
  */
+/* Which events the cyclic loop actually observes. Counted because the branch
+ * that did not fire is invisible from outside: a loop waking at roughly the
+ * right rate while one of its branches never runs looks, from the cycle
+ * statistics alone, much like a loop working correctly.
+ */
+static uint32_t dc_evt_wake, dc_evt_sm, dc_evt_sync0, dc_evt_mbx, dc_evt_idle;
+
+void ecat_slv_dc_counters (uint32_t * wake, uint32_t * sm, uint32_t * sync0,
+                           uint32_t * mbx, uint32_t * idle)
+{
+   *wake = dc_evt_wake;
+   *sm = dc_evt_sm;
+   *sync0 = dc_evt_sync0;
+   *mbx = dc_evt_mbx;
+   *idle = dc_evt_idle;
+}
+
 void ecat_slv_run_dc (uint64_t timeout_ns)
 {
    int rc;
@@ -588,6 +605,14 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
    }
 
    CC_ATOMIC_SET (ESCvar.ALevent, ESC_ALeventread ());
+   dc_evt_wake++;
+   if ((ESCvar.ALevent & (ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3 |
+                          ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_CONTROL |
+                          ESCREG_ALEVENT_SMCHANGE | ESCREG_ALEVENT_SM0 |
+                          ESCREG_ALEVENT_SM1 | ESCREG_ALEVENT_EEP)) == 0)
+   {
+      dc_evt_idle++;
+   }
 
    /* Process data. Under DC the outputs are applied here but the inputs are
     * deferred to the SYNC0 edge, so that what the master reads was sampled at
@@ -602,12 +627,14 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
       else
       {
          ESCvar.sm_event_seen = 1;
+         dc_evt_sm++;
          DIG_process (DIG_PROCESS_WD_FLAG | DIG_PROCESS_RXPDO_FLAG);
       }
    }
 
    if (ESCvar.ALevent & ESCREG_ALEVENT_DC_SYNC0)
    {
+      dc_evt_sync0++;
       ecat_slv_sync0_account (ESCvar.sm_event_seen);
       ESCvar.sm_event_seen = 0;
       DIG_process (DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_TXPDO_FLAG);
@@ -626,6 +653,7 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
                          ESCREG_ALEVENT_SM0 | ESCREG_ALEVENT_SM1 |
                          ESCREG_ALEVENT_EEP))
    {
+      dc_evt_mbx++;
       ESC_state ();
       ESC_sm_act_event ();
 

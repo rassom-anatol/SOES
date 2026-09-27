@@ -407,6 +407,13 @@ int main (int argc, char * argv[])
             }
          }
 
+         {
+            uint32_t w = 0, sm = 0, s0 = 0, mb = 0, id = 0;
+
+            ecat_slv_dc_counters (&w, &sm, &s0, &mb, &id);
+            printf ("   EVT: wakes=%u  sm=%u  sync0=%u  mbx=%u  idle=%u\n",
+                    w, sm, s0, mb, id);
+         }
          printf ("   DC: dcsync=%u sync0=%u ns  synccounter=%d limit=%u"
                  "  missed=%u syncerror=%u\n",
                  ESCvar.dcsync, (unsigned)sync0_period_ns,
