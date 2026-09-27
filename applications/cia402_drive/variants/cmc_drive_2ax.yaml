@@ -1,0 +1,15 @@
+# CMC drive, 2-axis variant.
+#
+# Overrides only what differs from the shared base. The product code encodes
+# the axis count in its low nibble so that a device and its description are
+# hard to mismatch by eye; the master matches on it, so each variant must have
+# its own or a master will configure one variant's process image onto another.
+
+base: ../od.yaml
+
+device:
+  product_code: 0x1002
+  name:         "cmc_drive_2ax"
+
+axes:
+  count: 2

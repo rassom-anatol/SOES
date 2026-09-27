@@ -92,17 +92,28 @@ static void cb_state_change (uint8_t * as, uint8_t * an);
  */
 void cb_apply_rxpdo (void)
 {
-   _Axis * a = &Obj.axis[0];
+   unsigned n;
 
-   a->PositionActual          = a->TargetPosition;
-   a->VelocityActual          = a->TargetVelocity;
-   a->TorqueActual            = a->TargetTorque;
-   a->ModesOfOperationDisplay = a->ModesOfOperation;
+   /* Every loop over axes is bounded by CMC_AXIS_COUNT, which the generator
+    * emits into utypes.h. Nothing here names an axis by number, which is what
+    * lets the same source build against the one, two and four axis variants --
+    * the rule this application exists partly to demonstrate, since the
+    * consuming motion controller has to follow it too. */
+   for (n = 0; n < CMC_AXIS_COUNT; n++)
+   {
+      _Axis * a = &Obj.axis[n];
 
-   /* Zero by construction while the mirror is exact. It is mapped rather than
-    * omitted so that the master's interpretation of a signed 32-bit entry that
-    * legitimately goes negative is exercised by the position mirror above. */
-   a->FollowingErrorActual = a->TargetPosition - a->PositionActual;
+      a->PositionActual          = a->TargetPosition;
+      a->VelocityActual          = a->TargetVelocity;
+      a->TorqueActual            = a->TargetTorque;
+      a->ModesOfOperationDisplay = a->ModesOfOperation;
+
+      /* Zero by construction while the mirror is exact. It is mapped rather
+       * than omitted so that the master's interpretation of a signed 32-bit
+       * entry that legitimately goes negative is exercised by the position
+       * mirror above. */
+      a->FollowingErrorActual = a->TargetPosition - a->PositionActual;
+   }
 
    rx_calls++;
 }
@@ -110,19 +121,24 @@ void cb_apply_rxpdo (void)
 /** Slave inputs are about to be packed into SM3 for the master to read. */
 void cb_update_txpdo (void)
 {
-   _Axis * a = &Obj.axis[0];
+   unsigned n;
 
-   /* Switch on disabled: the honest CiA402 state for a device with no power
-    * stage. It is a constant here rather than a computed value precisely
-    * because the state machine that should compute it is not in this repository
-    * -- a plausible-looking statusword from a stub would be worse than an
-    * obviously static one. */
-   a->Statusword = 0x0040;
+   for (n = 0; n < CMC_AXIS_COUNT; n++)
+   {
+      _Axis * a = &Obj.axis[n];
 
-   /* No gate driver and no motor to report on. */
-   a->ErrorCode        = 0;
-   a->GateDriverFaults = 0;
-   a->DriveStatusFlags = 0;
+      /* Switch on disabled: the honest CiA402 state for a device with no power
+       * stage. It is a constant here rather than a computed value precisely
+       * because the state machine that should compute it is not in this
+       * repository -- a plausible-looking statusword from a stub would be
+       * worse than an obviously static one. */
+      a->Statusword = 0x0040;
+
+      /* No gate driver and no motor to report on. */
+      a->ErrorCode        = 0;
+      a->GateDriverFaults = 0;
+      a->DriveStatusFlags = 0;
+   }
 
    tx_calls++;
 }
@@ -134,16 +150,22 @@ void cb_update_txpdo (void)
  */
 static void app_safe_state (void)
 {
-   _Axis * a = &Obj.axis[0];
+   unsigned n;
 
-   a->TargetPosition = 0;
-   a->TargetVelocity = 0;
-   a->TargetTorque   = 0;
-   a->PositionActual = 0;
-   a->VelocityActual = 0;
-   a->TorqueActual   = 0;
+   for (n = 0; n < CMC_AXIS_COUNT; n++)
+   {
+      _Axis * a = &Obj.axis[n];
 
-   printf ("safe state: setpoints cleared\n");
+      a->TargetPosition = 0;
+      a->TargetVelocity = 0;
+      a->TargetTorque   = 0;
+      a->PositionActual = 0;
+      a->VelocityActual = 0;
+      a->TorqueActual   = 0;
+   }
+
+   printf ("safe state: setpoints cleared on %u axis/axes\n",
+           (unsigned)CMC_AXIS_COUNT);
 }
 
 static esc_cfg_t config =
@@ -214,7 +236,8 @@ int main (int argc, char * argv[])
       hw_cfg.spi_speed_hz = (uint32_t)strtoul (argv[2], NULL, 0);
    }
 
-   printf ("cia402_drive: %s at %u Hz\n", hw_cfg.spidev,
+   printf ("cia402_drive: %u axis/axes on %s at %u Hz\n",
+           (unsigned)CMC_AXIS_COUNT, hw_cfg.spidev,
            (unsigned)hw_cfg.spi_speed_hz);
 
    if (ecat_slv_init (&config) != 0)
@@ -255,7 +278,6 @@ int main (int argc, char * argv[])
 
       if (b.tv_sec - last.tv_sec >= 5)
       {
-         _Axis * ax = &Obj.axis[0];
          uint16_t alctl = 0, alsts = 0, alerr = 0;
          uint8_t smc2 = 0;
          uint16_t wd = 0;
@@ -344,19 +366,29 @@ int main (int argc, char * argv[])
                     (unsigned long long)mbx_responses);
          }
 
-         /* The mirror, as the master should see it. Signed values are printed
-          * as signed on purpose: this line is the readout for stack-review
-          * 2.1, and an ESI that still declares these unsigned shows up as the
-          * master writing a number this slave never sees as negative. */
-         printf ("   PDO: mode %d->%d  pos %" PRId32 "->%" PRId32
-                 "  vel %" PRId32 "->%" PRId32
-                 "  torque %" PRId16 "->%" PRId16
-                 "  ctrl %04X sts %04X\n",
-                 ax->ModesOfOperation, ax->ModesOfOperationDisplay,
-                 ax->TargetPosition, ax->PositionActual,
-                 ax->TargetVelocity, ax->VelocityActual,
-                 ax->TargetTorque, ax->TorqueActual,
-                 ax->Controlword, ax->Statusword);
+         /* The mirror, as the master should see it, one line per axis. Signed
+          * values are printed as signed on purpose: this is the readout for
+          * stack-review 2.1, and an ESI that still declares these unsigned
+          * shows up as the master writing a number this slave never sees as
+          * negative. */
+         {
+            unsigned k;
+
+            for (k = 0; k < CMC_AXIS_COUNT; k++)
+            {
+               _Axis * ax = &Obj.axis[k];
+
+               printf ("   PDO[%u]: mode %d->%d  pos %" PRId32 "->%" PRId32
+                       "  vel %" PRId32 "->%" PRId32
+                       "  torque %" PRId16 "->%" PRId16
+                       "  ctrl %04X sts %04X\n",
+                       k, ax->ModesOfOperation, ax->ModesOfOperationDisplay,
+                       ax->TargetPosition, ax->PositionActual,
+                       ax->TargetVelocity, ax->VelocityActual,
+                       ax->TargetTorque, ax->TorqueActual,
+                       ax->Controlword, ax->Statusword);
+            }
+         }
          fflush (stdout);
 
          n = 0;

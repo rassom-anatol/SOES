@@ -1,4 +1,11 @@
-# Object dictionary source of truth.
+# Object dictionary source of truth -- the part every variant shares.
+#
+# This file is a base, not a device: it declares no axis count and no product
+# code, so it cannot be generated on its own. The buildable descriptions are in
+# variants/, each of which names this file as its base and overrides only what
+# genuinely differs. That keeps the ~200 lines of object definitions in one
+# place; three copies of them would reintroduce exactly the drift this
+# generator exists to remove.
 #
 # tools/gen_od.py turns this into slave_objectlist.c, utypes.h and
 # ecat_options.h (and later the ESI and SII). Nothing downstream is
@@ -13,21 +20,25 @@ device:
   # Identity. The ETG evaluation range is a placeholder: an assigned Vendor ID
   # is a prerequisite before any unit ships, because masters match on this and
   # it is baked into both the ESI and the SII image.
+  #
+  # product_code and name are per variant and live in variants/. A master
+  # matches on Vendor ID, Product Code and Revision, so two variants sharing an
+  # identity while presenting different process images is the worst failure
+  # available: the master configures from whichever ESI it holds and the slave
+  # refuses at SAFEOP with a code that says nothing about the real cause.
   vendor_id:    0x1337        # TODO: replace with an assigned ETG Vendor ID
   vendor_name:  "cortexware"
-  product_code: 0x1000
   revision:     0x0001
   serial:       0
-  name:         "cmc_drive"
   group:        "drives"
   group_name:   "CiA402 Drives"
 
 axes:
-  # v1 ships one axis. The generator emits the indexed form regardless, so
-  # adding axes later needs no change here beyond `count`, and the SM layout
-  # is already reserved for `reserve` axes so the ESI does not have to change.
-  count:   1
-  reserve: 4
+  # `count` is declared per variant. The stride is fixed by the profile and is
+  # also what caps the design: axis 7 lands at 0x9800-0x9FFF and axis 8 would
+  # start at 0xA000, outside the CiA402 profile area. Process RAM is nowhere
+  # near the limit by comparison -- eight axes plus an I/O block needs about
+  # 0x4A0 bytes of the 4 KB available -- so the index space is the ceiling.
   stride:  0x800              # CiA402: axis n at index + n*0x800
 
 mailbox:
@@ -69,6 +80,12 @@ sync_managers:
 # the master reads it from 0x1600/0x1A00 -- and it costs nothing.
 # ---------------------------------------------------------------------------
 
+# One PDO per axis, generated from this template: axis n gets index + n, so a
+# four-axis variant has 0x1600 through 0x1603 all assigned to SM2 through
+# 0x1C12. An I/O block, when the carrier design settles what it carries, is an
+# extra pair declared as `rxpdo_extra` / `txpdo_extra` rather than entries
+# appended here -- which keeps the axis image byte-identical across variants
+# and independent of whatever else is fitted.
 rxpdo:
   index: 0x1600
   name: "RxPDO Drive"

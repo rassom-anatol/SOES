@@ -14,8 +14,8 @@
     </Groups>
     <Devices>
       <Device Physics="YY">
-      <Type ProductCode="#x1000" RevisionNo="#x1">cmc_drive</Type>
-      <Name LcId="1033">cmc_drive</Name>
+      <Type ProductCode="#x1002" RevisionNo="#x1">cmc_drive_2ax</Type>
+      <Name LcId="1033">cmc_drive_2ax</Name>
       <GroupType>drives</GroupType>
       <Profile>
         <ProfileNo>402</ProfileNo>
@@ -28,7 +28,7 @@
       <Sm ControlByte="#x20" Enable="1" StartAddress="#x1300">Inputs</Sm>
       <RxPdo Fixed="1" Sm="2" Mandatory="1">
         <Index>#x1600</Index>
-        <Name>RxPDO Drive</Name>
+        <Name>RxPDO Drive Axis 0</Name>
         <Entry>
           <Index>#x607A</Index>
           <SubIndex>0</SubIndex>
@@ -77,9 +77,60 @@
           <BitLen>8</BitLen>
         </Entry>
       </RxPdo>
+      <RxPdo Fixed="1" Sm="2" Mandatory="1">
+        <Index>#x1601</Index>
+        <Name>RxPDO Drive Axis 1</Name>
+        <Entry>
+          <Index>#x687A</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>32</BitLen>
+          <Name>TargetPosition</Name>
+          <DataType>DINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x68FF</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>32</BitLen>
+          <Name>TargetVelocity</Name>
+          <DataType>DINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6840</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>Controlword</Name>
+          <DataType>UINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6871</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>TargetTorque</Name>
+          <DataType>INT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6872</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>MaxTorque</Name>
+          <DataType>UINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6860</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>8</BitLen>
+          <Name>ModesOfOperation</Name>
+          <DataType>SINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x0000</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>8</BitLen>
+        </Entry>
+      </RxPdo>
       <TxPdo Fixed="1" Sm="3" Mandatory="1">
         <Index>#x1A00</Index>
-        <Name>TxPDO Drive</Name>
+        <Name>TxPDO Drive Axis 0</Name>
         <Entry>
           <Index>#x6064</Index>
           <SubIndex>0</SubIndex>
@@ -138,6 +189,78 @@
         </Entry>
         <Entry>
           <Index>#x6061</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>8</BitLen>
+          <Name>ModesOfOperationDisplay</Name>
+          <DataType>SINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x0000</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>8</BitLen>
+        </Entry>
+      </TxPdo>
+      <TxPdo Fixed="1" Sm="3" Mandatory="1">
+        <Index>#x1A01</Index>
+        <Name>TxPDO Drive Axis 1</Name>
+        <Entry>
+          <Index>#x6864</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>32</BitLen>
+          <Name>PositionActual</Name>
+          <DataType>DINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x686C</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>32</BitLen>
+          <Name>VelocityActual</Name>
+          <DataType>DINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x68F4</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>32</BitLen>
+          <Name>FollowingErrorActual</Name>
+          <DataType>DINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x2800</Index>
+          <SubIndex>1</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>GateDriverFaults</Name>
+          <DataType>UINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x2800</Index>
+          <SubIndex>2</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>DriveStatusFlags</Name>
+          <DataType>UINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6841</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>Statusword</Name>
+          <DataType>UINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6877</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>TorqueActual</Name>
+          <DataType>INT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x683F</Index>
+          <SubIndex>0</SubIndex>
+          <BitLen>16</BitLen>
+          <Name>ErrorCode</Name>
+          <DataType>UINT</DataType>
+        </Entry>
+        <Entry>
+          <Index>#x6861</Index>
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
           <Name>ModesOfOperationDisplay</Name>

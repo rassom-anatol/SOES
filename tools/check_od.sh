@@ -1,10 +1,11 @@
 #!/bin/sh
-# Check the generated object dictionary is consistent and up to date.
+# Check the generated object dictionaries are consistent and up to date.
 #
-# The generator is the single point of failure for four artifacts, so the
-# checks come in two kinds:
+# Every variant under applications/cia402_drive/variants/ is checked, because a
+# defect that only shows in the four-axis build is exactly the kind that reaches
+# hardware. The checks come in two kinds:
 #
-#   1. Checks that the committed files still match the YAML. Catches someone
+#   1. Checks that the committed files still match their YAML. Catches someone
 #      editing the generated C directly, whose change regeneration would then
 #      silently revert.
 #   2. Checks on what the generator *emits*. Idempotency proves nothing about
@@ -18,45 +19,49 @@
 set -e
 
 root=$(cd "$(dirname "$0")/.." && pwd)
-yaml="$root/applications/cia402_drive/od.yaml"
-gen="$root/applications/cia402_drive/generated"
+app="$root/applications/cia402_drive"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-echo "== regenerating to a scratch directory =="
-python3 "$root/tools/gen_od.py" "$yaml" "$tmp" >/dev/null
+for variant in "$app"/variants/*.yaml; do
+    name=$(basename "$variant" .yaml)
+    gen="$app/generated/$name"
 
-# The ESI is named after the device rather than generically, so ask the
-# generator what it called it rather than restating the rule here.
-esi=$(python3 -c "
-import sys, yaml
+    echo "========== $name =========="
+    echo "== regenerating to a scratch directory =="
+    python3 "$root/tools/gen_od.py" "$variant" "$tmp/$name" >/dev/null
+
+    # The ESI is named after the device rather than generically, so ask the
+    # generator what it called it rather than restating the rule here.
+    esi=$(python3 -c "
+import sys
 sys.path.insert(0, '$root/tools')
-from gen_od import esi_name
-print(esi_name(yaml.safe_load(open('$yaml'))))
+from gen_od import load_config, esi_name
+print(esi_name(load_config('$variant')))
 ")
 
-fail=0
-for f in slave_objectlist.c utypes.h ecat_options.h "$esi"; do
-    if ! diff -q "$gen/$f" "$tmp/$f" >/dev/null 2>&1; then
-        echo "FAIL: $f differs from what the YAML generates"
-        diff -u "$gen/$f" "$tmp/$f" | head -20 || true
-        fail=1
+    fail=0
+    for f in slave_objectlist.c utypes.h ecat_options.h "$esi"; do
+        if ! diff -q "$gen/$f" "$tmp/$name/$f" >/dev/null 2>&1; then
+            echo "FAIL: $f differs from what the YAML generates"
+            diff -u "$gen/$f" "$tmp/$name/$f" | head -20 || true
+            fail=1
+        fi
+    done
+    if [ $fail -ne 0 ]; then
+        echo "regenerate with: python3 tools/gen_od.py $variant $gen"
+        exit 1
     fi
-done
-if [ $fail -ne 0 ]; then
-    echo "regenerate with: python3 tools/gen_od.py $yaml $gen"
-    exit 1
-fi
-echo "  generated files are up to date"
+    echo "  generated files are up to date"
 
-echo "== compiling the generated object list =="
-gcc -c -o /dev/null -Wall -Wextra -Wno-unused-parameter \
-    -I "$root/soes" -I "$root/soes/include/sys/gcc" -I "$gen" \
-    "$gen/slave_objectlist.c"
-echo "  compiles clean"
+    echo "== compiling the generated object list =="
+    gcc -c -o /dev/null -Wall -Wextra -Wno-unused-parameter \
+        -I "$root/soes" -I "$root/soes/include/sys/gcc" -I "$gen" \
+        "$gen/slave_objectlist.c"
+    echo "  compiles clean"
 
-echo "== inspecting the generated artifacts =="
-python3 - "$gen" "$esi" <<'PY'
+    echo "== inspecting the generated artifacts =="
+    python3 - "$gen" "$esi" <<'PY'
 import os, re, sys
 
 gen, esi_file = sys.argv[1], sys.argv[2]
@@ -317,9 +322,68 @@ if smc_out is not None and not (smc_out & 0x40):
                f"process data watchdog is never fed")
 check("the output SyncManager triggers the watchdog", bad)
 
+# --- 11. the SyncManager assignment lists every PDO -------------------------
+#
+# With one PDO per axis, 0x1C12 sub 0 is how a master learns how many axes the
+# device presents. If it disagrees with the number of PDO objects emitted, the
+# master configures a process image of a different size than the slave expects
+# and ESC_checkSM23 refuses SAFEOP on the length.
+
+bad = []
+for assign, lo, hi, what in ((0x1C12, 0x1600, 0x17FF, "RxPDO"),
+                             (0x1C13, 0x1A00, 0x1BFF, "TxPDO")):
+    declared = int(blocks.get(assign, {}).get(0, {}).get("value", "0"), 0)
+    present = sorted(i for i in blocks if lo <= i <= hi)
+    if declared != len(present):
+        bad.append(f"0x{assign:04X} says {declared} assigned {what}(s) but "
+                   f"{len(present)} are defined")
+    for n, idx in enumerate(present, 1):
+        got = blocks[assign].get(n)
+        if got is None:
+            bad.append(f"0x{assign:04X}:{n:02X} is missing for 0x{idx:04X}")
+        elif int(got["value"], 0) != idx:
+            bad.append(f"0x{assign:04X}:{n:02X} assigns "
+                       f"0x{int(got['value'], 0):04X}, expected 0x{idx:04X}")
+check("SyncManager assignment matches the PDOs defined", bad)
+
 if fails:
     print(f"\n{len(fails)} check(s) failed")
     sys.exit(1)
+PY
+done
+
+echo "========== across variants =========="
+python3 - "$app" <<'PY'
+import glob, os, re, sys
+
+app = sys.argv[1]
+
+# Each variant must carry its own identity. A master matches on Vendor ID,
+# Product Code and Revision; two variants sharing an identity while presenting
+# different process images means the master configures from whichever ESI it
+# holds and the slave refuses at SAFEOP with a code that names none of this.
+seen = {}
+bad = []
+for path in sorted(glob.glob(os.path.join(app, "generated", "*", "*.xml"))):
+    text = open(path, encoding="utf-8", errors="replace").read()
+    m = re.search(r'<Type ProductCode="#x([0-9A-Fa-f]+)" '
+                  r'RevisionNo="#x([0-9A-Fa-f]+)">([^<]+)</Type>', text)
+    if not m:
+        bad.append(f"{os.path.basename(path)} declares no identity")
+        continue
+    key = (int(m.group(1), 16), int(m.group(2), 16))
+    name = m.group(3)
+    if key in seen:
+        bad.append(f"{name} and {seen[key]} share product 0x{key[0]:X} "
+                   f"revision 0x{key[1]:X}")
+    seen[key] = name
+
+if bad:
+    print("  FAIL  every variant has a distinct identity")
+    for b in bad:
+        print(f"          {b}")
+    sys.exit(1)
+print(f"  ok    every variant has a distinct identity ({len(seen)} variants)")
 PY
 
 echo "== all checks passed =="

@@ -78,6 +78,39 @@ OBJECT_CODES = {
 }
 
 
+def deep_merge(base, over):
+    """Overlay `over` onto `base`.
+
+    Mappings merge recursively; anything else replaces outright, so a variant
+    that redeclares a list means to replace it rather than extend it.
+    """
+    if not isinstance(base, dict) or not isinstance(over, dict):
+        return over
+    out = dict(base)
+    for k, v in over.items():
+        out[k] = deep_merge(base[k], v) if k in base else v
+    return out
+
+
+def load_config(path):
+    """Load a dictionary description, resolving a `base:` reference.
+
+    Variants of this device differ in a handful of fields -- how many axes,
+    which product code, what I/O is fitted -- and share every object
+    definition. Copying the shared part per variant would reintroduce exactly
+    the drift this generator exists to remove, and would do it across files
+    that no longer even have to agree. So a variant names its base and
+    overrides only what genuinely differs.
+    """
+    with open(path) as fh:
+        cfg = yaml.safe_load(fh)
+    base_ref = cfg.pop("base", None)
+    if base_ref is None:
+        return cfg
+    base_path = os.path.join(os.path.dirname(os.path.abspath(path)), base_ref)
+    return deep_merge(load_config(base_path), cfg)
+
+
 def die(msg):
     print(f"gen_od: {msg}", file=sys.stderr)
     sys.exit(1)
@@ -244,6 +277,46 @@ def sm_control(cfg):
     return out, SMC_INPUTS
 
 
+def build_pdos(cfg, objs, key):
+    """Expand a PDO template into one PDO per axis, plus any extra blocks.
+
+    One PDO per axis rather than one wide PDO covering all of them. The master
+    assigns them all to the same SyncManager through 0x1C12/0x1C13, so the wire
+    image is the same either way, but keeping them separate means an axis's
+    layout does not depend on how many axes there are or on what else is mapped
+    alongside. A variant with an I/O block declares an extra pair and the axis
+    image is untouched.
+    """
+    template = cfg[key]
+    count = cfg["axes"]["count"]
+    pdos = []
+
+    for n in range(count):
+        entries, nbytes = resolve_pdo(cfg, template, objs, n)
+        pdos.append({
+            "index": template["index"] + n,
+            "name": (f"{template['name']} Axis {n}" if count > 1
+                     else template["name"]),
+            "entries": entries,
+            "bytes": nbytes,
+        })
+
+    # Extra blocks are not axis-replicated: they map objects in the
+    # manufacturer range at their declared index, so they resolve at axis 0.
+    for extra in cfg.get(key + "_extra", []):
+        entries, nbytes = resolve_pdo(cfg, extra, objs, 0)
+        pdos.append({"index": extra["index"], "name": extra["name"],
+                     "entries": entries, "bytes": nbytes})
+
+    seen = set()
+    for p in pdos:
+        if p["index"] in seen:
+            die(f"two PDOs share index 0x{p['index']:04X}")
+        seen.add(p["index"])
+
+    return pdos, sum(p["bytes"] for p in pdos)
+
+
 def compute_sm(cfg, rx_bytes, tx_bytes):
     """Check the SyncManager layout against the constraint esc.c enforces.
 
@@ -252,19 +325,21 @@ def compute_sm(cfg, rx_bytes, tx_bytes):
     the failure surfaces as an AL status code rather than anything legible.
     """
     sm = cfg["sync_managers"]
-    reserve = cfg["axes"]["reserve"]
-    rx_res = rx_bytes * reserve
-    tx_res = tx_bytes * reserve
 
-    if sm["outputs"] + 3 * rx_res > sm["inputs"]:
-        die(f"SM2 at 0x{sm['outputs']:04X} reserving {rx_res} bytes needs "
-            f"0x{sm['outputs'] + 3*rx_res:04X}, past SM3 at 0x{sm['inputs']:04X}")
-    top = sm["inputs"] + 3 * tx_res
+    # Sized for this variant exactly rather than for a hypothetical largest
+    # one. Each variant carries its own ESI and its own flashed SII, so there
+    # is nothing to keep stable between them and no reason to reserve space a
+    # given board will never use.
+    if sm["outputs"] + 3 * rx_bytes > sm["inputs"]:
+        die(f"SM2 at 0x{sm['outputs']:04X} with {rx_bytes} bytes needs "
+            f"0x{sm['outputs'] + 3*rx_bytes:04X}, past SM3 at "
+            f"0x{sm['inputs']:04X} -- raise sync_managers.inputs")
+    top = sm["inputs"] + 3 * tx_bytes
     if top > 0x2000:
-        die(f"SM3 reservation ends at 0x{top:04X}, past the 0x2000 top of "
-            f"LAN9252 process RAM")
+        die(f"SM3 ends at 0x{top:04X}, past the 0x2000 top of LAN9252 "
+            f"process RAM")
 
-    return {"rx_reserved": rx_res, "tx_reserved": tx_res, "top": top}
+    return {"rx_total": rx_bytes, "tx_total": tx_bytes, "top": top}
 
 
 # --------------------------------------------------------------------------
@@ -303,8 +378,9 @@ def emit_objectlist(cfg, objs, rx, tx, src):
 
     # PDO mapping objects. ATYPE_RO throughout: the process image is fixed,
     # so the master reads the mapping and does not reconfigure it.
-    for pdo, entries in ((cfg["rxpdo"], rx), (cfg["txpdo"], tx)):
+    for pdo in rx + tx:
         idx = pdo["index"]
+        entries = pdo["entries"]
         out.append(f"\n/* {pdo['name']} */")
         out.append(f"static const char acNamePDO{idx:04X}[] = \"{pdo['name']}\";")
         # Each mapping entry is named for the object it maps, not for the PDO
@@ -341,15 +417,21 @@ def emit_objectlist(cfg, objs, rx, tx, src):
     out.append("};")
 
     # SyncManager assignment, likewise fixed.
-    for idx, assigned, what in ((0x1C12, cfg["rxpdo"]["index"], "RxPDO Assignment"),
-                                (0x1C13, cfg["txpdo"]["index"], "TxPDO Assignment")):
+    # One sub-entry per assigned PDO. With a PDO per axis this is how the
+    # master learns how many axes the device actually presents, so sub 0 is
+    # the axis count for any variant that has no extra blocks.
+    for idx, pdos, what in ((0x1C12, rx, "RxPDO Assignment"),
+                            (0x1C13, tx, "TxPDO Assignment")):
         out.append(f'\nstatic const char acNameSM{idx:04X}[] = "{what}";')
-        out.append(f'static const char acNameSM{idx:04X}_01[] = '
-                   f'"Assigned PDO {assigned:04X}";')
+        for i, p in enumerate(pdos, 1):
+            out.append(f'static const char acNameSM{idx:04X}_{i:02X}[] = '
+                       f'"Assigned PDO {p["index"]:04X}";')
         out.append(f"const _objd SDO{idx:04X}[] =\n{{")
-        out.append(f"   {{0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNameSM{idx:04X}, 1, NULL}},")
-        out.append(f"   {{0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acNameSM{idx:04X}_01, "
-                   f"0x{assigned:04X}, NULL}},")
+        out.append(f"   {{0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acNameSM{idx:04X}, "
+                   f"{len(pdos)}, NULL}},")
+        for i, p in enumerate(pdos, 1):
+            out.append(f"   {{0x{i:02X}, DTYPE_UNSIGNED16, 16, ATYPE_RO, "
+                       f"acNameSM{idx:04X}_{i:02X}, 0x{p['index']:04X}, NULL}},")
         out.append("};")
 
     # Ordinary objects.
@@ -387,12 +469,9 @@ def emit_objectlist(cfg, objs, rx, tx, src):
     out.append("const _objectlist SDOobjects[] =\n{")
     rows = [(o.index, o.otype, o.maxsub, f"acName{o.index:04X}", o.cname())
             for o in objs]
-    rows.append((cfg["rxpdo"]["index"], "OTYPE_RECORD", len(rx),
-                 f"acNamePDO{cfg['rxpdo']['index']:04X}",
-                 f"SDO{cfg['rxpdo']['index']:04X}"))
-    rows.append((cfg["txpdo"]["index"], "OTYPE_RECORD", len(tx),
-                 f"acNamePDO{cfg['txpdo']['index']:04X}",
-                 f"SDO{cfg['txpdo']['index']:04X}"))
+    for p in rx + tx:
+        rows.append((p["index"], "OTYPE_RECORD", len(p["entries"]),
+                     f"acNamePDO{p['index']:04X}", f"SDO{p['index']:04X}"))
     rows.append((0x1C00, "OTYPE_ARRAY", 4, "acName1C00", "SDO1C00"))
     for idx in (0x1C12, 0x1C13):
         rows.append((idx, "OTYPE_ARRAY", 1, f"acNameSM{idx:04X}", f"SDO{idx:04X}"))
@@ -449,6 +528,16 @@ def emit_utypes(cfg, objs, src):
     out.append(f"   _Axis      axis[{cfg['axes']['count']}];")
     out.append("} _Objects;\n")
     out.append("extern _Objects Obj;\n")
+    out.append("/* How many axes this build presents.")
+    out.append(" *")
+    out.append(" * Stated rather than left to be counted, because it is the")
+    out.append(" * number a consumer must derive everything per-axis from. A")
+    out.append(" * literal Obj.axis[0], or a per-axis resource sized")
+    out.append(" * independently of this, is what makes a build variant-")
+    out.append(" * specific -- and the whole point of generating this header per")
+    out.append(" * variant is that consuming code does not have to be.")
+    out.append(" */")
+    out.append(f"#define CMC_AXIS_COUNT {cfg['axes']['count']}\n")
     out.append("#endif /* __UTYPES_H__ */")
     return "\n".join(out) + "\n"
 
@@ -456,7 +545,6 @@ def emit_utypes(cfg, objs, src):
 def emit_options(cfg, rx_bytes, tx_bytes, rx_entries, tx_entries, sm, src):
     d = cfg["mailbox"]
     s = cfg["sync_managers"]
-    reserve = cfg["axes"]["reserve"]
     out = [BANNER.format(src=src)]
     out.append("#ifndef ECAT_OPTIONS_H\n#define ECAT_OPTIONS_H\n")
     # FoE is off unless something calls FOE_config(): foe_cfg stays NULL and
@@ -483,10 +571,11 @@ def emit_options(cfg, rx_bytes, tx_bytes, rx_entries, tx_entries, sm, src):
     out.append(f"#define MBX1_sml_b        MBXSIZEBOOT")
     out.append(f"#define MBX1_sme_b        MBX1_sma_b+MBX1_sml_b-1")
     out.append(f"#define MBX1_smc_b        0x22\n")
-    out.append(f"/* Reserved for {reserve} axes at {rx_bytes}/{tx_bytes} bytes each,")
-    out.append(f"   so adding axes needs no ESI change. SM3 must start at or after")
-    out.append(f"   SM2 + 3*{sm['rx_reserved']} = 0x{s['outputs'] + 3*sm['rx_reserved']:04X};")
-    out.append(f"   the reservation ends at 0x{sm['top']:04X}, inside the 0x2000 top. */")
+    out.append(f"/* {cfg['axes']['count']} axis/axes, {rx_bytes} bytes out and "
+               f"{tx_bytes} in.")
+    out.append(f"   A buffered SyncManager holds three copies, so SM3 must start at")
+    out.append(f"   or after SM2 + 3*{rx_bytes} = 0x{s['outputs'] + 3*rx_bytes:04X};")
+    out.append(f"   the image ends at 0x{sm['top']:04X}, inside the 0x2000 top. */")
     smc_out, smc_in = sm_control(cfg)
     if smc_out & SMC_WATCHDOG:
         out.append("/* SM2 control bit 6 enables the watchdog trigger, without which")
@@ -497,10 +586,10 @@ def emit_options(cfg, rx_bytes, tx_bytes, rx_entries, tx_entries, sm, src):
     out.append(f"#define SM3_sma           0x{s['inputs']:04X}")
     out.append(f"#define SM3_smc           0x{smc_in:02X}")
     out.append(f"#define SM3_act           1\n")
-    out.append(f"#define MAX_MAPPINGS_SM2  {max(8, len(rx_entries) * reserve)}")
-    out.append(f"#define MAX_MAPPINGS_SM3  {max(8, len(tx_entries) * reserve)}\n")
-    out.append(f"#define MAX_RXPDO_SIZE    {sm['rx_reserved']}")
-    out.append(f"#define MAX_TXPDO_SIZE    {sm['tx_reserved']}\n")
+    out.append(f"#define MAX_MAPPINGS_SM2  {max(8, sum(len(p['entries']) for p in rx_entries))}")
+    out.append(f"#define MAX_MAPPINGS_SM3  {max(8, sum(len(p['entries']) for p in tx_entries))}\n")
+    out.append(f"#define MAX_RXPDO_SIZE    {sm['rx_total']}")
+    out.append(f"#define MAX_TXPDO_SIZE    {sm['tx_total']}\n")
     out.append("#endif /* ECAT_OPTIONS_H */")
     return "\n".join(out) + "\n"
 
@@ -582,8 +671,10 @@ def emit_esi(cfg, objs, rx, tx, rx_bytes, tx_bytes, sm, src):
     x.insert(x.index(f'      <Sm ControlByte="#x26" DefaultSize="{mbx}" Enable="1" '
                      f'StartAddress="#x{s_["mbx_out"]:04X}">MBoxOut</Sm>'),
              "      <Fmmu>Inputs</Fmmu>")
-    x += pdo_block("RxPdo", cfg["rxpdo"], rx, 2)
-    x += pdo_block("TxPdo", cfg["txpdo"], tx, 3)
+    for p in rx:
+        x += pdo_block("RxPdo", p, p["entries"], 2)
+    for p in tx:
+        x += pdo_block("TxPdo", p, p["entries"], 3)
     # CoE capabilities, which describe what esc_coe.c actually implements
     # rather than a conservative guess. Complete access is real -- both
     # SDO_upload_complete_access and SDO_download_complete_access are wired into
@@ -656,8 +747,7 @@ def main():
         return 2
     src, outdir = sys.argv[1], sys.argv[2]
 
-    with open(src) as fh:
-        cfg = yaml.safe_load(fh)
+    cfg = load_config(src)
 
     # The banner names the source. Use a repo-relative path so regenerating
     # from a different working directory produces identical bytes -- otherwise
@@ -666,8 +756,8 @@ def main():
                           os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     objs = build_objects(cfg)
-    rx, rx_bytes = resolve_pdo(cfg, cfg["rxpdo"], objs, 0)
-    tx, tx_bytes = resolve_pdo(cfg, cfg["txpdo"], objs, 0)
+    rx, rx_bytes = build_pdos(cfg, objs, "rxpdo")
+    tx, tx_bytes = build_pdos(cfg, objs, "txpdo")
     sm = compute_sm(cfg, rx_bytes, tx_bytes)
 
     os.makedirs(outdir, exist_ok=True)
@@ -688,11 +778,14 @@ def main():
         with open(os.path.join(outdir, name), "w") as fh:
             fh.write(text)
 
-    print(f"gen_od: {len(objs)} objects, {cfg['axes']['count']} axis/axes")
-    print(f"  RxPDO 0x{cfg['rxpdo']['index']:04X}: {len(rx)} entries, {rx_bytes} bytes"
-          f"  (reserved {sm['rx_reserved']} for {cfg['axes']['reserve']} axes)")
-    print(f"  TxPDO 0x{cfg['txpdo']['index']:04X}: {len(tx)} entries, {tx_bytes} bytes"
-          f"  (reserved {sm['tx_reserved']})")
+    print(f"gen_od: {cfg['device']['name']} "
+          f"(product 0x{cfg['device']['product_code']:X} rev "
+          f"0x{cfg['device']['revision']:X}), "
+          f"{len(objs)} objects, {cfg['axes']['count']} axis/axes")
+    for label, pdos, total in (("RxPDO", rx, rx_bytes), ("TxPDO", tx, tx_bytes)):
+        shown = ", ".join(f"0x{p['index']:04X}:{len(p['entries'])}e/"
+                          f"{p['bytes']}B" for p in pdos)
+        print(f"  {label} {shown}  = {total} bytes")
     print(f"  SM2 0x{cfg['sync_managers']['outputs']:04X}  "
           f"SM3 0x{cfg['sync_managers']['inputs']:04X}  "
           f"top 0x{sm['top']:04X}")
