@@ -72,6 +72,11 @@ typedef struct
 
 extern _Objects Obj;
 
+/* Constants exported from the dictionary, so that code
+ * enforcing a limit and the object advertising it cannot
+ * disagree. */
+#define CMC_MIN_CYCLE_NS 250000
+
 /* How many axes this build presents.
  *
  * Stated rather than left to be counted, because it is the

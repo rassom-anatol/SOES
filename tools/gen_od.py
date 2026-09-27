@@ -174,6 +174,12 @@ class Object:
             "access": ACCESS[spec.get("access", "ro")],
             "value": value,
             "var": var,
+            # Optional: also emit this constant as a macro, so application code
+            # can reference the same number the dictionary serves rather than
+            # restating it. A device that validates a master's request against
+            # a limit it advertises must use one source for both, or the
+            # advertised limit and the enforced one drift apart silently.
+            "define": spec.get("define"),
         }
 
     @property
@@ -528,6 +534,15 @@ def emit_utypes(cfg, objs, src):
     out.append(f"   _Axis      axis[{cfg['axes']['count']}];")
     out.append("} _Objects;\n")
     out.append("extern _Objects Obj;\n")
+    defines = [(s["define"], s["value"]) for o in objs for s in o.subs
+               if s.get("define")]
+    if defines:
+        out.append("/* Constants exported from the dictionary, so that code")
+        out.append(" * enforcing a limit and the object advertising it cannot")
+        out.append(" * disagree. */")
+        for name, value in defines:
+            out.append(f"#define {name} {value}")
+        out.append("")
     out.append("/* How many axes this build presents.")
     out.append(" *")
     out.append(" * Stated rather than left to be counted, because it is the")

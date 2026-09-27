@@ -83,7 +83,67 @@ static volatile uint64_t tx_calls = 0;
  */
 static uint64_t mbx_responses = 0;
 
+/* SYNC0 period the master configured, from dc_checker. The cyclic loop bounds
+ * its wait at twice this, which is what identifies a stopped sync unit. */
+static uint32_t sync0_period_ns = 0;
+
 static void cb_state_change (uint8_t * as, uint8_t * an);
+
+/** esc_cfg_t.esc_check_dc_handler: vet the DC configuration the master wrote.
+ *
+ * ESC_checkDC delegates the entire decision here once the sync unit is active,
+ * and returns ALERR_DCINVALIDSYNCCFG if no handler is registered -- so without
+ * this function DC cannot be entered at all.
+ *
+ * Validating rather than merely accepting is the point. The AL status code set
+ * distinguishes an unsupported sync configuration from a cycle time the device
+ * cannot sustain, and answering with the specific one turns a master
+ * misconfiguration from "the drive refuses and will not say why" into a
+ * diagnosis. The floor comes from CMC_MIN_CYCLE_NS, which the generator
+ * exports from the same object, 0x1C32:05, that advertises it -- so what is
+ * enforced here and what a master reads are one number.
+ */
+static uint16_t dc_checker (void)
+{
+   uint32_t sync0_cycle = 0;
+   uint8_t activation = 0;
+
+   ESC_read (ESCREG_SYNC_ACT, &activation, sizeof (activation));
+   ESC_read (ESCREG_SYNC0_CYCLE_TIME, &sync0_cycle, sizeof (sync0_cycle));
+   sync0_cycle = etohl (sync0_cycle);
+
+   if ((activation & ESCREG_SYNC_ACT_ACTIVATED) == 0)
+   {
+      /* The cyclic unit is on but SYNC0 generation is not, so nothing will
+       * ever wake the loop. */
+      return ALERR_DCINVALIDSYNCCFG;
+   }
+
+   if (sync0_cycle == 0)
+   {
+      return ALERR_DCSYNC0CYCLETIME;
+   }
+
+   if (sync0_cycle < CMC_MIN_CYCLE_NS)
+   {
+      printf ("DC: master asked for %u ns, floor is %u ns\n",
+              (unsigned)sync0_cycle, (unsigned)CMC_MIN_CYCLE_NS);
+      return ALERR_DCSYNC0CYCLETIME;
+   }
+
+   ESCvar.dcsync = 1;
+   ESCvar.synccounterlimit = Obj.ErrorSettings.SyncErrorCounterLimit;
+
+   /* Report back what was accepted, so 0x1C32/0x1C33 describe the running
+    * configuration rather than whatever was last written to them. */
+   Obj.SM2Sync.CycleTime = sync0_cycle;
+   Obj.SM3Sync.CycleTime = sync0_cycle;
+   sync0_period_ns = sync0_cycle;
+
+   printf ("DC: SYNC0 at %u ns, sync error limit %u\n",
+           (unsigned)sync0_cycle, (unsigned)ESCvar.synccounterlimit);
+   return 0;
+}
 
 /** Master outputs have arrived: SM2 has been read and unpacked into Obj.
  *
@@ -140,6 +200,14 @@ void cb_update_txpdo (void)
       a->DriveStatusFlags = 0;
    }
 
+   /* Mirror the stack's sync accounting into the dictionary. The stack owns
+    * the counts because it observes the events; these objects are how a master
+    * sees them, and they are only worth carrying if they are current. */
+   Obj.SM2Sync.SMEventMissed = ESCvar.smeventmissed;
+   Obj.SM3Sync.SMEventMissed = ESCvar.smeventmissed;
+   Obj.SM2Sync.SyncError     = ESCvar.syncerror;
+   Obj.SM3Sync.SyncError     = ESCvar.syncerror;
+
    tx_calls++;
 }
 
@@ -171,7 +239,10 @@ static void app_safe_state (void)
 static esc_cfg_t config =
 {
    .user_arg = &hw_cfg,
-   .use_interrupt = 0,
+   /* Not an optimisation: esc.c returns early when this is 0, before
+    * ESC_checkDC runs and before the SYNC0 bit is ever added to the AL event
+    * mask, so it is the precondition for DC existing at all. */
+   .use_interrupt = 1,
    /* Fallback only, for a master that leaves the hardware watchdog disabled.
     * See the watchdog handling in soes/ecat_slv.c. */
    .watchdog_cnt = 150,
@@ -188,7 +259,8 @@ static esc_cfg_t config =
    .esc_hw_interrupt_enable = NULL,
    .esc_hw_interrupt_disable = NULL,
    .esc_hw_eep_handler = NULL,
-   .esc_check_dc_handler = NULL,
+   .esc_check_dc_handler = dc_checker,
+   .esc_hw_wait = ESC_hw_wait,
 };
 
 static const char * al_name (uint8_t st)
@@ -224,6 +296,7 @@ int main (int argc, char * argv[])
    enum { NS = 20000 };
    static uint64_t samples[NS];
    static uint64_t xfers[NS];
+   static uint64_t spi_work[NS];
    uint32_t n = 0;
    struct timespec a, b, last;
 
@@ -251,9 +324,19 @@ int main (int argc, char * argv[])
    for (;;)
    {
       uint64_t c0 = ESC_hw_spi_count ();
+      uint64_t s0 = ESC_hw_spi_ns ();
 
       clock_gettime (CLOCK_MONOTONIC, &a);
-      ecat_slv ();
+      if ((ESCvar.dcsync > 0) && (sync0_period_ns > 0))
+      {
+         /* Bounded at twice the period the master configured: expiring with DC
+          * active is what identifies a stopped sync unit. */
+         ecat_slv_run_dc ((uint64_t)sync0_period_ns * 2ull);
+      }
+      else
+      {
+         ecat_slv ();
+      }
       clock_gettime (CLOCK_MONOTONIC, &b);
 
       {
@@ -272,6 +355,7 @@ int main (int argc, char * argv[])
       if (n < NS)
       {
          xfers[n] = ESC_hw_spi_count () - c0;
+         spi_work[n] = ESC_hw_spi_ns () - s0;
          samples[n++] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
                         (uint64_t)(b.tv_nsec - a.tv_nsec);
       }
@@ -290,7 +374,7 @@ int main (int argc, char * argv[])
 
          if (n > 0)
          {
-            uint64_t sum = 0, xsum = 0;
+            uint64_t sum = 0, xsum = 0, ssum = 0;
             uint32_t i;
             uint64_t * srt = malloc (n * sizeof (uint64_t));
 
@@ -301,17 +385,30 @@ int main (int argc, char * argv[])
                {
                   sum += srt[i];
                   xsum += xfers[i];
+                  ssum += spi_work[i];
                }
                qsort (srt, n, sizeof (uint64_t), cmp_u64);
-               printf ("ecat_slv n=%u  median %.1f  p99 %.1f  max %.1f us"
-                       "  over %.1f transfers\n",
+               /* Under DC the wall figure is the SYNC0 period, because the
+                * call blocks waiting for it; the SPI figure is the work. Both
+                * are printed so neither is mistaken for the other. */
+               printf ("cycle n=%u  wall median %.1f  p99 %.1f  max %.1f us"
+                       " | spi mean %.1f us over %.1f transfers%s\n",
                        n, (double)srt[n / 2] / 1000.0,
                        (double)srt[(n * 99) / 100] / 1000.0,
                        (double)srt[n - 1] / 1000.0,
-                       (double)xsum / (double)n);
+                       (double)ssum / (double)n / 1000.0,
+                       (double)xsum / (double)n,
+                       (ESCvar.dcsync > 0) ? "  [DC]" : "  [free-run]");
                free (srt);
             }
          }
+
+         printf ("   DC: dcsync=%u sync0=%u ns  synccounter=%d limit=%u"
+                 "  missed=%u syncerror=%u\n",
+                 ESCvar.dcsync, (unsigned)sync0_period_ns,
+                 (int)ESCvar.synccounter,
+                 (unsigned)ESCvar.synccounterlimit,
+                 (unsigned)ESCvar.smeventmissed, ESCvar.syncerror);
 
          printf ("   AL: ctl=%04X sts=%04X err=%04X | SM2 ctl=%02X "
                  "(wd trigger %s) 0x0440=%04X | rx=%llu tx=%llu\n",

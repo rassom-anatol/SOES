@@ -163,7 +163,7 @@ objects:
       # share the same thread. Revisit once the drive half is in the loop --
       # advertising a floor the device cannot hold is the same defect as
       # advertising a mode it does not implement.
-      - {sub: 0x05, name: "Minimum Cycle Time",    type: u32,  access: ro, value: 250000}
+      - {sub: 0x05, name: "Minimum Cycle Time",    type: u32,  access: ro, value: 250000, define: CMC_MIN_CYCLE_NS}
       - {sub: 0x0B, name: "SM Event Missed Count", type: u16,  access: ro, var: "SM2Sync.SMEventMissed"}
       - {sub: 0x20, name: "Sync Error",            type: bool, access: ro, var: "SM2Sync.SyncError"}
 
