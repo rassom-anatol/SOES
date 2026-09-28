@@ -190,6 +190,14 @@ objects:
   - {index: 0x603F, axis: true, name: "Error Code",              type: u16, access: ro, var: "ErrorCode"}
   - {index: 0x6040, axis: true, name: "Controlword",             type: u16, access: rw, var: "Controlword"}
   - {index: 0x6041, axis: true, name: "Statusword",              type: u16, access: ro, var: "Statusword"}
+  # DELIBERATE GAP, decided rather than overlooked. Value 2 means "decelerate on
+  # the quick stop ramp, then transition to Switch On Disabled", which requires
+  # 0x6085 Quick Stop Deceleration and a ramp generator. Neither exists yet, so
+  # this object currently advertises a capability the device does not have, and
+  # a master reading it will believe it. Kept as a statement of intent; the
+  # alternative considered was 0 (remove torque and coast), which is truthful
+  # today but wrong for a loaded or gravity-affected axis. Resolve by adding
+  # 0x6085 and the ramp, not by quietly changing the number.
   - {index: 0x605A, axis: true, name: "Quick Stop Option Code",  type: i16, access: rw, var: "QuickStopOptionCode", value: 2}
   - {index: 0x6060, axis: true, name: "Modes of Operation",      type: i8,  access: rw, var: "ModesOfOperation"}
   - {index: 0x6061, axis: true, name: "Modes of Operation Display", type: i8, access: ro, var: "ModesOfOperationDisplay"}
