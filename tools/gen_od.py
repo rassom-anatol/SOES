@@ -16,7 +16,12 @@ The generated files are committed. Neither the standalone build nor the
 consuming application should need Python, and CI can check that regenerating
 produces no diff.
 
-Usage:  gen_od.py <od.yaml> <output-dir>
+Usage:  gen_od.py <od.yaml> <output-dir> [--cxx <cxx-output-dir>]
+
+With --cxx, the same description is additionally emitted as the consuming
+drive's C++ descriptor table, together with the process image storage and the
+stack-facing headers, so that one directory holds everything a consumer's build
+needs and there is exactly one definition of Obj in that build.
 """
 
 import os
@@ -172,6 +177,9 @@ class Object:
             "bits": bits,
             "ctype": ctype,
             "access": ACCESS[spec.get("access", "ro")],
+            # The YAML spelling is kept alongside the SOES constant because the
+            # C++ emitter needs the meaning, not the stack's encoding of it.
+            "access_name": spec.get("access", "ro"),
             "value": value,
             "var": var,
             # Optional: also emit this constant as a macro, so application code
@@ -756,11 +764,324 @@ def esi_type(entry):
     return t
 
 
+CXX_TABLE_HPP = r'''#ifndef _CMC_OD_OBJECT_TABLE_HPP
+#define _CMC_OD_OBJECT_TABLE_HPP
+
+#include <cstddef>
+#include <cstdint>
+
+/**
+ * The object dictionary, as a table the drive can enforce rules against.
+ *
+ * This is the generated half: what every object *is*. The rules live in
+ * ObjectDictionary.{hpp,cpp}, which is hand written, because what may be done
+ * to an object *now* depends on the drive's state and cannot be tabulated.
+ *
+ * The same YAML also generates the stack's _objd tables and the ESI, so a
+ * master's view of this device and the drive's own view are one description
+ * rather than two that have to be kept in agreement by hand.
+ */
+
+namespace cortexware
+{
+namespace od
+{
+
+/** Declared type, taken from the YAML rather than inferred from the width.
+ *  Describing a signed object as unsigned reaches OP without complaint and
+ *  then reports -1 as 4294967295, which is why the declaration is carried. */
+enum class Type : uint8_t
+{
+   Bool, I8, U8, I16, U16, I32, U32, I64, U64, Real32, String
+};
+
+/** Access rights, as a bitmask. */
+constexpr uint8_t kRead      = 0x01;
+constexpr uint8_t kWrite     = 0x02;
+/** Writable only while the process image is not live, which CoE expresses as
+ *  writable in PREOP. A real restriction, not a hint. */
+constexpr uint8_t kPreopOnly = 0x04;
+
+/**
+ * One sub-entry.
+ *
+ * `storage` points into the process image for anything the drive actually
+ * holds. It is null for a constant, whose value is in `constant`, and for a
+ * string, whose value is in `text`. That split is not tidiness: a constant has
+ * no address to hand out, and a write to one must be refused rather than
+ * silently dropped.
+ */
+struct Entry
+{
+   uint16_t     index;
+   uint8_t      sub;
+   Type         type;
+   uint8_t      access;
+   uint16_t     bits;
+   void *       storage;
+   int64_t      constant;
+   const char * text;
+   const char * name;
+};
+
+extern const Entry       kEntries[];
+extern const std::size_t kEntryCount;
+
+/** The entry, or nullptr if this index and subindex do not exist. */
+const Entry * Find (uint16_t index, uint8_t sub);
+
+/** Number of entries under an index, or -1 if the object does not exist. */
+int SubCount (uint16_t index);
+
+/** Width in bytes of a fixed-width type, or 0 for String, whose length is
+ *  carried in the entry's own bit count. */
+std::size_t ByteWidth (Type type);
+
+}  // namespace od
+}  // namespace cortexware
+
+#endif  /* _CMC_OD_OBJECT_TABLE_HPP */
+'''
+
+CXX_TABLE_LOOKUPS = r'''
+const Entry * Find (uint16_t index, uint8_t sub)
+{
+   /* Binary search over (index, sub). The table is emitted sorted, and the
+    * generator is the only thing that could break that ordering. */
+   std::size_t lo = 0;
+   std::size_t hi = kEntryCount;
+
+   while (lo < hi)
+   {
+      const std::size_t mid = lo + (hi - lo) / 2;
+      const Entry & e = kEntries[mid];
+
+      if (e.index == index && e.sub == sub)
+      {
+         return &e;
+      }
+      if (e.index < index || (e.index == index && e.sub < sub))
+      {
+         lo = mid + 1;
+      }
+      else
+      {
+         hi = mid;
+      }
+   }
+   return nullptr;
+}
+
+int SubCount (uint16_t index)
+{
+   int count = -1;
+
+   for (std::size_t i = 0; i < kEntryCount; i++)
+   {
+      if (kEntries[i].index == index)
+      {
+         count = (count < 0) ? 1 : count + 1;
+      }
+      else if (count >= 0)
+      {
+         break;
+      }
+   }
+   return count;
+}
+
+std::size_t ByteWidth (Type type)
+{
+   switch (type)
+   {
+      case Type::Bool:
+      case Type::I8:
+      case Type::U8:     return 1;
+      case Type::I16:
+      case Type::U16:    return 2;
+      case Type::I32:
+      case Type::U32:
+      case Type::Real32: return 4;
+      case Type::I64:
+      case Type::U64:    return 8;
+      case Type::String: return 0;
+   }
+   return 0;
+}
+'''
+
+
+# ---------------------------------------------------------------------------
+# C++ emitters, for the consuming drive rather than for the stack.
+#
+# The stack gets a _objd/_objectlist description; the drive gets the same
+# dictionary as a descriptor table it can enforce access rules against. Both
+# come from this one YAML, which is the point: an object a master may write and
+# an object the drive believes is read-only would otherwise be two independent
+# assertions that nothing reconciles.
+# ---------------------------------------------------------------------------
+
+CXX_TYPES = {
+    "bool":   "Bool",
+    "i8":     "I8",
+    "u8":     "U8",
+    "i16":    "I16",
+    "u16":    "U16",
+    "i32":    "I32",
+    "u32":    "U32",
+    "i64":    "I64",
+    "u64":    "U64",
+    "real32": "Real32",
+    "string": "String",
+}
+
+# Access rights as meaning rather than as the stack's encoding. rwpre is
+# "writable, but only before the process image goes live", which CoE expresses
+# as writable in PREOP; it is a real restriction and not a hint.
+CXX_ACCESS = {
+    "ro":    "kRead",
+    "rw":    "kRead | kWrite",
+    "rwpre": "kRead | kWrite | kPreopOnly",
+    "wo":    "kWrite",
+}
+
+
+def cxx_entries(cfg, objs, rx, tx):
+    """Flatten everything a master can see into rows for the C++ table.
+
+    Mirrors emit_objectlist's row set deliberately, including the PDO mapping
+    and SyncManager objects. A tool browsing this table and a master browsing
+    the device over SDO must see one dictionary, or the Linux tooling stops
+    being a substitute for the Windows one.
+    """
+    rows = []
+
+    def add(index, sub, name, type_, access, bits, storage, constant, text):
+        rows.append({"index": index, "sub": sub, "name": name, "type": type_,
+                     "access": access, "bits": bits, "storage": storage,
+                     "constant": constant, "text": text})
+
+    for o in objs:
+        if o.is_record:
+            add(o.index, 0, o.name, "u8", "ro", 8, "nullptr", o.maxsub, "nullptr")
+        for s in o.subs:
+            if o.is_record and s["sub"] == 0:
+                continue
+            storage = "nullptr"
+            if s["var"]:
+                target = (f"Obj.axis[{o.axis}].{s['var']}" if o.axis is not None
+                          else f"Obj.{s['var']}")
+                storage = f"(void *)&{target}"
+            constant = 0
+            text = "nullptr"
+            if s["type"] == "string":
+                if not s["var"]:
+                    text = '"%s"' % s["value"]
+            elif not isinstance(s["value"], str):
+                constant = int(s["value"])
+            add(o.index, s["sub"], s["name"], s["type"], s["access_name"],
+                s["bits"], storage, constant, text)
+
+    for pdo in rx + tx:
+        entries = pdo["entries"]
+        add(pdo["index"], 0, pdo["name"], "u8", "ro", 8, "nullptr",
+            len(entries), "nullptr")
+        for i, e in enumerate(entries, 1):
+            word = (e["index"] << 16) | (e["sub"] << 8) | e["bits"]
+            add(pdo["index"], i, e["name"], "u32", "ro", 32, "nullptr",
+                word, "nullptr")
+
+    add(0x1C00, 0, "SM Communication Type", "u8", "ro", 8, "nullptr", 4, "nullptr")
+    for sub, what in enumerate(("Mailbox Receive", "Mailbox Send",
+                                "Process Data Output", "Process Data Input"), 1):
+        add(0x1C00, sub, what, "u8", "ro", 8, "nullptr", sub, "nullptr")
+
+    for idx, pdos, what in ((0x1C12, rx, "RxPDO Assignment"),
+                            (0x1C13, tx, "TxPDO Assignment")):
+        add(idx, 0, what, "u8", "ro", 8, "nullptr", len(pdos), "nullptr")
+        for i, p in enumerate(pdos, 1):
+            add(idx, i, "Assigned PDO %04X" % p["index"], "u16", "ro", 16,
+                "nullptr", p["index"], "nullptr")
+
+    # Sorted by index then sub, which is what lets the lookup be a binary
+    # search and what an SDO Information walk expects to receive.
+    rows.sort(key=lambda r: (r["index"], r["sub"]))
+
+    seen = set()
+    for r in rows:
+        key = (r["index"], r["sub"])
+        if key in seen:
+            die("duplicate entry 0x%04X:%02X in the C++ table" % key)
+        seen.add(key)
+    return rows
+
+
+def emit_cxx_table_hpp(cfg, src):
+    return BANNER.format(src=src) + CXX_TABLE_HPP
+
+
+def emit_cxx_table_cpp(cfg, objs, rx, tx, src):
+    rows = cxx_entries(cfg, objs, rx, tx)
+    out = [BANNER.format(src=src)]
+    out.append('#include "ObjectTable.hpp"')
+    out.append("")
+    out.append("extern \"C\"")
+    out.append("{")
+    out.append('#include "utypes.h"')
+    out.append("}")
+    out.append("")
+    out.append("namespace cortexware")
+    out.append("{")
+    out.append("namespace od")
+    out.append("{")
+    out.append("")
+    out.append("const Entry kEntries[] =")
+    out.append("{")
+    for r in rows:
+        out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\"},"
+                   % (r["index"], r["sub"], CXX_TYPES[r["type"]],
+                      CXX_ACCESS[r["access"]], r["bits"], r["storage"],
+                      r["constant"], r["text"], r["name"]))
+    out.append("};")
+    out.append("")
+    out.append("const std::size_t kEntryCount = "
+               "sizeof (kEntries) / sizeof (kEntries[0]);")
+    out.append(CXX_TABLE_LOOKUPS)
+    out.append("}  // namespace od")
+    out.append("}  // namespace cortexware")
+    return "\n".join(out) + "\n"
+
+
+def emit_storage(cfg, src):
+    """The one definition of the process image.
+
+    Generated rather than hand written because the drive owns this storage and
+    the stack is compiled against it. Whichever translation unit defines Obj
+    fixes the process image for the whole build, so having two candidates in a
+    tree is how a build ends up with the stack describing one image while the
+    application reads another.
+    """
+    out = [BANNER.format(src=src)]
+    out.append('#include "utypes.h"')
+    out.append("")
+    out.append("_Objects Obj;")
+    return "\n".join(out) + "\n"
+
+
 def main():
-    if len(sys.argv) != 3:
+    args = sys.argv[1:]
+    cxxdir = None
+    if "--cxx" in args:
+        i = args.index("--cxx")
+        if i + 1 >= len(args):
+            print(__doc__)
+            return 2
+        cxxdir = args[i + 1]
+        del args[i:i + 2]
+    if len(args) != 2:
         print(__doc__)
         return 2
-    src, outdir = sys.argv[1], sys.argv[2]
+    src, outdir = args[0], args[1]
 
     cfg = load_config(src)
 
@@ -793,6 +1114,26 @@ def main():
         with open(os.path.join(outdir, name), "w") as fh:
             fh.write(text)
 
+    cxx_files = {}
+    if cxxdir is not None:
+        # The consumer's directory carries the stack-facing headers as well as
+        # the C++ table. The stack is compiled against whatever ecat_options.h
+        # and utypes.h are on its include path, so putting them here is what
+        # lets the drive own its process image rather than borrowing the
+        # bring-up application's copy.
+        cxx_files = {
+            "utypes.h": files["utypes.h"],
+            "ecat_options.h": files["ecat_options.h"],
+            "slave_objectlist.c": files["slave_objectlist.c"],
+            "objects.c": emit_storage(cfg, src),
+            "ObjectTable.hpp": emit_cxx_table_hpp(cfg, src),
+            "ObjectTable.cpp": emit_cxx_table_cpp(cfg, objs, rx, tx, src),
+        }
+        os.makedirs(cxxdir, exist_ok=True)
+        for name, text in cxx_files.items():
+            with open(os.path.join(cxxdir, name), "w") as fh:
+                fh.write(text)
+
     print(f"gen_od: {cfg['device']['name']} "
           f"(product 0x{cfg['device']['product_code']:X} rev "
           f"0x{cfg['device']['revision']:X}), "
@@ -806,6 +1147,8 @@ def main():
           f"top 0x{sm['top']:04X}")
     for name in files:
         print(f"  wrote {os.path.join(outdir, name)}")
+    for name in cxx_files:
+        print(f"  wrote {os.path.join(cxxdir, name)}")
     return 0
 
 
