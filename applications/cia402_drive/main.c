@@ -87,6 +87,39 @@ static uint64_t mbx_responses = 0;
  * its wait at twice this, which is what identifies a stopped sync unit. */
 static uint32_t sync0_period_ns = 0;
 
+/* Measurement controls. `force_freerun` keeps the loop on the free-running
+ * path even when the master has activated DC, so the two loop structures can
+ * be compared in one session against one master rather than across runs --
+ * comparing measurements taken minutes apart under different conditions is how
+ * the per-transfer cost came to be misattributed in the first place.
+ * `limit_override` raises the sync error counter limit so that the slave stays
+ * in OP long enough to be measured instead of dropping to SAFEOP mid-sample.
+ */
+static int force_freerun = 0;
+static uint32_t limit_override = 0;
+
+/* Scheduler accounting for this thread, straight from the kernel.
+ *   field 1: nanoseconds spent running on a CPU
+ *   field 2: nanoseconds spent on the run queue, runnable but not running
+ *   field 3: number of times it was given the CPU
+ * Field 2 is the one that says whether the scheduler is stealing time, which
+ * is otherwise indistinguishable from the work simply being slow.
+ */
+static void read_schedstat (uint64_t * run, uint64_t * wait, uint64_t * slices)
+{
+   FILE * fh = fopen ("/proc/self/schedstat", "r");
+
+   *run = *wait = *slices = 0;
+   if (fh != NULL)
+   {
+      if (fscanf (fh, "%" SCNu64 " %" SCNu64 " %" SCNu64, run, wait, slices) != 3)
+      {
+         *run = *wait = *slices = 0;
+      }
+      fclose (fh);
+   }
+}
+
 /* The cyclic loop blocks on the SYNC0 pin, so it owns that line and the wake
  * count is the edge count -- see ESC_hw_wait_sync0 for why the pin rather than
  * the AL event register. */
@@ -136,7 +169,9 @@ static uint16_t dc_checker (void)
    }
 
    ESCvar.dcsync = 1;
-   ESCvar.synccounterlimit = Obj.ErrorSettings.SyncErrorCounterLimit;
+   ESCvar.synccounterlimit = (limit_override != 0)
+                             ? (uint16_t)limit_override
+                             : Obj.ErrorSettings.SyncErrorCounterLimit;
 
    /* Report back what was accepted, so 0x1C32/0x1C33 describe the running
     * configuration rather than whatever was last written to them. */
@@ -308,6 +343,9 @@ int main (int argc, char * argv[])
    static uint64_t samples[NS];
    static uint64_t xfers[NS];
    static uint64_t spi_work[NS];
+   static uint64_t per_xfer[NS];
+   uint64_t sched_run = 0, sched_wait = 0, sched_slices = 0;
+   uint64_t run0 = 0, wait0 = 0, slices0 = 0;
    uint32_t n = 0;
    struct timespec a, b, last;
 
@@ -318,6 +356,14 @@ int main (int argc, char * argv[])
    if (argc > 2)
    {
       hw_cfg.spi_speed_hz = (uint32_t)strtoul (argv[2], NULL, 0);
+   }
+   if (argc > 3 && strcmp (argv[3], "freerun") == 0)
+   {
+      force_freerun = 1;
+   }
+   if (argc > 4)
+   {
+      limit_override = (uint32_t)strtoul (argv[4], NULL, 0);
    }
 
    printf ("cia402_drive: %u axis/axes on %s at %u Hz\n",
@@ -331,6 +377,7 @@ int main (int argc, char * argv[])
    }
    printf ("stack init OK, entering cyclic loop\n");
 
+   read_schedstat (&run0, &wait0, &slices0);
    clock_gettime (CLOCK_MONOTONIC, &last);
    for (;;)
    {
@@ -338,7 +385,7 @@ int main (int argc, char * argv[])
       uint64_t s0 = ESC_hw_spi_ns ();
 
       clock_gettime (CLOCK_MONOTONIC, &a);
-      if ((ESCvar.dcsync > 0) && (sync0_period_ns > 0))
+      if ((ESCvar.dcsync > 0) && (sync0_period_ns > 0) && !force_freerun)
       {
          /* Bounded at twice the period the master configured: expiring with DC
           * active is what identifies a stopped sync unit. */
@@ -367,6 +414,9 @@ int main (int argc, char * argv[])
       {
          xfers[n] = ESC_hw_spi_count () - c0;
          spi_work[n] = ESC_hw_spi_ns () - s0;
+         /* Cost of one transfer, derived per cycle so that it can be reported
+          * as a distribution rather than as one ratio of two averages. */
+         per_xfer[n] = (xfers[n] > 0) ? (spi_work[n] / xfers[n]) : 0;
          samples[n++] = (uint64_t)(b.tv_sec - a.tv_sec) * 1000000000ull +
                         (uint64_t)(b.tv_nsec - a.tv_nsec);
       }
@@ -399,6 +449,48 @@ int main (int argc, char * argv[])
                   ssum += spi_work[i];
                }
                qsort (srt, n, sizeof (uint64_t), cmp_u64);
+               /* Medians, not means: the wall distribution has a tail running
+                * to ten milliseconds, and a mean over that says nothing about
+                * what a typical cycle costs. */
+               {
+                  uint64_t * sx = malloc (n * sizeof (uint64_t));
+                  uint64_t * st = malloc (n * sizeof (uint64_t));
+                  uint64_t * sp = malloc (n * sizeof (uint64_t));
+
+                  if (sx != NULL && st != NULL && sp != NULL)
+                  {
+                     memcpy (sx, spi_work, n * sizeof (uint64_t));
+                     memcpy (st, xfers, n * sizeof (uint64_t));
+                     memcpy (sp, per_xfer, n * sizeof (uint64_t));
+                     qsort (sx, n, sizeof (uint64_t), cmp_u64);
+                     qsort (st, n, sizeof (uint64_t), cmp_u64);
+                     qsort (sp, n, sizeof (uint64_t), cmp_u64);
+                     printf ("   SPI: per cycle median %.1f  p99 %.1f us"
+                             " | transfers median %llu"
+                             " | per transfer median %.1f  p99 %.1f us\n",
+                             (double)sx[n / 2] / 1000.0,
+                             (double)sx[(n * 99) / 100] / 1000.0,
+                             (unsigned long long)st[n / 2],
+                             (double)sp[n / 2] / 1000.0,
+                             (double)sp[(n * 99) / 100] / 1000.0);
+                  }
+                  free (sx); free (st); free (sp);
+               }
+               {
+                  uint64_t r, w, sl;
+
+                  read_schedstat (&r, &w, &sl);
+                  sched_run = r - run0;
+                  sched_wait = w - wait0;
+                  sched_slices = sl - slices0;
+                  run0 = r; wait0 = w; slices0 = sl;
+                  printf ("   SCHED: cycles=%u  onCPU %.1f us/cycle"
+                          "  runqueue-wait %.1f us/cycle  slices=%llu%s\n",
+                          n, (double)sched_run / (double)n / 1000.0,
+                          (double)sched_wait / (double)n / 1000.0,
+                          (unsigned long long)sched_slices,
+                          force_freerun ? "  [FREERUN forced]" : "");
+               }
                /* Under DC the wall figure is the SYNC0 period, because the
                 * call blocks waiting for it; the SPI figure is the work. Both
                 * are printed so neither is mistaken for the other. */
