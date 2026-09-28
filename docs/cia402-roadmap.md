@@ -216,7 +216,7 @@ Because the XMC4 and TI HALs are retained (§1.2), the rename must reach them to
 
 ## Phase 3 — Interrupts and Distributed Clocks
 
-**Implemented, not yet validated on hardware.** `ecat_slv_run_dc()` in [`ecat_slv.c`](../soes/ecat_slv.c) is the cyclic loop; `ESC_hw_wait()` in the HAL is the blocking edge wait behind a new `esc_cfg_t.esc_hw_wait` hook; `ecat_slv_sync0_account()` implements the ETG.1020 counting in §3.3.1; `dc_checker()` in the drive application validates what the master configured; 0x1C32 and 0x1C33 are in the dictionary. What remains is running it against a master with DC enabled, and the real-time setup in §3.5.
+**Implemented, and the sync error counter is validated on hardware** — see [`measurements.md`](measurements.md). It has been observed tripping with `ALERR_SYNCERROR` when the master's frame rate did not match SYNC0, and resting at zero at the real 0x10F1:02 limit of 24 when it does. The slave sustains both 1 ms and 4 ms SYNC0 periods. Outstanding: the real-time setup in §3.5, and a 1 ms run against a master that actually delivers frames at 1 ms. `ecat_slv_run_dc()` in [`ecat_slv.c`](../soes/ecat_slv.c) is the cyclic loop; `ESC_hw_wait()` in the HAL is the blocking edge wait behind a new `esc_cfg_t.esc_hw_wait` hook; `ecat_slv_sync0_account()` implements the ETG.1020 counting in §3.3.1; `dc_checker()` in the drive application validates what the master configured; 0x1C32 and 0x1C33 are in the dictionary. What remains is running it against a master with DC enabled, and the real-time setup in §3.5.
 
 ### The gate
 

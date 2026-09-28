@@ -102,6 +102,48 @@ detects this correctly and would trip at the real limit of 24.
 
 ---
 
+## 2026-09-27 — Phase 3 acceptance test passes
+
+Commit `bec6dbc` plus the governor unit installed. Same target as above.
+Master: a **different machine** — the previous one could not enter Run Mode
+(TwinCAT's real-time runtime needs hardware virtualisation, which was disabled
+in that BIOS) and its free-run rate was fixed at 2 ms, which is why process data
+arrived on only half the SYNC0 periods for most of the session.
+
+On the new master, with SYNC0 at its natural 4 ms Sync Unit Cycle and no
+override, **period and frame rate match**:
+
+| | value |
+|---|---|
+| SYNC0 period | 4 ms |
+| Process data per SYNC0 period | 1:1 (`sm` 9328 vs `sync0` 9322) |
+| Sync error counter | **0**, at the real limit of 24 |
+| Missed periods | 2, both at startup, drained away |
+| AL state | OP throughout, no error |
+| Wall median / p99 / max | 3999.7 / 4001.6 / 4092.0 us |
+| Transfers per cycle | 21 / 21 / 21 |
+| SPI per cycle, median | 189.1 us |
+| Per transfer, median / p99 | 9.0 / 9.5 us |
+
+**This closes the Phase 3 sync error counter validation.** The counter has now
+been observed in both directions: tripping with `ALERR_SYNCERROR` when the
+master's frame rate did not match SYNC0, and resting at zero when it does.
+
+Earlier the same day, against the old master at a 1 ms SYNC0 period, the slave
+held wall median 999.9 us, p99 1052.7, max 1057.8 — so **the slave sustains
+both 1 ms and 4 ms**. The 1 ms case failed only because that master delivered
+frames at 2 ms.
+
+### Known fidelity gap
+
+`ESCvar.syncerror`, mirrored into 0x1C32:20 (*Sync Error*), latches and is
+cleared only when DC is deactivated. It reads 1 in the run above because a wait
+timeout raised `ALERR_FATALSYNCERROR` during the bring-up transition, before
+process data started. Whether ETG.1020 expects that flag to self-clear once the
+condition passes is unverified.
+
+---
+
 ## Earlier figures, and their status
 
 Recorded for traceability. Configuration was not captured at the time, which is
