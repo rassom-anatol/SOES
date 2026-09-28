@@ -1,0 +1,38 @@
+# Pin the CPU frequency governor to performance.
+#
+# This is the single highest-value real-time change measured on this platform:
+# it took the per-transfer p99 from 350 us to 10.2 us, a 34x improvement, and
+# is what lets the cyclic loop hold a 1 ms cycle at all. See
+# docs/measurements.md for the before-and-after and docs/rpi-platform.md for
+# why it matters so much here.
+#
+# The short version: the BCM2711 takes no SPI or DMA interrupts for transfers
+# of our size, so the kernel polls and SPI time is CPU time. A core that sleeps
+# most of each millisecond looks idle to `ondemand`, which parks it near
+# 600 MHz; every wake then pays a frequency ramp inside the transfer.
+#
+# What mattered was the frequency being *constant*, not high. If thermal
+# headroom becomes a constraint, pinning a lower fixed frequency by also
+# writing scaling_max_freq keeps the benefit at less power. All four cores
+# share one clock domain on this SoC, so this is necessarily all of them.
+#
+# Install:
+#   sudo cp tools/tuning/cpu-governor.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now cpu-governor.service
+#
+# Revert:
+#   sudo systemctl disable --now cpu-governor.service   (stopping restores ondemand)
+
+[Unit]
+Description=Pin CPU frequency governor to performance for the EtherCAT cyclic loop
+Documentation=https://github.com/rassom-anatol/SOES/blob/master/docs/measurements.md
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'for c in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do echo performance > "$c"; done'
+ExecStop=/bin/sh -c 'for c in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do echo ondemand > "$c"; done'
+
+[Install]
+WantedBy=multi-user.target
