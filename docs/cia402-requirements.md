@@ -51,14 +51,14 @@ things, and each claim brings required behaviour with it.
 ## 2. State machine
 
 The exhaustively specified part of the profile, and therefore the part that admits an
-exhaustive test (roadmap §5.3).
+exhaustive test (cmc `docs/architecture.md`).
 
-- [ ] **Eight states, not nine.** Roadmap §5.3 says "nine states"; the profile defines
+- [ ] **Eight states, not nine.** An earlier draft said "nine states"; the profile defines
       **eight** — Not ready to switch on, Switch on disabled, Ready to switch on,
       Switched on, Operation enabled, Quick stop active, Fault reaction active, Fault —
       plus a *Start* pseudo-state that makes nine boxes in the published diagram. Fix
       the cardinality before writing the test table.
-      **Done** — roadmap §5.3 now says eight and says why the ninth box is not a state.
+      **Done** — the count is eight, and the ninth box in the diagram is a transition rather than a state.
 
 ### 2.1 Command encoding — controlword bits 7, 3, 2, 1, 0
 
@@ -171,7 +171,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 - [ ] **Torque is per-thousandth of rated torque.** 0x6071, 0x6072 and 0x6077 are all in
       units of 1/1000 of **0x6076** motor rated torque (mNm). Already correct in roadmap
-      §5.3.
+      cmc `docs/architecture.md`.
 - [ ] **Position scaling** comes from 0x608F position encoder resolution, 0x6091 gear
       ratio and 0x6092 feed constant — all present.
 - [ ] **Velocity and acceleration scaling are absent.** The factor group also defines
@@ -210,7 +210,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 - [ ] **The state machine is evaluated every cycle from that cycle's controlword.** It is
       not an event handler hung off SDO writes. This fixes where `Cia402Sm` sits
-      relative to the RxPDO unpack in roadmap §5.3.
+      relative to the RxPDO unpack, which cmc's EtherCAT adapter performs.
 - [ ] **One setpoint consumed per cycle, acknowledged in statusword bit 12.** A cycle in
       which the setpoint was not consumed — missed frame, late thread — must clear bit
       12 rather than silently reusing the previous value. This is a protocol-level

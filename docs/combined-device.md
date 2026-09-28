@@ -86,7 +86,7 @@ it is the one that cannot be reversed cheaply once the ESI ships.
       carries error mode and error value objects for digital (0x6206 / 0x6207) and
       analog (0x6443 / 0x6444) outputs precisely because *what does the output do when
       the master goes away* has to be answerable per channel.
-      SOES provides the mechanism — the `safe_state_override` hook, roadmap §5.3 — but
+      SOES provides the mechanism — the `safe_state_override` hook — but
       the mechanism is only reached if something notices the master left. See
       [`stack-review.md`](stack-review.md) §1.2: with no watchdog wired up, outputs hold
       their last commanded value indefinitely. For a drive that is bad; for a drive
@@ -97,7 +97,7 @@ it is the one that cannot be reversed cheaply once the ESI ships.
       raw-to-engineering-unit conversion, the range and the limit objects. In the
       manufacturer range the units, the scaling, the over-range indication and the
       resolution are all ours to define and document — the same treatment the torque
-      scaling gets in roadmap §5.3, and for the same reason: easy to get wrong, and
+      scaling gets in cmc's `docs/architecture.md`, and for the same reason: easy to get wrong, and
       expensive to rediscover from the master side.
 
 - [ ] **Analog sampling lands in the cyclic budget.** An ADC on the carrier means more

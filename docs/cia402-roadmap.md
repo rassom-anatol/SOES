@@ -4,9 +4,9 @@
 
 This repository is a hard fork of the unmaintained [OpenEtherCATsociety/SOES](https://github.com/OpenEtherCATsociety/SOES) EtherCAT slave stack. It is being developed as a git submodule of **cmc**, a ROS 2 motion controller (TMC4671 FOC controller + TMC6200 gate driver) running under Ubuntu 26.04 and ROS 2 Lyrical.
 
-**Hardware targets differ by build.** The EtherCAT build requires the custom carrier board being designed for the Compute Module 4, since the LAN9252 lives on it. The ROS 2 build carries no such requirement and runs on either a stock Raspberry Pi 4 or that same CM4 carrier. Both platforms use the BCM2711, so the peripheral analysis in this document — SPI1's fixed ALT4 assignment, AUX block behaviour, `gpiochip0` as the SoC bank — applies to either. This pairs with the single-transport rule in §5.3: a build targets one transport, and the EtherCAT choice implies the carrier.
+**Hardware targets differ by build.** The EtherCAT build requires the custom carrier board being designed for the Compute Module 4, since the LAN9252 lives on it. The ROS 2 build carries no such requirement and runs on either a stock Raspberry Pi 4 or that same CM4 carrier. Both platforms use the BCM2711, so the peripheral analysis in this document — SPI1's fixed ALT4 assignment, AUX block behaviour, `gpiochip0` as the SoC bank — applies to either. This pairs with the single-transport rule under *Settled decisions*: a build targets one transport for master control, and the EtherCAT choice implies the carrier.
 
-The end state: **cmc presents itself as a CiA402-compatible servo drive**, commanded by an external EtherCAT master. ROS 2 DDS, EtherCAT (CoE) and later CANopen-over-CAN become three interchangeable transports onto one shared CiA402 core, with the SOES cyclic task running on a `SCHED_FIFO` thread inside cmc's existing `axis` executable.
+The end state for this repository: a slave stack that presents a correct CiA402 CoE interface to any master, with a Linux HAL that needs no vendor library, and a generator that keeps the dictionary, the process image and the ESI from drifting apart. How cmc uses it — the layering, the adapters and the decision to treat the object dictionary as the drive's interface — is described in cmc's `docs/architecture.md` and deliberately not repeated here.
 
 Two things block that today. The Raspberry Pi HAL depends on **bcm2835**, which is GPLv2 with no linking exception plus a paid commercial licence — incompatible with cmc's Apache-2.0 licence. And the stack's `use_interrupt = 0` configuration makes Distributed Clocks structurally unreachable, which a motion controller cannot live with.
 
@@ -261,7 +261,7 @@ loop:
 
 So mailbox handling stays on the cyclic thread, bounded at **one mailbox step per cycle**. The objection that mailbox work is unbounded is about *total* SDO latency, not per-cycle cost: a single step is one mailbox transfer, at most `MBXSIZE` bytes of PRAM, which is bounded SPI time and therefore bounded cycle time. `ecat_slv_poll` already has this shape — `ESC_mbxprocess()` followed by one `ESC_coeprocess()`/`ESC_xoeprocess()` pass — so the decision is mostly about what *not* to build.
 
-What it costs is SDO-Info throughput: walking a four-axis dictionary at one step per millisecond takes seconds rather than milliseconds. That is scan-time work, it happens at PREOP, and no deadline depends on it. What it buys is that no lock is needed anywhere — not on the bus, not on `ESCvar`, not on `Obj` — and that the priority inversion analysis in §5.4 has nothing to analyse.
+What it costs is SDO-Info throughput: walking a four-axis dictionary at one step per millisecond takes seconds rather than milliseconds. That is scan-time work, it happens at PREOP, and no deadline depends on it. What it buys is that no lock is needed anywhere — not on the bus, not on `ESCvar`, not on `Obj` — and that there is no priority inversion to analyse, which is the real-time rule cmc's `docs/architecture.md` states as one thread owning each bus.
 
 **If that throughput ever becomes the problem, the answer is not a second thread.** It is to allow more than one mailbox step per cycle while the slave is in PREOP, where there is no SYNC0 deadline to miss.
 
@@ -492,7 +492,7 @@ This departs from what the vendor survey shows Beckhoff doing, and the departure
 | 0x608F | record | Position encoder resolution — `:01` increments, `:02` motor revolutions |
 | 0x6091 | record | Gear ratio — `:01` motor revolutions, `:02` shaft revolutions |
 | 0x6092 | record | Feed constant — `:01` feed, `:02` shaft revolutions |
-| 0x6076 | u32 | Motor rated torque, mNm — also the reference for the torque scaling in §5.3 |
+| 0x6076 | u32 | Motor rated torque, mNm — also the reference for torque scaling in the consuming drive |
 
 Deferred to v2, with survey support if wanted later: the touch-probe group 0x60B8-0x60BD (87% of devices) and the offsets 0x60B1/0x60B2 (65%).
 
@@ -571,148 +571,49 @@ Generator idempotent under a CI diff check; the master's PDO map byte-for-byte m
 
 ---
 
-## Phase 5 — cmc integration
+## Phase 5 — consumption by cmc
 
-### 5.1 Pre-integration fixes in cmc (separate, standalone commits)
+cmc's architecture is described in cmc's own repository, in
+`docs/architecture.md`, and is not duplicated here. This repository provides one
+component of one adapter in that architecture: the EtherCAT slave stack, its
+Linux HAL and the dictionary generator. Treating cmc's design as the final phase
+of a slave-stack roadmap had the dependency backwards, which is why that material
+moved rather than being kept in both places.
 
-- `cmc/src/main.cpp:68-72` — `while (!g_shutdownFlag) executor.spin_some();` busy-spins a core at 100% with no sleep, and `g_shutdownFlag` is never set because the signal handler calls `exit()` directly. Replace with `executor.spin()` and a handler that sets the flag and calls `rclcpp::shutdown()`. A 100%-CPU normal-priority spin next to a `SCHED_FIFO` thread will show up in the jitter histogram.
-- `cmc/include/comm/SPI.hpp:1-3` — the include guard `#endif`s on line 3, leaving the entire header body unguarded.
-- `cmc/setup_cmc.sh:553` — the "never clone --recursive" warning is stale; the orphaned gitlink it refers to is gone. Replace with an explicit `git submodule update --init --depth 1 external/soes`.
+What this repository owes its consumer, and must not break:
 
-### 5.2 Submodule and build
+- **The linking exception stays intact.** SOES is GPLv2 with the exception that
+  permits linking into an application under another licence, and cmc is
+  Apache-2.0. The exception is conditional on this fork's sources remaining
+  published, which is why cmc consumes it as a submodule rather than by copying
+  the files in.
+- **No writes into the source tree during a build.** The `configure_file` that
+  generated `soes/version.h` into the source directory is gone, and it must stay
+  gone: cmc's build would otherwise dirty the submodule on every build.
+  Verified by `git -C external/soes status --porcelain` being clean after a
+  full build.
+- **Warning flags stay per-target.** `-Werror` and `-Wconversion` apply to this
+  tree's own C and must not reach a consumer's C++ through directory-scoped
+  `add_compile_options`.
+- **The stack compiles against whichever `ecat_options.h` and `utypes.h` are on
+  the include path.** SyncManager addresses and process data sizes are
+  compile-time constants here, checked against the master's configuration at the
+  PREOP to SAFEOP transition by `ESC_checkSM23`. That is what lets cmc supply its
+  own generated dictionary in place of this tree's copy, and it is why the
+  generated artifacts under `applications/cia402_drive/generated/` exist for the
+  standalone bring-up application rather than for the product.
+- **The two PDO callbacks are resolved by link-time symbol**, not through
+  `esc_cfg_t`. `cb_apply_rxpdo` and `cb_update_txpdo` must be defined by
+  something in the link. cmc satisfies this with a small glue translation unit
+  compiled into the stack's own library, which turns them into registered
+  function pointers; without that, the stack and its consumer become mutually
+  dependent static libraries.
 
-`git submodule add <fork-url> external/soes` — **`external/`, not `include/`**, since cmc's `include/` holds .cpp files and is swept by globs and include paths.
-
-**Do not `add_subdirectory`.** Even with Phase 1.1's fixes, list the sources explicitly so nothing is inherited:
-
-```cmake
-set(SOES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/soes)
-add_library(soes_ecat STATIC
-  ${SOES_DIR}/soes/esc.c ${SOES_DIR}/soes/esc_coe.c ${SOES_DIR}/soes/esc_foe.c
-  ${SOES_DIR}/soes/esc_eoe.c ${SOES_DIR}/soes/esc_eep.c ${SOES_DIR}/soes/ecat_slv.c
-  ${SOES_DIR}/soes/hal/linux-lan9252-spidev/esc_hw.c
-  ${SOES_DIR}/applications/cia402_drive/generated/slave_objectlist.c)
-target_include_directories(soes_ecat PUBLIC
-  ${SOES_DIR} ${SOES_DIR}/soes ${SOES_DIR}/soes/include/sys/gcc
-  ${SOES_DIR}/applications/cia402_drive/generated)
-target_compile_options(soes_ecat PRIVATE -Wall -Wextra -Wno-unused-parameter)
-set_target_properties(soes_ecat PROPERTIES POSITION_INDEPENDENT_CODE ON C_STANDARD 11)
-target_link_libraries(axis soes_ecat)
-```
-
-No new `package.xml` dependencies. Add a cmc `NOTICE` entry naming SOES's GPLv2-with-linking-exception and this fork's URL; keep the sources behind the submodule boundary rather than copying them in, so the licence boundary stays legible.
-
-### 5.3 Transport-neutral CiA402 core
-
-```
-include/cia402/Cia402Sm.{hpp,cpp}      pure state machine — DONE, 29 tests
-include/cia402/Cia402Axis.{hpp,cpp}    per-axis: holds the state, runs the SM,
-                                       maps state changes onto the drive
-include/cia402/DriveInterface.hpp      abstract: ApplySetpoint / ReadFeedback /
-                                       EnablePowerStage / Disable / FaultReset
-include/ethercat/EtherCatTransport.{hpp,cpp}   owns SOES and the cyclic thread
-```
-
-`Cia402Sm` is implemented and on the `cia402` branch of cmc, with 29 tests
-including an exhaustive sweep of every state against all 65536 controlword
-values. The tests were mutation-checked rather than merely passing: four
-deliberate breakages of the implementation — level-triggered fault reset,
-inverted quick-stop polarity, a direct jump to Operation Enabled, and fault
-reset while the fault persists — each failed between two and eight tests.
-
-There is no `Transport.hpp` with an `IsCommanding()` method, because there is
-nothing to arbitrate (see below).
-
-`Cia402Sm` is a free function — `transition(controlword, current_state, fault) → {next_state, statusword}`. The **eight** states and the transition table come from the **ETG.6010 / CiA402 state diagram**, written from the specification. Eight, not nine: the published diagram draws a *Start* pseudo-state as a ninth box, but it is an entry point rather than a state the drive can be in or report in the statusword, so it must not appear in the test table. **This is the highest-value unit test in the project:** an exhaustive controlword × state table under `ament_add_gtest`, running in CI with no hardware.
-
-`DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
-
-**The cyclic SPI budget.** The EtherCAT half costs a measured 188 us median / 190 us p99 per cycle at 25 MHz for one axis, on hardware, with the CPU governor pinned — see [`measurements.md`](measurements.md). **Decided: the cyclic thread drives the TMC4671 directly**, so the two halves are additive and serial on one thread. The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
-
-**Measured on SPI0** with [`tools/spidev_bench.c`](../tools/spidev_bench.c), 20000 iterations per shape, medians:
-
-| TMC4671 config | per access | 6 accesses | + EtherCAT | total in a 1 ms cycle |
-|---|---|---|---|---|
-| 1 MHz single (current) | 67.1 us | 403 us | 188 us | **591 us** |
-| 2 MHz single | 26.8 us | 161 us | 188 us | **349 us** |
-| 8 MHz split read | 13.3 us | 80 us | 188 us | **268 us** |
-
-**The split transfer is cheap on SPI0 — about 3 us** (13.3 vs 10.3 us at 8 MHz), so the TMC4671's 8 MHz read mode is viable and roughly halves the cost of 2 MHz single datagrams. This does *not* carry over from the AUX controller, where multi-transfer messages measured much worse (§3.4); the difference is that SPI0 uses a hardware chip select while the AUX bus uses a GPIO the driver toggles.
-
-**1 MHz is disproportionately bad.** Fixed overhead is 5-7 us at 2 MHz and above but about 27 us at 1 MHz, an extra 21 us that appears at no other rate. Whatever the cause in the driver, the current setting costs 2.5x what 2 MHz does for only twice the wire time, so moving off 1 MHz is worthwhile even if nothing else changes.
-
-Timings were taken with no device attached, which is valid for transaction cost — the bus clocks the same bits in the same time — but says nothing about whether a real TMC4671 is reliable at 8 MHz on a given layout. Validate with the chip before adopting.
-
-**Keep telemetry off the cyclic path.** cmc already reads telemetry over UART at 921600 in parallel with SPI. That split is worth preserving: UART is no faster per transaction (~59 us for 5 bytes) but it is a separate channel, so temperatures, voltages and diagnostics cost nothing in the cyclic budget provided they stay on their own thread. The cyclic SPI path should carry only what the TxPDO needs.
-
-**The torque scaling contract belongs here**, because it is easy to get wrong and expensive to rediscover. CiA402 expresses torque as per-thousandths of rated torque (`0x6071`, `0x6077`, `0x6072`), with `0x6076` Motor rated torque in mNm as the scaling reference. The TMC4671's torque registers are signed 16-bit — `PID_TORQUE_FLUX_TARGET` (0x64), `PID_TORQUE_FLUX_ACTUAL` (0x69), `PID_TORQUE_FLUX_LIMITS` (0x5E) — so the widths match exactly and no range is lost. Three rules:
-
-- **Compute in `int32`.** The scaling multiply overflows `int16` well before the operands do; saturate on the way back down.
-- **The TMC4671 regulates current, not torque.** Its FOC loop controls Iq, so the conversion runs through the motor's torque constant Kt, a commissioning parameter, with `0x6076` as the bridge to physical units.
-- **Torque and flux share one register.** `PID_TORQUE_FLUX_TARGET` packs torque in the high half and flux in the low half, so write both fields together rather than read-modify-write — on the cyclic path the latter costs an extra SPI round trip per cycle.
-
-**Configuration and command are different things, and only command is exclusive.**
-The WebSocket interface is always present: it is how the device is configured
-and brought up, and for some applications it is the only interface there is.
-That sounds like it conflicts with "exactly one transport", and it does not,
-once the two roles are separated.
-
-*Configuration* — PID gains, encoder calibration, telemetry rates, motor
-parameters — is always available over WebSocket, needs no ownership, and is
-gated by **drive state** rather than by transport. Retuning gains or
-recalibrating an encoder while the axis is in Operation Enabled must be
-refused, which is a rule CiA402 already expresses: many objects are writable
-only in particular states.
-
-*Command* — the controlword and the setpoints — is exclusive to one owner. The
-rule is simply: **if a fieldbus transport is compiled in and operational it owns
-command; otherwise the WebSocket may.** A WebSocket-only device is therefore not
-a special case but the same code with no fieldbus compiled in, and it behaves
-identically because it drives the same state machine. That is the return on
-keeping `Cia402Sm` transport-neutral.
-
-Enforcement is one check in one place, because everything that commands passes
-through the state machine.
-
-**Handover must not be silent.** If the owning transport stops — EtherCAT
-leaving OP, a DDS publisher disappearing — the WebSocket must not inherit a
-moving axis. Loss of the commanding transport goes to safe state, which is what
-the process data watchdog and `safe_state_override` already do, and the
-WebSocket then takes ownership as a deliberate act. Automatic handover of a live
-axis is the kind of thing that works in testing and hurts somebody later.
-
-**Exactly one transport, fixed at configuration.** WebSocket, ROS 2 DDS, EtherCAT or CANopen is selected when the device is configured and started, and does not change for the life of the run. This is a decided constraint on the cmc architecture and it removes a great deal: no priority ladder, no arbitration between concurrent commanders, no observer mode, and no handover path that would otherwise have to pass through a safe state to avoid a step discontinuity in the setpoint.
-
-**The transport is selected at compile time.** `Cia402Core` binds to one transport implementation in the build; the others are not compiled in at all. This is stronger than a runtime switch and simplifies several things at once: an EtherCAT build genuinely contains no ROS (no `rclcpp` link dependency, not merely an unused one), dead transports cannot be reached by accident, and the binary shrinks to what the device actually does.
-
-In CMake terms this means separate executable targets over a shared core rather than one binary with runtime branches — `axis_ethercat`, `axis_ros2` and so on, each linking the common `Cia402Core` plus its own transport. The ROS-specific sources and the `ament` dependencies belong only to the ROS target.
-
-**An EtherCAT build contains no ROS.** No `rclcpp::init`, no `Axis` ROS node, no publishers, no 20 ms wall timer. This is the structurally significant consequence, and it dictates the shape of the refactor: `Axis` today (`cmc/include/axis/Axis.cpp`, ~916 lines) is simultaneously the ROS node *and* the drive logic, so the drive logic has to come out of it first. `Cia402Core`, `DriveInterface`, `Tmc`, `Controller` and `GateDriver` must all be ROS-free — most already are; `Axis` is the exception.
-
-Practical consequences to plan for:
-
-- **Telemetry.** ROS topics do not exist in an EtherCAT build, so anything an operator needs must be reachable as TxPDO entries or SDO-readable objects. Decide what moves into the object dictionary before Phase 4 fixes the PDO layout, since retrofitting entries means re-deriving the SM arithmetic (§4.3).
-- **Extraction order.** Splitting the drive logic out of the ROS node is its own commit, landing before `EtherCatTransport` is wired up — alongside the SPI ownership change in §5.4.
-
-`safe_state_override` **must not be NULL here** — wire it to `Cia402Core::ForceSafeState()` → Switch On Disabled plus `ctrl_.Disable()`. This is the most safety-relevant line in the integration.
-
-### 5.4 Threading
-
-**No mutex on the hot path.** A `SCHED_FIFO`-60 thread blocking on a mutex held by a `SCHED_OTHER` ROS thread is unbounded priority inversion. The payload is under 64 bytes, so use a **seqlock** (`std::atomic<uint32_t> seq_` plus a double buffer; the writer bumps to odd then even, the reader retries on odd-or-changed) — one per direction. Lock-free, no syscall, no inversion, and no page fault under lock thanks to the Phase 1 `realloc` removal plus `mlockall`.
-
-**SPI ownership.** `Tmc` has a `spi_mutex_`, and `Axis::TimerCB` (`cmc/include/axis/Axis.cpp:361-378`) currently does TMC4671 SPI reads (`GetPhaseCurrents`, `GetRPM`) from the 20 ms ROS timer on `/dev/spidev0.0`. If the EtherCAT thread also drives the TMC4671 each cycle while that timer is running, the two contend on that mutex — priority inversion on the hot path, defeating the seqlock.
-
-**This concern disappears entirely in an EtherCAT build.** With no ROS, there is no 20 ms timer and no second SPI user: the `SCHED_FIFO` thread is the sole owner of TMC SPI by construction, and `spi_mutex_` is uncontended on the hot path. The seqlock is then only needed if a non-RT thread reads drive state — which, in a ROS-free build, may be nothing at all.
-
-What remains is the extraction work, not an arbitration problem: `GetPhaseCurrents` and `GetRPM` must be callable from the cyclic thread rather than from `Axis::TimerCB`, which is part of lifting the drive logic out of the ROS node (§5.3).
-
-**The hardware watchdog is a hard requirement, not an open question.** `bsp_.PetWatchdog()` exists *only* on the 20 ms ROS timer (`cmc/include/axis/Axis.cpp:363`). Remove ROS and nothing pets it, so the board resets after the 625 ms window — an EtherCAT build would reboot in under a second with no other symptom. Give it an explicit owner before `EtherCatTransport` runs on hardware.
-
-The natural owner is the cyclic thread itself, gated on elapsed time exactly as `Bsp::PetWatchdog` already does internally: at 1 ms SYNC0 the thread wakes far more often than the 625 ms window needs, the check is a timestamp comparison plus an occasional GPIO toggle, and it ties the watchdog to the liveness of the thread that actually matters. The alternative — a separate low-priority timer thread — keeps the RT path pure but will happily go on petting the watchdog while the cyclic thread is wedged, which is the failure the watchdog exists to catch.
-
-### 5.5 Verification
-
-`colcon build` clean and `nm -C libsoes_ecat.a | grep -c ' T '` non-zero (proves the library is not silently empty); cmc's own C++ still builds without `-Werror`; `git -C external/soes status --porcelain` clean after a full build (proves the `configure_file` removal landed); `Cia402Sm` gtest exhaustive; hardware enable sequence Shutdown → Switch On → Enable Operation with matching statuswords and the motor spinning in CSV; arbitration test (EtherCAT in OP rejects a ROS command, falls back to DDS within one cycle on SAFEOP); `chrt -p` confirms exactly one `SCHED_FIFO 60` thread; p99.9 jitter does not regress from the Phase 3 standalone number under full ROS telemetry load.
+The bring-up application in `applications/cia402_drive/` stays. It is the fixture
+that proves the SyncManager layout, the PDO mapping and the ESI data types
+against a real master without any drive attached, and it deliberately contains no
+CiA402 state machine — that lives in cmc, where it is unit tested without
+hardware.
 
 ---
 
@@ -724,7 +625,7 @@ Phase 0 ──► Phase 1 ──► Phase 2 ──► Phase 3 ──► Phase 5
                             └──────► Phase 4 ──────┘
 ```
 
-Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about to be deleted are not renamed first. Phase 4 is independent of Phase 3 and can run in parallel. Phase 5 needs both.
+Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about to be deleted are not renamed first. Phase 4 is independent of Phase 3 and can run in parallel. Phase 5 is not work in this repository but the contract it has to keep, so it constrains every phase rather than following them.
 
 ---
 
@@ -735,14 +636,14 @@ Phase 1 ships and is testable alone. Phase 2 must follow 1.2 so that files about
 - **Cycle time** — 1 ms SYNC0 target, 2 ms acceptable fallback (§3.4).
 - **Platform** — EtherCAT builds require the CM4 carrier; ROS 2 builds run on a stock Pi 4 or the carrier. PREEMPT_RT is present on the target.
 - **SM watchdog** — TwinCAT default, 100 ms.
-- **Retention** — XMC4 and AM335x/TI HALs and demos are kept (§1.2).
+- **Retention** — superseded. The XMC4 and AM335x/TI HALs, the other demos and the vendor-library HALs were removed (§1.2); git history keeps them. The one kept reference is the DC handling from `rtl_xmc4_dynpdo`, which Phase 3 copied before the deletion.
 - **Process image** — fixed, not master-configurable; `ATYPE_RO` mapping objects, dynamic machinery retained (§4.2).
 - **PDO field order** — widest-first for natural alignment; 16 bytes out, 24 in, per axis (§4.2).
 - **Telemetry** — vendor objects in 0x2000-0x5FFF, SDO-readable, with only the status/fault word PDO-mapped (§4.2).
 - **Scaling objects** — 0x608F, 0x6091, 0x6092 and 0x6076 present, SDO-only (§4.2).
 - **Identity** — ETG evaluation range for now, replaced by an assigned Vendor ID before shipping (§4.2).
 - **Axis count** — v1 ships one axis; the generator and SM layout are built for several from the start (§4.3, §4.4).
-- **Transport** — exactly one, selected at **compile time** as separate executable targets; no ROS in an EtherCAT build (§5.3).
+- **Transport** — exactly one carries master control, selected at **compile time**. The earlier clause forbidding ROS in an EtherCAT build is **withdrawn**: the slave runs on Ubuntu whichever master it faces, so linking ROS logging costs nothing real. What remains is a real-time rule rather than a dependency rule — nothing on the cyclic path may allocate, which rules out `rclcpp` logging on that thread specifically. See cmc's `docs/architecture.md`.
 
 ## Open questions
 
