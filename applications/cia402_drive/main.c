@@ -346,6 +346,11 @@ int main (int argc, char * argv[])
    static uint64_t per_xfer[NS];
    uint64_t sched_run = 0, sched_wait = 0, sched_slices = 0;
    uint64_t run0 = 0, wait0 = 0, slices0 = 0;
+   /* Cycles actually executed in this reporting interval. Distinct from n,
+    * which stops at the size of the sample arrays: dividing a five-second
+    * scheduler delta by a capped sample count overstates the per-cycle cost by
+    * whatever factor the cap discarded. */
+   uint64_t cycles = 0;
    uint32_t n = 0;
    struct timespec a, b, last;
 
@@ -410,6 +415,7 @@ int main (int argc, char * argv[])
          }
       }
 
+      cycles++;
       if (n < NS)
       {
          xfers[n] = ESC_hw_spi_count () - c0;
@@ -484,10 +490,12 @@ int main (int argc, char * argv[])
                   sched_wait = w - wait0;
                   sched_slices = sl - slices0;
                   run0 = r; wait0 = w; slices0 = sl;
-                  printf ("   SCHED: cycles=%u  onCPU %.1f us/cycle"
-                          "  runqueue-wait %.1f us/cycle  slices=%llu%s\n",
-                          n, (double)sched_run / (double)n / 1000.0,
-                          (double)sched_wait / (double)n / 1000.0,
+                  printf ("   SCHED: cycles=%llu (sampled %u)  onCPU %.1f"
+                          " us/cycle  runqueue-wait %.2f us/cycle"
+                          "  slices=%llu%s\n",
+                          (unsigned long long)cycles, n,
+                          (double)sched_run / (double)cycles / 1000.0,
+                          (double)sched_wait / (double)cycles / 1000.0,
                           (unsigned long long)sched_slices,
                           force_freerun ? "  [FREERUN forced]" : "");
                }
@@ -620,6 +628,7 @@ int main (int argc, char * argv[])
          fflush (stdout);
 
          n = 0;
+         cycles = 0;
          last = b;
       }
    }
