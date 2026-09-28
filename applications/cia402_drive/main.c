@@ -471,12 +471,18 @@ int main (int argc, char * argv[])
                      qsort (sx, n, sizeof (uint64_t), cmp_u64);
                      qsort (st, n, sizeof (uint64_t), cmp_u64);
                      qsort (sp, n, sizeof (uint64_t), cmp_u64);
+                     /* The transfer count's tail is what separates a stall
+                      * inside one transfer from our own busy-poll issuing a
+                      * burst of extra frames: the poll loop costs transfers,
+                      * never microseconds per transfer. */
                      printf ("   SPI: per cycle median %.1f  p99 %.1f us"
-                             " | transfers median %llu"
+                             " | transfers median %llu  p99 %llu  max %llu"
                              " | per transfer median %.1f  p99 %.1f us\n",
                              (double)sx[n / 2] / 1000.0,
                              (double)sx[(n * 99) / 100] / 1000.0,
                              (unsigned long long)st[n / 2],
+                             (unsigned long long)st[(n * 99) / 100],
+                             (unsigned long long)st[n - 1],
                              (double)sp[n / 2] / 1000.0,
                              (double)sp[(n * 99) / 100] / 1000.0);
                   }
