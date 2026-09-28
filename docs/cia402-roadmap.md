@@ -605,26 +605,37 @@ No new `package.xml` dependencies. Add a cmc `NOTICE` entry naming SOES's GPLv2-
 ### 5.3 Transport-neutral CiA402 core
 
 ```
-include/cia402/Cia402Sm.{hpp,cpp}      pure state machine — no I/O, no ROS, no clock
-include/cia402/Cia402Core.{hpp,cpp}    OD values + Step(); owns the SM
-include/cia402/DriveInterface.hpp      abstract: ApplySetpoint / ReadFeedback
-include/cia402/Transport.hpp           abstract: Poll(), Id(), IsCommanding()
-include/transport/{EtherCatTransport,DdsTransport,CanOpenTransport}.{hpp,cpp}
+include/cia402/Cia402Sm.{hpp,cpp}      pure state machine — DONE, 29 tests
+include/cia402/Cia402Axis.{hpp,cpp}    per-axis: holds the state, runs the SM,
+                                       maps state changes onto the drive
+include/cia402/DriveInterface.hpp      abstract: ApplySetpoint / ReadFeedback /
+                                       EnablePowerStage / Disable / FaultReset
+include/ethercat/EtherCatTransport.{hpp,cpp}   owns SOES and the cyclic thread
 ```
+
+`Cia402Sm` is implemented and on the `cia402` branch of cmc, with 29 tests
+including an exhaustive sweep of every state against all 65536 controlword
+values. The tests were mutation-checked rather than merely passing: four
+deliberate breakages of the implementation — level-triggered fault reset,
+inverted quick-stop polarity, a direct jump to Operation Enabled, and fault
+reset while the fault persists — each failed between two and eight tests.
+
+There is no `Transport.hpp` with an `IsCommanding()` method, because there is
+nothing to arbitrate (see below).
 
 `Cia402Sm` is a free function — `transition(controlword, current_state, fault) → {next_state, statusword}`. The **eight** states and the transition table come from the **ETG.6010 / CiA402 state diagram**, written from the specification. Eight, not nine: the published diagram draws a *Start* pseudo-state as a ninth box, but it is an entry point rather than a state the drive can be in or report in the statusword, so it must not appear in the test table. **This is the highest-value unit test in the project:** an exhaustive controlword × state table under `ament_add_gtest`, running in CI with no hardware.
 
 `DriveInterface` keeps `Cia402Core` free of TMC specifics; `Axis` implements it against `Controller` and `GateDriver`.
 
-**The cyclic SPI budget.** The EtherCAT half costs a measured 93 us median / 148 us p99 per cycle at 25 MHz (§3.4). The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
+**The cyclic SPI budget.** The EtherCAT half costs a measured 188 us median / 190 us p99 per cycle at 25 MHz for one axis, on hardware, with the CPU governor pinned — see [`measurements.md`](measurements.md). **Decided: the cyclic thread drives the TMC4671 directly**, so the two halves are additive and serial on one thread. The TMC4671 half is additive and serial — same thread, no overlap — and is currently the larger of the two. Its datagram is 40 bits, and its SPI interface runs at **2 MHz plain**, or 8 MHz for writes and for reads that insert a 500 ns pause after the address. cmc configures it at **1 MHz** today (`include/tmc/TMC.cpp:43`), which nobody had reason to question on a 20 ms timer:
 
 **Measured on SPI0** with [`tools/spidev_bench.c`](../tools/spidev_bench.c), 20000 iterations per shape, medians:
 
 | TMC4671 config | per access | 6 accesses | + EtherCAT | total in a 1 ms cycle |
 |---|---|---|---|---|
-| 1 MHz single (current) | 67.1 us | 403 us | 93 us | **496 us** |
-| 2 MHz single | 26.8 us | 161 us | 93 us | **254 us** |
-| 8 MHz split read | 13.3 us | 80 us | 93 us | **173 us** |
+| 1 MHz single (current) | 67.1 us | 403 us | 188 us | **591 us** |
+| 2 MHz single | 26.8 us | 161 us | 188 us | **349 us** |
+| 8 MHz split read | 13.3 us | 80 us | 188 us | **268 us** |
 
 **The split transfer is cheap on SPI0 — about 3 us** (13.3 vs 10.3 us at 8 MHz), so the TMC4671's 8 MHz read mode is viable and roughly halves the cost of 2 MHz single datagrams. This does *not* carry over from the AUX controller, where multi-transfer messages measured much worse (§3.4); the difference is that SPI0 uses a hardware chip select while the AUX bus uses a GPIO the driver toggles.
 
@@ -639,6 +650,36 @@ Timings were taken with no device attached, which is valid for transaction cost 
 - **Compute in `int32`.** The scaling multiply overflows `int16` well before the operands do; saturate on the way back down.
 - **The TMC4671 regulates current, not torque.** Its FOC loop controls Iq, so the conversion runs through the motor's torque constant Kt, a commissioning parameter, with `0x6076` as the bridge to physical units.
 - **Torque and flux share one register.** `PID_TORQUE_FLUX_TARGET` packs torque in the high half and flux in the low half, so write both fields together rather than read-modify-write — on the cyclic path the latter costs an extra SPI round trip per cycle.
+
+**Configuration and command are different things, and only command is exclusive.**
+The WebSocket interface is always present: it is how the device is configured
+and brought up, and for some applications it is the only interface there is.
+That sounds like it conflicts with "exactly one transport", and it does not,
+once the two roles are separated.
+
+*Configuration* — PID gains, encoder calibration, telemetry rates, motor
+parameters — is always available over WebSocket, needs no ownership, and is
+gated by **drive state** rather than by transport. Retuning gains or
+recalibrating an encoder while the axis is in Operation Enabled must be
+refused, which is a rule CiA402 already expresses: many objects are writable
+only in particular states.
+
+*Command* — the controlword and the setpoints — is exclusive to one owner. The
+rule is simply: **if a fieldbus transport is compiled in and operational it owns
+command; otherwise the WebSocket may.** A WebSocket-only device is therefore not
+a special case but the same code with no fieldbus compiled in, and it behaves
+identically because it drives the same state machine. That is the return on
+keeping `Cia402Sm` transport-neutral.
+
+Enforcement is one check in one place, because everything that commands passes
+through the state machine.
+
+**Handover must not be silent.** If the owning transport stops — EtherCAT
+leaving OP, a DDS publisher disappearing — the WebSocket must not inherit a
+moving axis. Loss of the commanding transport goes to safe state, which is what
+the process data watchdog and `safe_state_override` already do, and the
+WebSocket then takes ownership as a deliberate act. Automatic handover of a live
+axis is the kind of thing that works in testing and hurts somebody later.
 
 **Exactly one transport, fixed at configuration.** WebSocket, ROS 2 DDS, EtherCAT or CANopen is selected when the device is configured and started, and does not change for the life of the run. This is a decided constraint on the cmc architecture and it removes a great deal: no priority ladder, no arbitration between concurrent commanders, no observer mode, and no handover path that would otherwise have to pass through a safe state to avoid a step discontinuity in the setpoint.
 
