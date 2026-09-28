@@ -144,6 +144,46 @@ condition passes is unverified.
 
 ---
 
+## 2026-09-27 — 1 ms cycle achieved, Run Mode
+
+Commit `bec6dbc` plus the governor unit. Master in **Run Mode** with a 1 ms
+cyclic task, on the replacement machine. Dictionary variant `cmc_drive_1ax`,
+LAN9252 on SPI1 at 25 MHz, `SCHED_OTHER`, no core isolation, sync error limit
+at its real value of 24 with no override.
+
+| | value |
+|---|---|
+| SYNC0 period | **1 ms** |
+| Process data per SYNC0 period | 1:1 (`sm` 33336 vs `sync0` 33376, 99.9%) |
+| Sync error counter | **0**, at the real limit of 24 |
+| Missed periods | 77, all at bring-up, static thereafter |
+| AL state | OP throughout, no error, hardware watchdog armed |
+| Wall median / p99 / max | **999.8 / 1003.7 / 1018.6 us** |
+| SPI per cycle, median / p99 | **188.4 / 189.6 us** |
+| Transfers per cycle | 21 / 21 / 21 |
+| Per transfer, median / p99 | 9.0 / 9.0 us |
+| Duty cycle | **19%** |
+
+**This is the Phase 3 target met**: a 1 ms distributed-clock cycle held to
+within 19 us of worst case, with process data on every period and the sync
+error counter at rest. 810 us of every millisecond is free.
+
+Note the two masters were not equivalent. The original could not enter Run Mode
+— TwinCAT's real-time runtime requires hardware virtualisation, which that
+machine's BIOS had disabled — and its free-run rate was fixed at 2 ms, so
+process data arrived on only half the SYNC0 periods no matter what was
+configured on the slave. Several hours went into slave-side investigation of
+what was a master-side limit.
+
+### Headroom for four axes
+
+At 19% duty for one axis, the arithmetic for four is comfortable but should be
+measured rather than assumed. Estimated: EtherCAT 250-300 us (the process image
+grows from 16/24 to 64/96 bytes; register accesses do not change), plus roughly
+80 us per axis for TMC4671 transactions if serial, giving about 600 us of 1000.
+
+---
+
 ## Earlier figures, and their status
 
 Recorded for traceability. Configuration was not captured at the time, which is
