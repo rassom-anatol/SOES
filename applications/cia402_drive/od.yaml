@@ -205,6 +205,11 @@ objects:
   - {index: 0x606C, axis: true, name: "Velocity Actual Value",   type: i32, access: ro, var: "VelocityActual"}
   - {index: 0x6071, axis: true, name: "Target Torque",           type: i16, access: rw, var: "TargetTorque"}
   - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000}
+  # Motor Rated Current, mA. The reference for 0x6071, 0x6072 and 0x6077:
+  # the drive controls current, and per mille of rated current is per mille
+  # of rated torque for a constant torque constant. 0 means not commissioned,
+  # and cyclic synchronous torque is then refused.
+  - {index: 0x6075, axis: true, name: "Motor Rated Current",     type: u32, access: rw, var: "MotorRatedCurrent"}
   - {index: 0x6076, axis: true, name: "Motor Rated Torque",      type: u32, access: rw, var: "MotorRatedTorque"}
   - {index: 0x6077, axis: true, name: "Torque Actual Value",     type: i16, access: ro, var: "TorqueActual"}
   - {index: 0x607A, axis: true, name: "Target Position",         type: i32, access: rw, var: "TargetPosition"}

@@ -31,6 +31,7 @@ typedef struct
    int8_t     ModesOfOperation;
    int8_t     ModesOfOperationDisplay;
    int32_t    MosfetTemp_mC;
+   uint32_t   MotorRatedCurrent;
    uint32_t   MotorRatedTorque;
    uint32_t   MotorRevolutions;
    int32_t    MotorTemp_mC;

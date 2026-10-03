@@ -82,6 +82,8 @@ static const char acName6071[] = "Target Torque";
 static const char acName6071_00[] = "Target Torque";
 static const char acName6072[] = "Max Torque";
 static const char acName6072_00[] = "Max Torque";
+static const char acName6075[] = "Motor Rated Current";
+static const char acName6075_00[] = "Motor Rated Current";
 static const char acName6076[] = "Motor Rated Torque";
 static const char acName6076_00[] = "Motor Rated Torque";
 static const char acName6077[] = "Torque Actual Value";
@@ -123,6 +125,8 @@ static const char acName6871[] = "Target Torque";
 static const char acName6871_00[] = "Target Torque";
 static const char acName6872[] = "Max Torque";
 static const char acName6872_00[] = "Max Torque";
+static const char acName6875[] = "Motor Rated Current";
+static const char acName6875_00[] = "Motor Rated Current";
 static const char acName6876[] = "Motor Rated Torque";
 static const char acName6876_00[] = "Motor Rated Torque";
 static const char acName6877[] = "Torque Actual Value";
@@ -451,6 +455,12 @@ const _objd SDO6072[] =
    {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6072_00, 1000, &Obj.axis[0].MaxTorque},
 };
 
+/* 0x6075 Motor Rated Current */
+const _objd SDO6075[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6075_00, 0, &Obj.axis[0].MotorRatedCurrent},
+};
+
 /* 0x6076 Motor Rated Torque */
 const _objd SDO6076[] =
 {
@@ -571,6 +581,12 @@ const _objd SDO6872[] =
    {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6872_00, 1000, &Obj.axis[1].MaxTorque},
 };
 
+/* 0x6875 Motor Rated Current */
+const _objd SDO6875[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6875_00, 0, &Obj.axis[1].MotorRatedCurrent},
+};
+
 /* 0x6876 Motor Rated Torque */
 const _objd SDO6876[] =
 {
@@ -666,6 +682,7 @@ const _objectlist SDOobjects[] =
    {0x606C, OTYPE_VAR, 0, 0, acName606C, SDO606C},
    {0x6071, OTYPE_VAR, 0, 0, acName6071, SDO6071},
    {0x6072, OTYPE_VAR, 0, 0, acName6072, SDO6072},
+   {0x6075, OTYPE_VAR, 0, 0, acName6075, SDO6075},
    {0x6076, OTYPE_VAR, 0, 0, acName6076, SDO6076},
    {0x6077, OTYPE_VAR, 0, 0, acName6077, SDO6077},
    {0x607A, OTYPE_VAR, 0, 0, acName607A, SDO607A},
@@ -685,6 +702,7 @@ const _objectlist SDOobjects[] =
    {0x686C, OTYPE_VAR, 0, 0, acName686C, SDO686C},
    {0x6871, OTYPE_VAR, 0, 0, acName6871, SDO6871},
    {0x6872, OTYPE_VAR, 0, 0, acName6872, SDO6872},
+   {0x6875, OTYPE_VAR, 0, 0, acName6875, SDO6875},
    {0x6876, OTYPE_VAR, 0, 0, acName6876, SDO6876},
    {0x6877, OTYPE_VAR, 0, 0, acName6877, SDO6877},
    {0x687A, OTYPE_VAR, 0, 0, acName687A, SDO687A},
