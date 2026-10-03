@@ -51,6 +51,16 @@ static const char acName2002[] = "Phase Currents";
 static const char acName2002_01[] = "Current U";
 static const char acName2002_02[] = "Current V";
 static const char acName2002_03[] = "Current W";
+static const char acName2010[] = "Control Loop Tuning";
+static const char acName2010_01[] = "Torque P";
+static const char acName2010_02[] = "Torque I";
+static const char acName2010_03[] = "Flux P";
+static const char acName2010_04[] = "Flux I";
+static const char acName2010_05[] = "Velocity P";
+static const char acName2010_06[] = "Velocity I";
+static const char acName2010_07[] = "Position P";
+static const char acName2010_08[] = "Position I";
+static const char acName2010_09[] = "Velocity Limit";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -62,6 +72,16 @@ static const char acName2802[] = "Phase Currents";
 static const char acName2802_01[] = "Current U";
 static const char acName2802_02[] = "Current V";
 static const char acName2802_03[] = "Current W";
+static const char acName2810[] = "Control Loop Tuning";
+static const char acName2810_01[] = "Torque P";
+static const char acName2810_02[] = "Torque I";
+static const char acName2810_03[] = "Flux P";
+static const char acName2810_04[] = "Flux I";
+static const char acName2810_05[] = "Velocity P";
+static const char acName2810_06[] = "Velocity I";
+static const char acName2810_07[] = "Position P";
+static const char acName2810_08[] = "Position I";
+static const char acName2810_09[] = "Velocity Limit";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -369,6 +389,21 @@ const _objd SDO2002[] =
    {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName2002_03, 0, &Obj.axis[0].CurrentW},
 };
 
+/* 0x2010 Control Loop Tuning */
+const _objd SDO2010[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2010, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_01, 0, &Obj.axis[0].TorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_02, 0, &Obj.axis[0].TorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_03, 0, &Obj.axis[0].FluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_04, 0, &Obj.axis[0].FluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_05, 0, &Obj.axis[0].VelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_06, 0, &Obj.axis[0].VelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_07, 0, &Obj.axis[0].PositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_08, 0, &Obj.axis[0].PositionI},
+   {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_09, 0, &Obj.axis[0].VelocityLimit},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -393,6 +428,21 @@ const _objd SDO2802[] =
    {0x01, DTYPE_INTEGER16, 16, ATYPE_RO, acName2802_01, 0, &Obj.axis[1].CurrentU},
    {0x02, DTYPE_INTEGER16, 16, ATYPE_RO, acName2802_02, 0, &Obj.axis[1].CurrentV},
    {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName2802_03, 0, &Obj.axis[1].CurrentW},
+};
+
+/* 0x2810 Control Loop Tuning */
+const _objd SDO2810[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2810, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_01, 0, &Obj.axis[1].TorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_02, 0, &Obj.axis[1].TorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_03, 0, &Obj.axis[1].FluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_04, 0, &Obj.axis[1].FluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_05, 0, &Obj.axis[1].VelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_06, 0, &Obj.axis[1].VelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_07, 0, &Obj.axis[1].PositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_08, 0, &Obj.axis[1].PositionI},
+   {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2810_09, 0, &Obj.axis[1].VelocityLimit},
 };
 
 /* 0x603F Error Code */
@@ -669,9 +719,11 @@ const _objectlist SDOobjects[] =
    {0x2000, OTYPE_RECORD, 2, 0, acName2000, SDO2000},
    {0x2001, OTYPE_RECORD, 3, 0, acName2001, SDO2001},
    {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},
+   {0x2010, OTYPE_RECORD, 9, 0, acName2010, SDO2010},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 3, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
+   {0x2810, OTYPE_RECORD, 9, 0, acName2810, SDO2810},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

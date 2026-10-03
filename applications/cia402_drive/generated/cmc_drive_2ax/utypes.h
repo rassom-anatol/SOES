@@ -23,6 +23,8 @@ typedef struct
    uint16_t   ErrorCode;
    uint32_t   Feed;
    uint32_t   FeedShaftRevolutions;
+   uint16_t   FluxI;
+   uint16_t   FluxP;
    int32_t    FollowingErrorActual;
    uint16_t   GateDriverFaults;
    uint32_t   GearMotorRevolutions;
@@ -36,6 +38,8 @@ typedef struct
    uint32_t   MotorRevolutions;
    int32_t    MotorTemp_mC;
    int32_t    PositionActual;
+   uint16_t   PositionI;
+   uint16_t   PositionP;
    int16_t    QuickStopOptionCode;
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;
@@ -43,7 +47,12 @@ typedef struct
    int16_t    TargetTorque;
    int32_t    TargetVelocity;
    int16_t    TorqueActual;
+   uint16_t   TorqueI;
+   uint16_t   TorqueP;
    int32_t    VelocityActual;
+   uint16_t   VelocityI;
+   uint32_t   VelocityLimit;
+   uint16_t   VelocityP;
 } _Axis;
 
 typedef struct

@@ -263,6 +263,8 @@ objects:
       - {sub: 2, name: "Motor Temp mC",       type: i32, access: ro, var: "MotorTemp_mC"}
       - {sub: 3, name: "MOSFET Temp mC",      type: i32, access: ro, var: "MosfetTemp_mC"}
 
+  # Phase currents in mA, the TMC4671's measured values after its own offset
+  # and scale correction. Sampled at a low rate, like 0x2001.
   - index: 0x2002
     axis: true
     name: "Phase Currents"
@@ -271,6 +273,25 @@ objects:
       - {sub: 1, name: "Current U", type: i16, access: ro, var: "CurrentU"}
       - {sub: 2, name: "Current V", type: i16, access: ro, var: "CurrentV"}
       - {sub: 3, name: "Current W", type: i16, access: ro, var: "CurrentW"}
+
+  # Control loop tuning, in the TMC4671's own register units -- the same
+  # numbers as foc.* in bsp.yaml, which seed these at startup. Writable at any
+  # time so the loops can be tuned live; a change reaches the chip within one
+  # cycle. Not stored: a restart returns to bsp.yaml.
+  - index: 0x2010
+    axis: true
+    name: "Control Loop Tuning"
+    type: record
+    subs:
+      - {sub: 1, name: "Torque P",       type: u16, access: rw, var: "TorqueP"}
+      - {sub: 2, name: "Torque I",       type: u16, access: rw, var: "TorqueI"}
+      - {sub: 3, name: "Flux P",         type: u16, access: rw, var: "FluxP"}
+      - {sub: 4, name: "Flux I",         type: u16, access: rw, var: "FluxI"}
+      - {sub: 5, name: "Velocity P",     type: u16, access: rw, var: "VelocityP"}
+      - {sub: 6, name: "Velocity I",     type: u16, access: rw, var: "VelocityI"}
+      - {sub: 7, name: "Position P",     type: u16, access: rw, var: "PositionP"}
+      - {sub: 8, name: "Position I",     type: u16, access: rw, var: "PositionI"}
+      - {sub: 9, name: "Velocity Limit", type: u32, access: rw, var: "VelocityLimit"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
