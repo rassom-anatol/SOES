@@ -41,10 +41,13 @@ typedef struct
    uint16_t   FluxI;
    uint16_t   FluxP;
    int32_t    FollowingErrorActual;
+   uint16_t   FollowingErrorTimeout;
+   uint32_t   FollowingErrorWindow;
    uint16_t   GateDriverFaults;
    uint32_t   GearMotorRevolutions;
    uint32_t   GearShaftRevolutions;
    int16_t    HaltOptionCode;
+   uint32_t   MaxMotorSpeed;
    uint16_t   MaxTorque;
    int8_t     ModesOfOperation;
    int8_t     ModesOfOperationDisplay;
@@ -55,6 +58,8 @@ typedef struct
    int32_t    MotorTemp_mC;
    int32_t    PositionActual;
    uint16_t   PositionI;
+   int32_t    PositionLimitMax;
+   int32_t    PositionLimitMin;
    uint16_t   PositionP;
    uint32_t   ProfileDeceleration;
    uint32_t   QuickStopDeceleration;
@@ -75,6 +80,7 @@ typedef struct
 
 typedef struct
 {
+   uint8_t    ErrorRegister;
    uint32_t   serial;
    struct
    {

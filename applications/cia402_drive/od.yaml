@@ -130,6 +130,9 @@ objects:
 
   # --- communication ------------------------------------------------------
   - {index: 0x1000, name: "Device Type",       type: u32, access: ro, value: 0x00020192}
+  # Error Register, CiA 301: bit 0 generic, 1 current, 2 voltage,
+  # 3 temperature, 5 device profile specific. The OR over all axes.
+  - {index: 0x1001, name: "Error Register",    type: u8,  access: ro, var: "ErrorRegister"}
   - {index: 0x1008, name: "Device Name",       type: string, value: "cmc_drive"}
   - {index: 0x1009, name: "Hardware Version",  type: string, value: "1.0"}
   - {index: 0x100A, name: "Software Version",  type: string, value: "0.1"}
@@ -199,6 +202,11 @@ objects:
   - {index: 0x6060, axis: true, name: "Modes of Operation",      type: i8,  access: rw, var: "ModesOfOperation"}
   - {index: 0x6061, axis: true, name: "Modes of Operation Display", type: i8, access: ro, var: "ModesOfOperationDisplay"}
   - {index: 0x6064, axis: true, name: "Position Actual Value",   type: i32, access: ro, var: "PositionActual"}
+  # Following error supervision in cyclic synchronous position: outside the
+  # window for longer than the timeout is a fault, error code 0x8611.
+  # 0xFFFFFFFF switches supervision off.
+  - {index: 0x6065, axis: true, name: "Following Error Window",  type: u32, access: rw, var: "FollowingErrorWindow", value: 8192}
+  - {index: 0x6066, axis: true, name: "Following Error Time Out", type: u16, access: rw, var: "FollowingErrorTimeout", value: 50}
   - {index: 0x606C, axis: true, name: "Velocity Actual Value",   type: i32, access: ro, var: "VelocityActual"}
   - {index: 0x6071, axis: true, name: "Target Torque",           type: i16, access: rw, var: "TargetTorque"}
   - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000}
@@ -210,6 +218,18 @@ objects:
   - {index: 0x6076, axis: true, name: "Motor Rated Torque",      type: u32, access: rw, var: "MotorRatedTorque"}
   - {index: 0x6077, axis: true, name: "Torque Actual Value",     type: i16, access: ro, var: "TorqueActual"}
   - {index: 0x607A, axis: true, name: "Target Position",         type: i32, access: rw, var: "TargetPosition"}
+  # Software position limits, in position units. The defaults span the full
+  # range, which leaves them inactive.
+  - index: 0x607D
+    axis: true
+    name: "Software Position Limit"
+    type: record
+    subs:
+      - {sub: 1, name: "Min Position Limit", type: i32, access: rw, var: "PositionLimitMin", value: -2147483648}
+      - {sub: 2, name: "Max Position Limit", type: i32, access: rw, var: "PositionLimitMax", value: 2147483647}
+  # Max Motor Speed, rpm: caps velocity targets and the velocity limit. The
+  # default is the maxon EC-i 496654's no-load speed at 18 V.
+  - {index: 0x6080, axis: true, name: "Max Motor Speed",         type: u32, access: rw, var: "MaxMotorSpeed", value: 7840}
   # Decelerations in rpm per second, the drive's velocity unit per second.
   - {index: 0x6084, axis: true, name: "Profile Deceleration",    type: u32, access: rw, var: "ProfileDeceleration", value: 10000}
   - {index: 0x6085, axis: true, name: "Quick Stop Deceleration", type: u32, access: rw, var: "QuickStopDeceleration", value: 10000}

@@ -14,6 +14,8 @@
 /* object and entry names */
 static const char acName1000[] = "Device Type";
 static const char acName1000_00[] = "Device Type";
+static const char acName1001[] = "Error Register";
+static const char acName1001_00[] = "Error Register";
 static const char acName1008[] = "Device Name";
 static const char acName1008_00[] = "Device Name";
 static const char acName1009[] = "Hardware Version";
@@ -130,6 +132,10 @@ static const char acName6061[] = "Modes of Operation Display";
 static const char acName6061_00[] = "Modes of Operation Display";
 static const char acName6064[] = "Position Actual Value";
 static const char acName6064_00[] = "Position Actual Value";
+static const char acName6065[] = "Following Error Window";
+static const char acName6065_00[] = "Following Error Window";
+static const char acName6066[] = "Following Error Time Out";
+static const char acName6066_00[] = "Following Error Time Out";
 static const char acName606C[] = "Velocity Actual Value";
 static const char acName606C_00[] = "Velocity Actual Value";
 static const char acName6071[] = "Target Torque";
@@ -144,6 +150,11 @@ static const char acName6077[] = "Torque Actual Value";
 static const char acName6077_00[] = "Torque Actual Value";
 static const char acName607A[] = "Target Position";
 static const char acName607A_00[] = "Target Position";
+static const char acName607D[] = "Software Position Limit";
+static const char acName607D_01[] = "Min Position Limit";
+static const char acName607D_02[] = "Max Position Limit";
+static const char acName6080[] = "Max Motor Speed";
+static const char acName6080_00[] = "Max Motor Speed";
 static const char acName6084[] = "Profile Deceleration";
 static const char acName6084_00[] = "Profile Deceleration";
 static const char acName6085[] = "Quick Stop Deceleration";
@@ -179,6 +190,10 @@ static const char acName6861[] = "Modes of Operation Display";
 static const char acName6861_00[] = "Modes of Operation Display";
 static const char acName6864[] = "Position Actual Value";
 static const char acName6864_00[] = "Position Actual Value";
+static const char acName6865[] = "Following Error Window";
+static const char acName6865_00[] = "Following Error Window";
+static const char acName6866[] = "Following Error Time Out";
+static const char acName6866_00[] = "Following Error Time Out";
 static const char acName686C[] = "Velocity Actual Value";
 static const char acName686C_00[] = "Velocity Actual Value";
 static const char acName6871[] = "Target Torque";
@@ -193,6 +208,11 @@ static const char acName6877[] = "Torque Actual Value";
 static const char acName6877_00[] = "Torque Actual Value";
 static const char acName687A[] = "Target Position";
 static const char acName687A_00[] = "Target Position";
+static const char acName687D[] = "Software Position Limit";
+static const char acName687D_01[] = "Min Position Limit";
+static const char acName687D_02[] = "Max Position Limit";
+static const char acName6880[] = "Max Motor Speed";
+static const char acName6880_00[] = "Max Motor Speed";
 static const char acName6884[] = "Profile Deceleration";
 static const char acName6884_00[] = "Profile Deceleration";
 static const char acName6885[] = "Quick Stop Deceleration";
@@ -347,6 +367,12 @@ const _objd SDO1C13[] =
 const _objd SDO1000[] =
 {
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1000_00, 131474, NULL},
+};
+
+/* 0x1001 Error Register */
+const _objd SDO1001[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1001_00, 0, &Obj.ErrorRegister},
 };
 
 /* 0x1008 Device Name */
@@ -579,6 +605,18 @@ const _objd SDO6064[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RO, acName6064_00, 0, &Obj.axis[0].PositionActual},
 };
 
+/* 0x6065 Following Error Window */
+const _objd SDO6065[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6065_00, 8192, &Obj.axis[0].FollowingErrorWindow},
+};
+
+/* 0x6066 Following Error Time Out */
+const _objd SDO6066[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6066_00, 50, &Obj.axis[0].FollowingErrorTimeout},
+};
+
 /* 0x606C Velocity Actual Value */
 const _objd SDO606C[] =
 {
@@ -619,6 +657,20 @@ const _objd SDO6077[] =
 const _objd SDO607A[] =
 {
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName607A_00, 0, &Obj.axis[0].TargetPosition},
+};
+
+/* 0x607D Software Position Limit */
+const _objd SDO607D[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName607D, 2, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName607D_01, -2147483648, &Obj.axis[0].PositionLimitMin},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName607D_02, 2147483647, &Obj.axis[0].PositionLimitMax},
+};
+
+/* 0x6080 Max Motor Speed */
+const _objd SDO6080[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6080_00, 7840, &Obj.axis[0].MaxMotorSpeed},
 };
 
 /* 0x6084 Profile Deceleration */
@@ -723,6 +775,18 @@ const _objd SDO6864[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RO, acName6864_00, 0, &Obj.axis[1].PositionActual},
 };
 
+/* 0x6865 Following Error Window */
+const _objd SDO6865[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6865_00, 8192, &Obj.axis[1].FollowingErrorWindow},
+};
+
+/* 0x6866 Following Error Time Out */
+const _objd SDO6866[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6866_00, 50, &Obj.axis[1].FollowingErrorTimeout},
+};
+
 /* 0x686C Velocity Actual Value */
 const _objd SDO686C[] =
 {
@@ -763,6 +827,20 @@ const _objd SDO6877[] =
 const _objd SDO687A[] =
 {
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName687A_00, 0, &Obj.axis[1].TargetPosition},
+};
+
+/* 0x687D Software Position Limit */
+const _objd SDO687D[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName687D, 2, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName687D_01, -2147483648, &Obj.axis[1].PositionLimitMin},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName687D_02, 2147483647, &Obj.axis[1].PositionLimitMax},
+};
+
+/* 0x6880 Max Motor Speed */
+const _objd SDO6880[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6880_00, 7840, &Obj.axis[1].MaxMotorSpeed},
 };
 
 /* 0x6884 Profile Deceleration */
@@ -824,6 +902,7 @@ const _objd SDO6D02[] =
 const _objectlist SDOobjects[] =
 {
    {0x1000, OTYPE_VAR, 0, 0, acName1000, SDO1000},
+   {0x1001, OTYPE_VAR, 0, 0, acName1001, SDO1001},
    {0x1008, OTYPE_VAR, 0, 0, acName1008, SDO1008},
    {0x1009, OTYPE_VAR, 0, 0, acName1009, SDO1009},
    {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
@@ -856,6 +935,8 @@ const _objectlist SDOobjects[] =
    {0x6060, OTYPE_VAR, 0, 0, acName6060, SDO6060},
    {0x6061, OTYPE_VAR, 0, 0, acName6061, SDO6061},
    {0x6064, OTYPE_VAR, 0, 0, acName6064, SDO6064},
+   {0x6065, OTYPE_VAR, 0, 0, acName6065, SDO6065},
+   {0x6066, OTYPE_VAR, 0, 0, acName6066, SDO6066},
    {0x606C, OTYPE_VAR, 0, 0, acName606C, SDO606C},
    {0x6071, OTYPE_VAR, 0, 0, acName6071, SDO6071},
    {0x6072, OTYPE_VAR, 0, 0, acName6072, SDO6072},
@@ -863,6 +944,8 @@ const _objectlist SDOobjects[] =
    {0x6076, OTYPE_VAR, 0, 0, acName6076, SDO6076},
    {0x6077, OTYPE_VAR, 0, 0, acName6077, SDO6077},
    {0x607A, OTYPE_VAR, 0, 0, acName607A, SDO607A},
+   {0x607D, OTYPE_RECORD, 2, 0, acName607D, SDO607D},
+   {0x6080, OTYPE_VAR, 0, 0, acName6080, SDO6080},
    {0x6084, OTYPE_VAR, 0, 0, acName6084, SDO6084},
    {0x6085, OTYPE_VAR, 0, 0, acName6085, SDO6085},
    {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
@@ -879,6 +962,8 @@ const _objectlist SDOobjects[] =
    {0x6860, OTYPE_VAR, 0, 0, acName6860, SDO6860},
    {0x6861, OTYPE_VAR, 0, 0, acName6861, SDO6861},
    {0x6864, OTYPE_VAR, 0, 0, acName6864, SDO6864},
+   {0x6865, OTYPE_VAR, 0, 0, acName6865, SDO6865},
+   {0x6866, OTYPE_VAR, 0, 0, acName6866, SDO6866},
    {0x686C, OTYPE_VAR, 0, 0, acName686C, SDO686C},
    {0x6871, OTYPE_VAR, 0, 0, acName6871, SDO6871},
    {0x6872, OTYPE_VAR, 0, 0, acName6872, SDO6872},
@@ -886,6 +971,8 @@ const _objectlist SDOobjects[] =
    {0x6876, OTYPE_VAR, 0, 0, acName6876, SDO6876},
    {0x6877, OTYPE_VAR, 0, 0, acName6877, SDO6877},
    {0x687A, OTYPE_VAR, 0, 0, acName687A, SDO687A},
+   {0x687D, OTYPE_RECORD, 2, 0, acName687D, SDO687D},
+   {0x6880, OTYPE_VAR, 0, 0, acName6880, SDO6880},
    {0x6884, OTYPE_VAR, 0, 0, acName6884, SDO6884},
    {0x6885, OTYPE_VAR, 0, 0, acName6885, SDO6885},
    {0x688F, OTYPE_RECORD, 2, 0, acName688F, SDO688F},
