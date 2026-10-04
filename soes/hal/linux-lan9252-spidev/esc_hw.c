@@ -978,19 +978,46 @@ int ESC_init (const esc_cfg_t * config)
       hw_reset_pulse ();
    }
 
-   /* Reset the EtherCAT core over SPI and wait for the bit to self-clear.
-    * The original HAL polled the CSR command register here instead of the
-    * reset register, so it never observed the reset completing.
-    */
-   lan9252_write_32 (ESC_CMD_RESET_CTL, ESC_RESET_CTRL_RST);
-   (void)wait_until (ESC_CMD_RESET_CTL, ESC_RESET_CTRL_RST, 0, "core reset");
-
    /* Each wait below gets its own deadline. The original shared one counter
     * across all three, so an early slow step consumed the entire budget and
     * the later loops exited immediately on an unvalidated value.
     */
    (void)wait_until (ESC_CMD_BYTE_TEST, 0xFFFFFFFFu, ESC_BYTE_TEST_OK, "byte test");
    (void)wait_until (ESC_CMD_HW_CFG, ESC_HW_CFG_READY, ESC_HW_CFG_READY, "hw ready");
+
+   /* Reset the EtherCAT core over SPI only if no master has configured the
+    * ESC yet, which its AL status shows: a powered-up ESC reads INIT.
+    *
+    * Above INIT, a master has configured it -- including the Distributed
+    * Clocks system time offset (0x0920), which the reset wipes and which a
+    * running master does not write again when it walks a slave that dropped
+    * back to INIT up to OP. The slave's local clock then reads time since
+    * power-up while SYNC0 is scheduled in the master's time base, decades
+    * ahead, and SYNC0 never fires. Without the reset, ecat_slv_init still
+    * puts the AL state back to INIT and the master re-initialises the slave
+    * as usual, with the clock offset intact.
+    *
+    * The original HAL polled the CSR command register here instead of the
+    * reset register, so it never observed the reset completing.
+    */
+   {
+      uint16_t al_status = 0;
+      ESC_read_csr (ESCREG_ALSTATUS, &al_status, sizeof (al_status));
+      al_status = etohs (al_status);
+      if ((al_status & 0x0F) <= ESCinit)
+      {
+         lan9252_write_32 (ESC_CMD_RESET_CTL, ESC_RESET_CTRL_RST);
+         (void)wait_until (ESC_CMD_RESET_CTL, ESC_RESET_CTRL_RST, 0, "core reset");
+         (void)wait_until (ESC_CMD_BYTE_TEST, 0xFFFFFFFFu, ESC_BYTE_TEST_OK, "byte test");
+         (void)wait_until (ESC_CMD_HW_CFG, ESC_HW_CFG_READY, ESC_HW_CFG_READY, "hw ready");
+      }
+      else
+      {
+         DPRINT ("lan9252: AL status 0x%04X, a master has configured the ESC; "
+                 "keeping its state instead of resetting the core\n",
+                 (unsigned)al_status);
+      }
+   }
 
    if (hw_fault)
    {
