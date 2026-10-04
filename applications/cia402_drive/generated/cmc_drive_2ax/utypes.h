@@ -14,6 +14,20 @@
 /* Per-axis process and parameter data. */
 typedef struct
 {
+   uint16_t   AdcCalAgpiA25;
+   uint16_t   AdcCalAgpiA50;
+   uint16_t   AdcCalAgpiA75;
+   uint16_t   AdcCalAgpiAPin;
+   uint16_t   AdcCalAgpiB25;
+   uint16_t   AdcCalAgpiB50;
+   uint16_t   AdcCalAgpiB75;
+   uint16_t   AdcCalAgpiBPin;
+   uint16_t   AdcCalI0Zero;
+   uint16_t   AdcCalI1Zero;
+   uint16_t   AdcCalVm25;
+   uint16_t   AdcCalVm50;
+   uint16_t   AdcCalVm75;
+   uint16_t   AdcCalVmPin;
    uint16_t   Controlword;
    int16_t    CurrentU;
    int16_t    CurrentV;

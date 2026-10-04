@@ -274,6 +274,31 @@ objects:
       - {sub: 2, name: "Current V", type: i16, access: ro, var: "CurrentV"}
       - {sub: 3, name: "Current W", type: i16, access: ro, var: "CurrentW"}
 
+  # ADC self-calibration, measured at bring-up: raw ADC codes, 0..65535. The
+  # single-ended channels are switched to the chip's internal 25 %, 50 % and
+  # 75 % reference inputs and back; the current-sense channels are read with no
+  # current flowing. Measurements only -- the corrections derived from them
+  # come later, once real numbers have been seen.
+  - index: 0x2003
+    axis: true
+    name: "ADC Self-Calibration"
+    type: record
+    subs:
+      - {sub: 1,  name: "VM at 25% ref",     type: u16, access: ro, var: "AdcCalVm25"}
+      - {sub: 2,  name: "VM at 50% ref",     type: u16, access: ro, var: "AdcCalVm50"}
+      - {sub: 3,  name: "VM at 75% ref",     type: u16, access: ro, var: "AdcCalVm75"}
+      - {sub: 4,  name: "AGPI_A at 25% ref", type: u16, access: ro, var: "AdcCalAgpiA25"}
+      - {sub: 5,  name: "AGPI_A at 50% ref", type: u16, access: ro, var: "AdcCalAgpiA50"}
+      - {sub: 6,  name: "AGPI_A at 75% ref", type: u16, access: ro, var: "AdcCalAgpiA75"}
+      - {sub: 7,  name: "AGPI_B at 25% ref", type: u16, access: ro, var: "AdcCalAgpiB25"}
+      - {sub: 8,  name: "AGPI_B at 50% ref", type: u16, access: ro, var: "AdcCalAgpiB50"}
+      - {sub: 9,  name: "AGPI_B at 75% ref", type: u16, access: ro, var: "AdcCalAgpiB75"}
+      - {sub: 10, name: "I0 at zero current", type: u16, access: ro, var: "AdcCalI0Zero"}
+      - {sub: 11, name: "I1 at zero current", type: u16, access: ro, var: "AdcCalI1Zero"}
+      - {sub: 12, name: "VM pin",            type: u16, access: ro, var: "AdcCalVmPin"}
+      - {sub: 13, name: "AGPI_A pin",        type: u16, access: ro, var: "AdcCalAgpiAPin"}
+      - {sub: 14, name: "AGPI_B pin",        type: u16, access: ro, var: "AdcCalAgpiBPin"}
+
   # Control loop tuning, in the TMC4671's own register units -- the same
   # numbers as foc.* in bsp.yaml, which seed these at startup. Writable at any
   # time so the loops can be tuned live; a change reaches the chip within one

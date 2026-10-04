@@ -51,6 +51,21 @@ static const char acName2002[] = "Phase Currents";
 static const char acName2002_01[] = "Current U";
 static const char acName2002_02[] = "Current V";
 static const char acName2002_03[] = "Current W";
+static const char acName2003[] = "ADC Self-Calibration";
+static const char acName2003_01[] = "VM at 25% ref";
+static const char acName2003_02[] = "VM at 50% ref";
+static const char acName2003_03[] = "VM at 75% ref";
+static const char acName2003_04[] = "AGPI_A at 25% ref";
+static const char acName2003_05[] = "AGPI_A at 50% ref";
+static const char acName2003_06[] = "AGPI_A at 75% ref";
+static const char acName2003_07[] = "AGPI_B at 25% ref";
+static const char acName2003_08[] = "AGPI_B at 50% ref";
+static const char acName2003_09[] = "AGPI_B at 75% ref";
+static const char acName2003_0A[] = "I0 at zero current";
+static const char acName2003_0B[] = "I1 at zero current";
+static const char acName2003_0C[] = "VM pin";
+static const char acName2003_0D[] = "AGPI_A pin";
+static const char acName2003_0E[] = "AGPI_B pin";
 static const char acName2010[] = "Control Loop Tuning";
 static const char acName2010_01[] = "Torque P";
 static const char acName2010_02[] = "Torque I";
@@ -273,6 +288,26 @@ const _objd SDO2002[] =
    {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName2002_03, 0, &Obj.axis[0].CurrentW},
 };
 
+/* 0x2003 ADC Self-Calibration */
+const _objd SDO2003[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2003, 14, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_01, 0, &Obj.axis[0].AdcCalVm25},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_02, 0, &Obj.axis[0].AdcCalVm50},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_03, 0, &Obj.axis[0].AdcCalVm75},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_04, 0, &Obj.axis[0].AdcCalAgpiA25},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_05, 0, &Obj.axis[0].AdcCalAgpiA50},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_06, 0, &Obj.axis[0].AdcCalAgpiA75},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_07, 0, &Obj.axis[0].AdcCalAgpiB25},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_08, 0, &Obj.axis[0].AdcCalAgpiB50},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_09, 0, &Obj.axis[0].AdcCalAgpiB75},
+   {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0A, 0, &Obj.axis[0].AdcCalI0Zero},
+   {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0B, 0, &Obj.axis[0].AdcCalI1Zero},
+   {0x0C, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0C, 0, &Obj.axis[0].AdcCalVmPin},
+   {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0D, 0, &Obj.axis[0].AdcCalAgpiAPin},
+   {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0E, 0, &Obj.axis[0].AdcCalAgpiBPin},
+};
+
 /* 0x2010 Control Loop Tuning */
 const _objd SDO2010[] =
 {
@@ -434,6 +469,7 @@ const _objectlist SDOobjects[] =
    {0x2000, OTYPE_RECORD, 2, 0, acName2000, SDO2000},
    {0x2001, OTYPE_RECORD, 3, 0, acName2001, SDO2001},
    {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},
+   {0x2003, OTYPE_RECORD, 14, 0, acName2003, SDO2003},
    {0x2010, OTYPE_RECORD, 9, 0, acName2010, SDO2010},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
