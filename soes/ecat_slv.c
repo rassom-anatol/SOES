@@ -661,14 +661,27 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
    }
 
    /* Everything else -- AL control, SyncManager changes, mailbox, EEPROM --
-    * on this same thread, one step per cycle. */
-   if (events & (ESCREG_ALEVENT_CONTROL | ESCREG_ALEVENT_SMCHANGE |
+    * on this same thread, one step per cycle.
+    *
+    * The mailbox step also runs while a reply is queued (txcue), not only on
+    * a mailbox event. Answering a request takes two passes: one reads it and
+    * queues the reply, the next posts the reply. Gated on events alone, the
+    * second pass waited for the master's next request, so every reply went
+    * out one request late -- the non-DC loop above avoids this by looping on
+    * txcue. Still one step per cycle, so the cycle-time bound holds. */
+   const int state_event =
+      (events & (ESCREG_ALEVENT_CONTROL | ESCREG_ALEVENT_SMCHANGE |
                  ESCREG_ALEVENT_SM0 | ESCREG_ALEVENT_SM1 |
-                 ESCREG_ALEVENT_EEP))
+                 ESCREG_ALEVENT_EEP)) != 0;
+
+   if (state_event || (ESCvar.txcue > 0))
    {
       dc_evt_mbx++;
-      ESC_state ();
-      ESC_sm_act_event ();
+      if (state_event)
+      {
+         ESC_state ();
+         ESC_sm_act_event ();
+      }
 
       if (ESC_mbxprocess ())
       {
