@@ -47,6 +47,7 @@ static const char acName2001[] = "Board Telemetry";
 static const char acName2001_01[] = "Supply Voltage mV";
 static const char acName2001_02[] = "Motor Temp mC";
 static const char acName2001_03[] = "MOSFET Temp mC";
+static const char acName2001_04[] = "Sample Period";
 static const char acName2002[] = "Phase Currents";
 static const char acName2002_01[] = "Current U";
 static const char acName2002_02[] = "Current V";
@@ -273,10 +274,11 @@ const _objd SDO2000[] =
 /* 0x2001 Board Telemetry */
 const _objd SDO2001[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2001, 3, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2001, 4, NULL},
    {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2001_01, 0, &Obj.axis[0].SupplyVoltage_mV},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2001_02, 0, &Obj.axis[0].MotorTemp_mC},
    {0x03, DTYPE_INTEGER32, 32, ATYPE_RO, acName2001_03, 0, &Obj.axis[0].MosfetTemp_mC},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2001_04, 50, &Obj.axis[0].BoardTelemetryPeriod},
 };
 
 /* 0x2002 Phase Currents */
@@ -467,7 +469,7 @@ const _objectlist SDOobjects[] =
    {0x1C32, OTYPE_RECORD, 32, 0, acName1C32, SDO1C32},
    {0x1C33, OTYPE_RECORD, 32, 0, acName1C33, SDO1C33},
    {0x2000, OTYPE_RECORD, 2, 0, acName2000, SDO2000},
-   {0x2001, OTYPE_RECORD, 3, 0, acName2001, SDO2001},
+   {0x2001, OTYPE_RECORD, 4, 0, acName2001, SDO2001},
    {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},
    {0x2003, OTYPE_RECORD, 14, 0, acName2003, SDO2003},
    {0x2010, OTYPE_RECORD, 9, 0, acName2010, SDO2010},

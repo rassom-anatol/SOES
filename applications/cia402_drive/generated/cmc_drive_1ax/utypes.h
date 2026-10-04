@@ -28,6 +28,7 @@ typedef struct
    uint16_t   AdcCalVm50;
    uint16_t   AdcCalVm75;
    uint16_t   AdcCalVmPin;
+   uint16_t   BoardTelemetryPeriod;
    uint16_t   Controlword;
    int16_t    CurrentU;
    int16_t    CurrentV;

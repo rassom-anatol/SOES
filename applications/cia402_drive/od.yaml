@@ -262,6 +262,10 @@ objects:
       - {sub: 1, name: "Supply Voltage mV",   type: u32, access: ro, var: "SupplyVoltage_mV"}
       - {sub: 2, name: "Motor Temp mC",       type: i32, access: ro, var: "MotorTemp_mC"}
       - {sub: 3, name: "MOSFET Temp mC",      type: i32, access: ro, var: "MosfetTemp_mC"}
+      # Cycles between samples of this record and 0x2002; 0 stops sampling.
+      # Each sample costs SPI time in that cycle, so this is also a diagnostic
+      # switch for disturbances in step with it.
+      - {sub: 4, name: "Sample Period",       type: u16, access: rw, var: "BoardTelemetryPeriod", value: 50}
 
   # Phase currents in mA, the TMC4671's measured values after its own offset
   # and scale correction. Sampled at a low rate, like 0x2001.
