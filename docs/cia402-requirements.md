@@ -154,13 +154,13 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 - [x] **Bit 12 = "drive follows the command value"**, in all three cyclic modes. This is
       the drive's per-cycle acknowledgement that the setpoint was consumed, and it is
       what a master checks first.
-- [ ] **Bit 13 = "following error"**, in csp. Meaningful only with a following error
+- [x] **Bit 13 = "following error"**, in csp. Meaningful only with a following error
       window (**0x6065**) and timeout (**0x6066**), neither of which is in the
       dictionary. 0x60F4 (following error actual value) is mapped but is a measurement,
       not a trip condition. **Until 0x6065/0x6066 exist, bit 13 must read 0** rather
       than being driven from an ad-hoc threshold.
-- [ ] Bit 13 is reserved in csv and cst.
-- [ ] Bit 10 (target reached) is not used in the cyclic modes.
+- [x] Bit 13 is reserved in csv and cst.
+- [x] Bit 10 (target reached) is not used in the cyclic modes.
 - [x] Bit 11 (internal limit active) should reflect torque, current or position limiting
       — it is the standard channel for "the drive is clamping your setpoint", and
       0x6072 Max torque makes it reachable.
@@ -188,7 +188,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 ## 6. Error handling
 
-- [ ] **0x603F Error code takes values from the standard emergency error code table**,
+- [x] **0x603F Error code takes values from the standard emergency error code table**,
       not from an internal enumeration. The relevant ranges are the CANopen ones —
       0x2310 continuous over-current, 0x3210 DC link over-voltage, 0x4210 excess
       temperature, 0x7305 incremental sensor fault, 0x8611 following error, and so on.
@@ -196,19 +196,19 @@ Two properties worth asserting in the unit test beyond reproducing the table:
       the vendor-specific detail belongs in 0x2000, where roadmap §4.2 already puts it.
       **The translation from GSTAT bits to standard error codes is a piece of design
       work that does not currently exist anywhere in the plan.**
-- [ ] 0x603F holds the code for the most recent fault and must be valid whenever
+- [x] 0x603F holds the code for the most recent fault and must be valid whenever
       statusword bit 3 is set.
 - [ ] **[verify]** Whether ETG.6010 treats 0x603F as mandatory. It is the only standard
       channel for *what* failed, so it should be treated as required in practice
       regardless.
-- [ ] Statusword bit 7 (warning) is the non-latching counterpart — a condition that does
+- [x] Statusword bit 7 (warning) is the non-latching counterpart — a condition that does
       not force a state change. Decide whether anything drives it.
 
 ---
 
 ## 7. Behavioural requirements that shape the architecture
 
-- [ ] **The state machine is evaluated every cycle from that cycle's controlword.** It is
+- [x] **The state machine is evaluated every cycle from that cycle's controlword.** It is
       not an event handler hung off SDO writes. This fixes where `Cia402Sm` sits
       relative to the RxPDO unpack, which cmc's EtherCAT adapter performs.
 - [ ] **One setpoint consumed per cycle, acknowledged in statusword bit 12.** A cycle in
@@ -216,7 +216,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
       12 rather than silently reusing the previous value. This is a protocol-level
       representation of the missed-cycle condition, distinct from 0x1C32:0B and from the
       sync error counter in roadmap §3.3.1, and it is the one a master reacts to first.
-- [ ] **A fault must reach the master in the cycle it occurs.** Roadmap §4.2 already puts
+- [x] **A fault must reach the master in the cycle it occurs.** Roadmap §4.2 already puts
       the vendor status word in the TxPDO for this reason; the same argument applies to
       statusword bit 3 and 0x603F, both of which are mapped.
 - [x] **Mode changes are acknowledged, not assumed.** 0x6061 reflects the mode actually
@@ -230,11 +230,14 @@ Each of these is optional in the profile, and each is the kind of thing a master
 expect from a "normal" servo drive:
 
 - 0x607E Polarity — direction inversion. Commonly needed at commissioning.
-- 0x607D Software position limit.
-- 0x6065 / 0x6066 Following error window and timeout — see §4.
-- 0x6083 / 0x6084 Profile acceleration and deceleration — only required by the profiled
-  modes, which v1 does not claim, but 0x6084 becomes required if 0x605A is set to 1.
-- 0x6085 Quick stop deceleration — **required** if 0x605A is 2, per §1.
+- ~~0x607D Software position limit.~~ Implemented 3 October 2026.
+- ~~0x6065 / 0x6066 Following error window and timeout.~~ Implemented 3 October 2026.
+- 0x6083 Profile acceleration — only for the profiled modes. (0x6084 Profile
+  deceleration is implemented, for Halt.)
+- ~~0x6085 Quick stop deceleration.~~ Implemented 3 October 2026, with the ramp.
+- **Emergency messages (EMCY over CoE).** SOES has none. Decided absent for v1: no
+  master in use needs them, and 0x603F, 0x1001 and statusword bit 3 report every
+  fault through the dictionary and the process data.
 - 0x60B0 / 0x60B1 / 0x60B2 Position, velocity and torque offsets.
 - 0x60B8-0x60BD Touch probe group.
 - 0x6007 Abort connection option code — what the drive does when the fieldbus
