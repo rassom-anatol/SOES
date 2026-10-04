@@ -190,15 +190,12 @@ objects:
   - {index: 0x603F, axis: true, name: "Error Code",              type: u16, access: ro, var: "ErrorCode"}
   - {index: 0x6040, axis: true, name: "Controlword",             type: u16, access: rw, var: "Controlword"}
   - {index: 0x6041, axis: true, name: "Statusword",              type: u16, access: ro, var: "Statusword"}
-  # DELIBERATE GAP, decided rather than overlooked. Value 2 means "decelerate on
-  # the quick stop ramp, then transition to Switch On Disabled", which requires
-  # 0x6085 Quick Stop Deceleration and a ramp generator. Neither exists yet, so
-  # this object currently advertises a capability the device does not have, and
-  # a master reading it will believe it. Kept as a statement of intent; the
-  # alternative considered was 0 (remove torque and coast), which is truthful
-  # today but wrong for a loaded or gravity-affected axis. Resolve by adding
-  # 0x6085 and the ramp, not by quietly changing the number.
-  - {index: 0x605A, axis: true, name: "Quick Stop Option Code",  type: i16, access: rw, var: "QuickStopOptionCode", value: 2}
+  # Quick Stop: decelerate on 0x6085, then Switch On Disabled. The only code
+  # implemented, so read-only rather than accepting values the drive ignores.
+  - {index: 0x605A, axis: true, name: "Quick Stop Option Code",  type: i16, access: ro, var: "QuickStopOptionCode", value: 2}
+  # Halt (controlword bit 8): decelerate on 0x6084 and hold in Operation
+  # Enabled. The only code implemented.
+  - {index: 0x605D, axis: true, name: "Halt Option Code",        type: i16, access: ro, var: "HaltOptionCode", value: 1}
   - {index: 0x6060, axis: true, name: "Modes of Operation",      type: i8,  access: rw, var: "ModesOfOperation"}
   - {index: 0x6061, axis: true, name: "Modes of Operation Display", type: i8, access: ro, var: "ModesOfOperationDisplay"}
   - {index: 0x6064, axis: true, name: "Position Actual Value",   type: i32, access: ro, var: "PositionActual"}
@@ -213,33 +210,39 @@ objects:
   - {index: 0x6076, axis: true, name: "Motor Rated Torque",      type: u32, access: rw, var: "MotorRatedTorque"}
   - {index: 0x6077, axis: true, name: "Torque Actual Value",     type: i16, access: ro, var: "TorqueActual"}
   - {index: 0x607A, axis: true, name: "Target Position",         type: i32, access: rw, var: "TargetPosition"}
+  # Decelerations in rpm per second, the drive's velocity unit per second.
+  - {index: 0x6084, axis: true, name: "Profile Deceleration",    type: u32, access: rw, var: "ProfileDeceleration", value: 10000}
+  - {index: 0x6085, axis: true, name: "Quick Stop Deceleration", type: u32, access: rw, var: "QuickStopDeceleration", value: 10000}
   - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
   - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00000380}
 
   # Scaling. SDO-only, but a master cannot convert increments to user units
   # without them -- TwinCAT NC in particular.
+  # Position units are fixed: 65536 counts per motor revolution, no gearing,
+  # one position unit per count. Read-only so a master sees the truth; applying
+  # a configurable factor group is a later feature.
   - index: 0x608F
     axis: true
     name: "Position Encoder Resolution"
     type: record
     subs:
-      - {sub: 1, name: "Encoder Increments",  type: u32, access: rw, var: "EncoderIncrements", value: 65536}
-      - {sub: 2, name: "Motor Revolutions",   type: u32, access: rw, var: "MotorRevolutions", value: 1}
+      - {sub: 1, name: "Encoder Increments",  type: u32, access: ro, var: "EncoderIncrements", value: 65536}
+      - {sub: 2, name: "Motor Revolutions",   type: u32, access: ro, var: "MotorRevolutions", value: 1}
   - index: 0x6091
     axis: true
     name: "Gear Ratio"
     type: record
     subs:
-      - {sub: 1, name: "Motor Revolutions",   type: u32, access: rw, var: "GearMotorRevolutions", value: 1}
-      - {sub: 2, name: "Shaft Revolutions",   type: u32, access: rw, var: "GearShaftRevolutions", value: 1}
+      - {sub: 1, name: "Motor Revolutions",   type: u32, access: ro, var: "GearMotorRevolutions", value: 1}
+      - {sub: 2, name: "Shaft Revolutions",   type: u32, access: ro, var: "GearShaftRevolutions", value: 1}
   - index: 0x6092
     axis: true
     name: "Feed Constant"
     type: record
     subs:
-      - {sub: 1, name: "Feed",                type: u32, access: rw, var: "Feed", value: 1}
-      - {sub: 2, name: "Shaft Revolutions",   type: u32, access: rw, var: "FeedShaftRevolutions", value: 1}
+      - {sub: 1, name: "Feed",                type: u32, access: ro, var: "Feed", value: 65536}
+      - {sub: 2, name: "Shaft Revolutions",   type: u32, access: ro, var: "FeedShaftRevolutions", value: 1}
 
   # --- vendor range -------------------------------------------------------
   # Safety and task critical flags are cyclic; everything else is SDO-only.

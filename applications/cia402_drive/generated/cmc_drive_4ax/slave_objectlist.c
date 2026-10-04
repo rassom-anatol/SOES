@@ -196,6 +196,8 @@ static const char acName6041[] = "Statusword";
 static const char acName6041_00[] = "Statusword";
 static const char acName605A[] = "Quick Stop Option Code";
 static const char acName605A_00[] = "Quick Stop Option Code";
+static const char acName605D[] = "Halt Option Code";
+static const char acName605D_00[] = "Halt Option Code";
 static const char acName6060[] = "Modes of Operation";
 static const char acName6060_00[] = "Modes of Operation";
 static const char acName6061[] = "Modes of Operation Display";
@@ -216,6 +218,10 @@ static const char acName6077[] = "Torque Actual Value";
 static const char acName6077_00[] = "Torque Actual Value";
 static const char acName607A[] = "Target Position";
 static const char acName607A_00[] = "Target Position";
+static const char acName6084[] = "Profile Deceleration";
+static const char acName6084_00[] = "Profile Deceleration";
+static const char acName6085[] = "Quick Stop Deceleration";
+static const char acName6085_00[] = "Quick Stop Deceleration";
 static const char acName608F[] = "Position Encoder Resolution";
 static const char acName608F_01[] = "Encoder Increments";
 static const char acName608F_02[] = "Motor Revolutions";
@@ -239,6 +245,8 @@ static const char acName6841[] = "Statusword";
 static const char acName6841_00[] = "Statusword";
 static const char acName685A[] = "Quick Stop Option Code";
 static const char acName685A_00[] = "Quick Stop Option Code";
+static const char acName685D[] = "Halt Option Code";
+static const char acName685D_00[] = "Halt Option Code";
 static const char acName6860[] = "Modes of Operation";
 static const char acName6860_00[] = "Modes of Operation";
 static const char acName6861[] = "Modes of Operation Display";
@@ -259,6 +267,10 @@ static const char acName6877[] = "Torque Actual Value";
 static const char acName6877_00[] = "Torque Actual Value";
 static const char acName687A[] = "Target Position";
 static const char acName687A_00[] = "Target Position";
+static const char acName6884[] = "Profile Deceleration";
+static const char acName6884_00[] = "Profile Deceleration";
+static const char acName6885[] = "Quick Stop Deceleration";
+static const char acName6885_00[] = "Quick Stop Deceleration";
 static const char acName688F[] = "Position Encoder Resolution";
 static const char acName688F_01[] = "Encoder Increments";
 static const char acName688F_02[] = "Motor Revolutions";
@@ -282,6 +294,8 @@ static const char acName7041[] = "Statusword";
 static const char acName7041_00[] = "Statusword";
 static const char acName705A[] = "Quick Stop Option Code";
 static const char acName705A_00[] = "Quick Stop Option Code";
+static const char acName705D[] = "Halt Option Code";
+static const char acName705D_00[] = "Halt Option Code";
 static const char acName7060[] = "Modes of Operation";
 static const char acName7060_00[] = "Modes of Operation";
 static const char acName7061[] = "Modes of Operation Display";
@@ -302,6 +316,10 @@ static const char acName7077[] = "Torque Actual Value";
 static const char acName7077_00[] = "Torque Actual Value";
 static const char acName707A[] = "Target Position";
 static const char acName707A_00[] = "Target Position";
+static const char acName7084[] = "Profile Deceleration";
+static const char acName7084_00[] = "Profile Deceleration";
+static const char acName7085[] = "Quick Stop Deceleration";
+static const char acName7085_00[] = "Quick Stop Deceleration";
 static const char acName708F[] = "Position Encoder Resolution";
 static const char acName708F_01[] = "Encoder Increments";
 static const char acName708F_02[] = "Motor Revolutions";
@@ -325,6 +343,8 @@ static const char acName7841[] = "Statusword";
 static const char acName7841_00[] = "Statusword";
 static const char acName785A[] = "Quick Stop Option Code";
 static const char acName785A_00[] = "Quick Stop Option Code";
+static const char acName785D[] = "Halt Option Code";
+static const char acName785D_00[] = "Halt Option Code";
 static const char acName7860[] = "Modes of Operation";
 static const char acName7860_00[] = "Modes of Operation";
 static const char acName7861[] = "Modes of Operation Display";
@@ -345,6 +365,10 @@ static const char acName7877[] = "Torque Actual Value";
 static const char acName7877_00[] = "Torque Actual Value";
 static const char acName787A[] = "Target Position";
 static const char acName787A_00[] = "Target Position";
+static const char acName7884[] = "Profile Deceleration";
+static const char acName7884_00[] = "Profile Deceleration";
+static const char acName7885[] = "Quick Stop Deceleration";
+static const char acName7885_00[] = "Quick Stop Deceleration";
 static const char acName788F[] = "Position Encoder Resolution";
 static const char acName788F_01[] = "Encoder Increments";
 static const char acName788F_02[] = "Motor Revolutions";
@@ -928,7 +952,13 @@ const _objd SDO6041[] =
 /* 0x605A Quick Stop Option Code */
 const _objd SDO605A[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName605A_00, 2, &Obj.axis[0].QuickStopOptionCode},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605A_00, 2, &Obj.axis[0].QuickStopOptionCode},
+};
+
+/* 0x605D Halt Option Code */
+const _objd SDO605D[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605D_00, 1, &Obj.axis[0].HaltOptionCode},
 };
 
 /* 0x6060 Modes of Operation */
@@ -991,28 +1021,40 @@ const _objd SDO607A[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName607A_00, 0, &Obj.axis[0].TargetPosition},
 };
 
+/* 0x6084 Profile Deceleration */
+const _objd SDO6084[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6084_00, 10000, &Obj.axis[0].ProfileDeceleration},
+};
+
+/* 0x6085 Quick Stop Deceleration */
+const _objd SDO6085[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6085_00, 10000, &Obj.axis[0].QuickStopDeceleration},
+};
+
 /* 0x608F Position Encoder Resolution */
 const _objd SDO608F[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName608F, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName608F_01, 65536, &Obj.axis[0].EncoderIncrements},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName608F_02, 1, &Obj.axis[0].MotorRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName608F_01, 65536, &Obj.axis[0].EncoderIncrements},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName608F_02, 1, &Obj.axis[0].MotorRevolutions},
 };
 
 /* 0x6091 Gear Ratio */
 const _objd SDO6091[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6091, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6091_01, 1, &Obj.axis[0].GearMotorRevolutions},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6091_02, 1, &Obj.axis[0].GearShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6091_01, 1, &Obj.axis[0].GearMotorRevolutions},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6091_02, 1, &Obj.axis[0].GearShaftRevolutions},
 };
 
 /* 0x6092 Feed Constant */
 const _objd SDO6092[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6092, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6092_01, 1, &Obj.axis[0].Feed},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6092_02, 1, &Obj.axis[0].FeedShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6092_01, 65536, &Obj.axis[0].Feed},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6092_02, 1, &Obj.axis[0].FeedShaftRevolutions},
 };
 
 /* 0x60F4 Following Error Actual */
@@ -1054,7 +1096,13 @@ const _objd SDO6841[] =
 /* 0x685A Quick Stop Option Code */
 const _objd SDO685A[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName685A_00, 2, &Obj.axis[1].QuickStopOptionCode},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685A_00, 2, &Obj.axis[1].QuickStopOptionCode},
+};
+
+/* 0x685D Halt Option Code */
+const _objd SDO685D[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685D_00, 1, &Obj.axis[1].HaltOptionCode},
 };
 
 /* 0x6860 Modes of Operation */
@@ -1117,28 +1165,40 @@ const _objd SDO687A[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName687A_00, 0, &Obj.axis[1].TargetPosition},
 };
 
+/* 0x6884 Profile Deceleration */
+const _objd SDO6884[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6884_00, 10000, &Obj.axis[1].ProfileDeceleration},
+};
+
+/* 0x6885 Quick Stop Deceleration */
+const _objd SDO6885[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6885_00, 10000, &Obj.axis[1].QuickStopDeceleration},
+};
+
 /* 0x688F Position Encoder Resolution */
 const _objd SDO688F[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName688F, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName688F_01, 65536, &Obj.axis[1].EncoderIncrements},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName688F_02, 1, &Obj.axis[1].MotorRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName688F_01, 65536, &Obj.axis[1].EncoderIncrements},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName688F_02, 1, &Obj.axis[1].MotorRevolutions},
 };
 
 /* 0x6891 Gear Ratio */
 const _objd SDO6891[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6891, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6891_01, 1, &Obj.axis[1].GearMotorRevolutions},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6891_02, 1, &Obj.axis[1].GearShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6891_01, 1, &Obj.axis[1].GearMotorRevolutions},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6891_02, 1, &Obj.axis[1].GearShaftRevolutions},
 };
 
 /* 0x6892 Feed Constant */
 const _objd SDO6892[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6892, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6892_01, 1, &Obj.axis[1].Feed},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6892_02, 1, &Obj.axis[1].FeedShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6892_01, 65536, &Obj.axis[1].Feed},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6892_02, 1, &Obj.axis[1].FeedShaftRevolutions},
 };
 
 /* 0x68F4 Following Error Actual */
@@ -1180,7 +1240,13 @@ const _objd SDO7041[] =
 /* 0x705A Quick Stop Option Code */
 const _objd SDO705A[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName705A_00, 2, &Obj.axis[2].QuickStopOptionCode},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705A_00, 2, &Obj.axis[2].QuickStopOptionCode},
+};
+
+/* 0x705D Halt Option Code */
+const _objd SDO705D[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705D_00, 1, &Obj.axis[2].HaltOptionCode},
 };
 
 /* 0x7060 Modes of Operation */
@@ -1243,28 +1309,40 @@ const _objd SDO707A[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName707A_00, 0, &Obj.axis[2].TargetPosition},
 };
 
+/* 0x7084 Profile Deceleration */
+const _objd SDO7084[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7084_00, 10000, &Obj.axis[2].ProfileDeceleration},
+};
+
+/* 0x7085 Quick Stop Deceleration */
+const _objd SDO7085[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7085_00, 10000, &Obj.axis[2].QuickStopDeceleration},
+};
+
 /* 0x708F Position Encoder Resolution */
 const _objd SDO708F[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName708F, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName708F_01, 65536, &Obj.axis[2].EncoderIncrements},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName708F_02, 1, &Obj.axis[2].MotorRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName708F_01, 65536, &Obj.axis[2].EncoderIncrements},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName708F_02, 1, &Obj.axis[2].MotorRevolutions},
 };
 
 /* 0x7091 Gear Ratio */
 const _objd SDO7091[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7091, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7091_01, 1, &Obj.axis[2].GearMotorRevolutions},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7091_02, 1, &Obj.axis[2].GearShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7091_01, 1, &Obj.axis[2].GearMotorRevolutions},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7091_02, 1, &Obj.axis[2].GearShaftRevolutions},
 };
 
 /* 0x7092 Feed Constant */
 const _objd SDO7092[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7092, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7092_01, 1, &Obj.axis[2].Feed},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7092_02, 1, &Obj.axis[2].FeedShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7092_01, 65536, &Obj.axis[2].Feed},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7092_02, 1, &Obj.axis[2].FeedShaftRevolutions},
 };
 
 /* 0x70F4 Following Error Actual */
@@ -1306,7 +1384,13 @@ const _objd SDO7841[] =
 /* 0x785A Quick Stop Option Code */
 const _objd SDO785A[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName785A_00, 2, &Obj.axis[3].QuickStopOptionCode},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785A_00, 2, &Obj.axis[3].QuickStopOptionCode},
+};
+
+/* 0x785D Halt Option Code */
+const _objd SDO785D[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785D_00, 1, &Obj.axis[3].HaltOptionCode},
 };
 
 /* 0x7860 Modes of Operation */
@@ -1369,28 +1453,40 @@ const _objd SDO787A[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName787A_00, 0, &Obj.axis[3].TargetPosition},
 };
 
+/* 0x7884 Profile Deceleration */
+const _objd SDO7884[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7884_00, 10000, &Obj.axis[3].ProfileDeceleration},
+};
+
+/* 0x7885 Quick Stop Deceleration */
+const _objd SDO7885[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7885_00, 10000, &Obj.axis[3].QuickStopDeceleration},
+};
+
 /* 0x788F Position Encoder Resolution */
 const _objd SDO788F[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName788F, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName788F_01, 65536, &Obj.axis[3].EncoderIncrements},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName788F_02, 1, &Obj.axis[3].MotorRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName788F_01, 65536, &Obj.axis[3].EncoderIncrements},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName788F_02, 1, &Obj.axis[3].MotorRevolutions},
 };
 
 /* 0x7891 Gear Ratio */
 const _objd SDO7891[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7891, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7891_01, 1, &Obj.axis[3].GearMotorRevolutions},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7891_02, 1, &Obj.axis[3].GearShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7891_01, 1, &Obj.axis[3].GearMotorRevolutions},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7891_02, 1, &Obj.axis[3].GearShaftRevolutions},
 };
 
 /* 0x7892 Feed Constant */
 const _objd SDO7892[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7892, 2, NULL},
-   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7892_01, 1, &Obj.axis[3].Feed},
-   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7892_02, 1, &Obj.axis[3].FeedShaftRevolutions},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7892_01, 65536, &Obj.axis[3].Feed},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7892_02, 1, &Obj.axis[3].FeedShaftRevolutions},
 };
 
 /* 0x78F4 Following Error Actual */
@@ -1458,6 +1554,7 @@ const _objectlist SDOobjects[] =
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
    {0x605A, OTYPE_VAR, 0, 0, acName605A, SDO605A},
+   {0x605D, OTYPE_VAR, 0, 0, acName605D, SDO605D},
    {0x6060, OTYPE_VAR, 0, 0, acName6060, SDO6060},
    {0x6061, OTYPE_VAR, 0, 0, acName6061, SDO6061},
    {0x6064, OTYPE_VAR, 0, 0, acName6064, SDO6064},
@@ -1468,6 +1565,8 @@ const _objectlist SDOobjects[] =
    {0x6076, OTYPE_VAR, 0, 0, acName6076, SDO6076},
    {0x6077, OTYPE_VAR, 0, 0, acName6077, SDO6077},
    {0x607A, OTYPE_VAR, 0, 0, acName607A, SDO607A},
+   {0x6084, OTYPE_VAR, 0, 0, acName6084, SDO6084},
+   {0x6085, OTYPE_VAR, 0, 0, acName6085, SDO6085},
    {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
    {0x6091, OTYPE_RECORD, 2, 0, acName6091, SDO6091},
    {0x6092, OTYPE_RECORD, 2, 0, acName6092, SDO6092},
@@ -1478,6 +1577,7 @@ const _objectlist SDOobjects[] =
    {0x6840, OTYPE_VAR, 0, 0, acName6840, SDO6840},
    {0x6841, OTYPE_VAR, 0, 0, acName6841, SDO6841},
    {0x685A, OTYPE_VAR, 0, 0, acName685A, SDO685A},
+   {0x685D, OTYPE_VAR, 0, 0, acName685D, SDO685D},
    {0x6860, OTYPE_VAR, 0, 0, acName6860, SDO6860},
    {0x6861, OTYPE_VAR, 0, 0, acName6861, SDO6861},
    {0x6864, OTYPE_VAR, 0, 0, acName6864, SDO6864},
@@ -1488,6 +1588,8 @@ const _objectlist SDOobjects[] =
    {0x6876, OTYPE_VAR, 0, 0, acName6876, SDO6876},
    {0x6877, OTYPE_VAR, 0, 0, acName6877, SDO6877},
    {0x687A, OTYPE_VAR, 0, 0, acName687A, SDO687A},
+   {0x6884, OTYPE_VAR, 0, 0, acName6884, SDO6884},
+   {0x6885, OTYPE_VAR, 0, 0, acName6885, SDO6885},
    {0x688F, OTYPE_RECORD, 2, 0, acName688F, SDO688F},
    {0x6891, OTYPE_RECORD, 2, 0, acName6891, SDO6891},
    {0x6892, OTYPE_RECORD, 2, 0, acName6892, SDO6892},
@@ -1498,6 +1600,7 @@ const _objectlist SDOobjects[] =
    {0x7040, OTYPE_VAR, 0, 0, acName7040, SDO7040},
    {0x7041, OTYPE_VAR, 0, 0, acName7041, SDO7041},
    {0x705A, OTYPE_VAR, 0, 0, acName705A, SDO705A},
+   {0x705D, OTYPE_VAR, 0, 0, acName705D, SDO705D},
    {0x7060, OTYPE_VAR, 0, 0, acName7060, SDO7060},
    {0x7061, OTYPE_VAR, 0, 0, acName7061, SDO7061},
    {0x7064, OTYPE_VAR, 0, 0, acName7064, SDO7064},
@@ -1508,6 +1611,8 @@ const _objectlist SDOobjects[] =
    {0x7076, OTYPE_VAR, 0, 0, acName7076, SDO7076},
    {0x7077, OTYPE_VAR, 0, 0, acName7077, SDO7077},
    {0x707A, OTYPE_VAR, 0, 0, acName707A, SDO707A},
+   {0x7084, OTYPE_VAR, 0, 0, acName7084, SDO7084},
+   {0x7085, OTYPE_VAR, 0, 0, acName7085, SDO7085},
    {0x708F, OTYPE_RECORD, 2, 0, acName708F, SDO708F},
    {0x7091, OTYPE_RECORD, 2, 0, acName7091, SDO7091},
    {0x7092, OTYPE_RECORD, 2, 0, acName7092, SDO7092},
@@ -1518,6 +1623,7 @@ const _objectlist SDOobjects[] =
    {0x7840, OTYPE_VAR, 0, 0, acName7840, SDO7840},
    {0x7841, OTYPE_VAR, 0, 0, acName7841, SDO7841},
    {0x785A, OTYPE_VAR, 0, 0, acName785A, SDO785A},
+   {0x785D, OTYPE_VAR, 0, 0, acName785D, SDO785D},
    {0x7860, OTYPE_VAR, 0, 0, acName7860, SDO7860},
    {0x7861, OTYPE_VAR, 0, 0, acName7861, SDO7861},
    {0x7864, OTYPE_VAR, 0, 0, acName7864, SDO7864},
@@ -1528,6 +1634,8 @@ const _objectlist SDOobjects[] =
    {0x7876, OTYPE_VAR, 0, 0, acName7876, SDO7876},
    {0x7877, OTYPE_VAR, 0, 0, acName7877, SDO7877},
    {0x787A, OTYPE_VAR, 0, 0, acName787A, SDO787A},
+   {0x7884, OTYPE_VAR, 0, 0, acName7884, SDO7884},
+   {0x7885, OTYPE_VAR, 0, 0, acName7885, SDO7885},
    {0x788F, OTYPE_RECORD, 2, 0, acName788F, SDO788F},
    {0x7891, OTYPE_RECORD, 2, 0, acName7891, SDO7891},
    {0x7892, OTYPE_RECORD, 2, 0, acName7892, SDO7892},

@@ -44,6 +44,7 @@ typedef struct
    uint16_t   GateDriverFaults;
    uint32_t   GearMotorRevolutions;
    uint32_t   GearShaftRevolutions;
+   int16_t    HaltOptionCode;
    uint16_t   MaxTorque;
    int8_t     ModesOfOperation;
    int8_t     ModesOfOperationDisplay;
@@ -55,6 +56,8 @@ typedef struct
    int32_t    PositionActual;
    uint16_t   PositionI;
    uint16_t   PositionP;
+   uint32_t   ProfileDeceleration;
+   uint32_t   QuickStopDeceleration;
    int16_t    QuickStopOptionCode;
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;
