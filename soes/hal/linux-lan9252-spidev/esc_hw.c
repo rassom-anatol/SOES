@@ -88,6 +88,12 @@
 
 static int      spi_fd   = -1;
 static int      reset_fd = -1;
+
+/* What ESC_init found and decided, for the application to log. */
+uint16_t lan9252_init_al_status = 0;
+uint8_t  lan9252_init_sync_activation = 0;
+int      lan9252_init_dc_offset_set = 0;
+int      lan9252_init_core_reset = 0;
 static uint32_t reset_pulse_us = 500;
 static uint32_t timeout_ms = DEFAULT_TIMEOUT_MS;
 
@@ -1001,10 +1007,26 @@ int ESC_init (const esc_cfg_t * config)
     * reset register, so it never observed the reset completing.
     */
    {
+      /* What has to survive is the master's DC configuration, so check for
+       * it directly as well as the AL status: a master can have set the ESC
+       * back to INIT (for instance while the previous slave process stopped
+       * answering) with the clock offset and SYNC0 activation still in
+       * place. At a real power-up all three read zero. */
       uint16_t al_status = 0;
+      uint8_t sync_act = 0;
+      uint32_t offset_lo = 0, offset_hi = 0;
       ESC_read_csr (ESCREG_ALSTATUS, &al_status, sizeof (al_status));
+      ESC_read_csr (0x0981, &sync_act, sizeof (sync_act));
+      ESC_read_csr (0x0920, &offset_lo, sizeof (offset_lo));
+      ESC_read_csr (0x0924, &offset_hi, sizeof (offset_hi));
       al_status = etohs (al_status);
-      if ((al_status & 0x0F) <= ESCinit)
+      lan9252_init_al_status = al_status;
+      lan9252_init_sync_activation = sync_act;
+      lan9252_init_dc_offset_set = (offset_lo | offset_hi) != 0;
+      lan9252_init_core_reset =
+         ((al_status & 0x0F) <= ESCinit) && (sync_act == 0) &&
+         !lan9252_init_dc_offset_set;
+      if (lan9252_init_core_reset)
       {
          lan9252_write_32 (ESC_CMD_RESET_CTL, ESC_RESET_CTRL_RST);
          (void)wait_until (ESC_CMD_RESET_CTL, ESC_RESET_CTRL_RST, 0, "core reset");

@@ -141,4 +141,12 @@ int ESC_hw_edge_wait (int fd, uint64_t timeout_ns, uint64_t * timestamp_ns,
 /** Write a LAN9252 system register directly over SPI. See ESC_hw_sys_read32. */
 void ESC_hw_sys_write32 (uint16_t address, uint32_t value);
 
+/* What ESC_init found and decided about resetting the EtherCAT core: the AL
+ * status, SYNC activation (0x0981) and whether the DC system time offset
+ * (0x0920) was set, and whether the core was reset. Set once by ESC_init. */
+extern uint16_t lan9252_init_al_status;
+extern uint8_t  lan9252_init_sync_activation;
+extern int      lan9252_init_dc_offset_set;
+extern int      lan9252_init_core_reset;
+
 #endif
