@@ -21,7 +21,7 @@ Scope is the v1 mode set from roadmap §4.2: **csp, csv, cst, single axis**.
 These are the highest-priority items: the dictionary as generated today already claims
 things, and each claim brings required behaviour with it.
 
-- [ ] **0x605A Quick stop option code is `2`, which commits the drive to a ramp.**
+- [x] **0x605A Quick stop option code is `2`, which commits the drive to a ramp.**
       Option code 2 means *decelerate on the quick stop ramp, then transition to Switch
       on disabled*. That requires a quick stop deceleration (**0x6085**) and an actual
       ramp implementation. Option code 1 requires 0x6084 instead. Only option code 0 —
@@ -29,13 +29,13 @@ things, and each claim brings required behaviour with it.
       **Until a ramp exists, 0x605A should read 0.** A drive that advertises a
       controlled stop and coasts instead is worse than one that admits it coasts.
 
-- [ ] **0x6502 = `0x000003A0` claims homing mode (bit 5).** Homing brings its own
+- [x] **0x6502 = `0x000003A0` claims homing mode (bit 5).** Homing brings its own
       mandatory set — **0x6098** homing method, **0x6099** homing speeds, **0x609A**
       homing acceleration, **0x607C** home offset — plus homing-specific statusword
       semantics on bits 10 and 12. Reduce to `0x380` (csp, csv, cst) unless homing is
       actually in scope. See [`stack-review.md`](stack-review.md) §2.6.
 
-- [ ] **Controlword bit 8 (Halt) applies in all cyclic modes and has no implementation.**
+- [x] **Controlword bit 8 (Halt) applies in all cyclic modes and has no implementation.**
       It is not mode-specific and not optional. Its behaviour is governed by **0x605D**
       halt option code; absent that object, the profile's default for the halt action
       still applies.
@@ -53,7 +53,7 @@ things, and each claim brings required behaviour with it.
 The exhaustively specified part of the profile, and therefore the part that admits an
 exhaustive test (cmc `docs/architecture.md`).
 
-- [ ] **Eight states, not nine.** An earlier draft said "nine states"; the profile defines
+- [x] **Eight states, not nine.** An earlier draft said "nine states"; the profile defines
       **eight** — Not ready to switch on, Switch on disabled, Ready to switch on,
       Switched on, Operation enabled, Quick stop active, Fault reaction active, Fault —
       plus a *Start* pseudo-state that makes nine boxes in the published diagram. Fix
@@ -73,9 +73,9 @@ exhaustive test (cmc `docs/architecture.md`).
 | Enable operation | 0 | 1 | 1 | 1 | 1 | 4, 16 |
 | Fault reset | rising edge | x | x | x | x | 15 |
 
-- [ ] **Bit 2 (Quick stop) is active low.** A controlword of 0x0000 is therefore a quick
+- [x] **Bit 2 (Quick stop) is active low.** A controlword of 0x0000 is therefore a quick
       stop request, not an idle value.
-- [ ] **Fault reset is edge-triggered, not level.** A controlword arriving every cycle
+- [x] **Fault reset is edge-triggered, not level.** A controlword arriving every cycle
       with bit 7 set must produce exactly one reset attempt, not one per cycle.
 - [ ] Bits 4, 5, 6 and 9 are mode-specific; bit 10 reserved; bits 11-15
       manufacturer-specific.
@@ -122,11 +122,11 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 ### 3.1 Unconditional
 
-- [ ] 0x6040 Controlword — present
-- [ ] 0x6041 Statusword — present
-- [ ] 0x6060 Modes of operation — present
-- [ ] 0x6061 Modes of operation display — present
-- [ ] 0x6502 Supported drive modes — present, value wrong (§1)
+- [x] 0x6040 Controlword — present
+- [x] 0x6041 Statusword — present
+- [x] 0x6060 Modes of operation — present
+- [x] 0x6061 Modes of operation display — present
+- [x] 0x6502 Supported drive modes — present, value wrong (§1)
 
 ### 3.2 Per mode
 
@@ -143,7 +143,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
       ETG.6010 requires for csp specifically before omitting it — this is the single
       object in the v1 set whose status I would not assume.
 
-- [ ] **0x6060 must reject modes 0x6502 does not claim.** Writing an unsupported mode
+- [x] **0x6060 must reject modes 0x6502 does not claim.** Writing an unsupported mode
       must not take effect, and 0x6061 must not follow it. The generated dictionary
       currently accepts any `int8`.
 
@@ -151,7 +151,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 ## 4. Mode-specific statusword semantics
 
-- [ ] **Bit 12 = "drive follows the command value"**, in all three cyclic modes. This is
+- [x] **Bit 12 = "drive follows the command value"**, in all three cyclic modes. This is
       the drive's per-cycle acknowledgement that the setpoint was consumed, and it is
       what a master checks first.
 - [ ] **Bit 13 = "following error"**, in csp. Meaningful only with a following error
@@ -161,7 +161,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
       than being driven from an ad-hoc threshold.
 - [ ] Bit 13 is reserved in csv and cst.
 - [ ] Bit 10 (target reached) is not used in the cyclic modes.
-- [ ] Bit 11 (internal limit active) should reflect torque, current or position limiting
+- [x] Bit 11 (internal limit active) should reflect torque, current or position limiting
       — it is the standard channel for "the drive is clamping your setpoint", and
       0x6072 Max torque makes it reachable.
 
@@ -169,7 +169,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 ## 5. Units and scaling
 
-- [ ] **Torque is per-thousandth of rated torque.** 0x6071, 0x6072 and 0x6077 are all in
+- [x] **Torque is per-thousandth of rated torque.** 0x6071, 0x6072 and 0x6077 are all in
       units of 1/1000 of **0x6076** motor rated torque (mNm). Already correct in roadmap
       cmc `docs/architecture.md`.
 - [ ] **Position scaling** comes from 0x608F position encoder resolution, 0x6091 gear
@@ -219,7 +219,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 - [ ] **A fault must reach the master in the cycle it occurs.** Roadmap §4.2 already puts
       the vendor status word in the TxPDO for this reason; the same argument applies to
       statusword bit 3 and 0x603F, both of which are mapped.
-- [ ] **Mode changes are acknowledged, not assumed.** 0x6061 reflects the mode actually
+- [x] **Mode changes are acknowledged, not assumed.** 0x6061 reflects the mode actually
       in effect, which may lag 0x6060 by a cycle or be refused outright.
 
 ---
