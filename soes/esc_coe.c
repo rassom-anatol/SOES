@@ -278,6 +278,59 @@ static void SDO_abort (uint8_t reusembx, uint16_t index, uint8_t subindex, uint3
    }
 }
 
+/* The one download whose reply is held back, if any. Only the request is
+ * remembered, not a mailbox buffer: the reply buffer is claimed when the work
+ * finishes, so nothing sits claimed-but-unsent for seconds, and the mailbox's
+ * count of replies waiting to go out (txcue) never includes it. */
+static struct
+{
+   uint8_t  active;
+   uint16_t index;
+   uint8_t  subindex;
+} sdo_held;
+
+int ESC_SDO_pending (void)
+{
+   return sdo_held.active;
+}
+
+void ESC_SDO_cancel (void)
+{
+   sdo_held.active = 0;
+}
+
+void ESC_SDO_complete (uint32_t abortcode)
+{
+   _COEsdo *coeres;
+   uint8_t MBXout;
+
+   if (!sdo_held.active)
+   {
+      return;
+   }
+   sdo_held.active = 0;
+
+   if (abortcode != 0)
+   {
+      SDO_abort (0, sdo_held.index, sdo_held.subindex, abortcode);
+      return;
+   }
+   MBXout = ESC_claimbuffer ();
+   if (MBXout)
+   {
+      coeres = (_COEsdo *) &MBX[MBXout * ESC_MBXSIZE];
+      coeres->mbxheader.length = htoes (COE_DEFAULTLENGTH);
+      coeres->mbxheader.mbxtype = MBXCOE;
+      coeres->coeheader.numberservice =
+            htoes ((0 & 0x01f) | (COE_SDORESPONSE << 12));
+      coeres->index = htoes (sdo_held.index);
+      coeres->subindex = sdo_held.subindex;
+      coeres->command = COE_COMMAND_DOWNLOADRESPONSE;
+      coeres->size = htoel (0);
+      MBXcontrol[MBXout].state = MBXstate_outreq;
+   }
+}
+
 static void set_state_idle (uint8_t reusembx,
                            uint16_t index,
                            uint8_t subindex,
@@ -844,7 +897,25 @@ static void SDO_download (void)
                   size,
                   (objd + nsub)->flags
             );
-            if (abort == 0)
+            if (abort == ESC_SDO_PENDING)
+            {
+               /* The application holds the reply back until its work is done.
+                * The value is not copied into the object: what was written is
+                * a command, and the object keeps reading as it did. Only a
+                * transfer that fits this one mailbox can be held. */
+               if ((size > 4) &&
+                     (size > (coesdo->mbxheader.length - COE_HEADERSIZE)))
+               {
+                  SDO_abort (0, index, subindex, ABORT_GENERALERROR);
+               }
+               else
+               {
+                  sdo_held.active = 1;
+                  sdo_held.index = index;
+                  sdo_held.subindex = subindex;
+               }
+            }
+            else if (abort == 0)
             {
                if ((size > 4) &&
                      (size > (coesdo->mbxheader.length - COE_HEADERSIZE)))
@@ -972,6 +1043,11 @@ static void SDO_download_complete_access (void)
    {
       abortcode = ESC_download_pre_objecthandler(index, subindex, mbxdata,
             size, objd->flags | COMPLETE_ACCESS_FLAG);
+      if (abortcode == ESC_SDO_PENDING)
+      {
+         /* A held reply is only supported for a single entry. */
+         abortcode = ABORT_GENERALERROR;
+      }
       if (abortcode != 0)
       {
          set_state_idle (0, index, subindex, abortcode);
@@ -1477,7 +1553,17 @@ void ESC_coeprocess (void)
       DPRINT ("coe service %u cmd %02X opcode %02X index %04X:%02X\n",
               service, coesdo->command, coeobjdesc->infoheader.opcode,
               etohs (coesdo->index), coesdo->subindex);
-      if (service == COE_SDOREQUEST)
+      if ((service == COE_SDOREQUEST) && sdo_held.active)
+      {
+         /* A reply is still held back. Answering this one first would put the
+          * replies out of order, so it is turned away at once, as Beckhoff's
+          * slave stack does: the master learns the device is busy rather than
+          * waiting. SDO Information requests are still served. */
+         MBX_error (MBXERR_SERVICEINWORK);
+         MBXcontrol[0].state = MBXstate_idle;
+         ESCvar.xoe = 0;
+      }
+      else if (service == COE_SDOREQUEST)
       {
          if ((SDO_COMMAND(coesdo->command) == COE_COMMAND_UPLOADREQUEST)
                && (etohs (coesdo->mbxheader.length) == COE_HEADERSIZE))

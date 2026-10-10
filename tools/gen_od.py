@@ -145,13 +145,17 @@ class Object:
                 f"the object has sub-entries")
         self.otype = OBJECT_CODES[code]
 
+        # `store: true` on an object applies to all its writable subs; a sub
+        # may override it. Stored entries are what 0x1010 Store Parameters
+        # saves and what is loaded back at startup.
+        store = spec.get("store", False)
         if self.is_record:
             for sub in spec["subs"]:
-                self.subs.append(self._sub(sub, cfg))
+                self.subs.append(self._sub(sub, cfg, store))
         else:
-            self.subs.append(self._sub(dict(spec, sub=0), cfg))
+            self.subs.append(self._sub(dict(spec, sub=0), cfg, store))
 
-    def _sub(self, spec, cfg):
+    def _sub(self, spec, cfg, store_default=False):
         t = spec.get("type", "u32")
         if t == "record":
             die(f"0x{self.index:04X}: nested records are not supported")
@@ -169,6 +173,11 @@ class Object:
             bits = 8 * (len(str(value)) if value else 1)
 
         var = spec.get("var")
+        access = spec.get("access", "ro")
+        store = spec.get("store", store_default and access in ("rw", "rwpre"))
+        if store and (access not in ("rw", "rwpre") or not var):
+            die(f"0x{self.index:04X}:{spec.get('sub', 0)}: only a writable "
+                f"entry with storage can be stored")
         return {
             "sub": spec.get("sub", 0),
             "name": spec["name"],
@@ -188,6 +197,7 @@ class Object:
             # a limit it advertises must use one source for both, or the
             # advertised limit and the enforced one drift apart silently.
             "define": spec.get("define"),
+            "store": bool(store),
         }
 
     @property
@@ -801,6 +811,10 @@ constexpr uint8_t kWrite     = 0x02;
 /** Writable only while the process image is not live, which CoE expresses as
  *  writable in PREOP. A real restriction, not a hint. */
 constexpr uint8_t kPreopOnly = 0x04;
+/** Saved by 0x1010 Store Parameters and loaded back at startup. Declared in
+ *  the YAML with `store: true`, so the stored set is part of the description
+ *  rather than a list kept somewhere else. */
+constexpr uint8_t kStore     = 0x08;
 
 /**
  * One sub-entry.
@@ -956,10 +970,11 @@ def cxx_entries(cfg, objs, rx, tx):
     """
     rows = []
 
-    def add(index, sub, name, type_, access, bits, storage, constant, text):
+    def add(index, sub, name, type_, access, bits, storage, constant, text,
+            store=False):
         rows.append({"index": index, "sub": sub, "name": name, "type": type_,
                      "access": access, "bits": bits, "storage": storage,
-                     "constant": constant, "text": text})
+                     "constant": constant, "text": text, "store": store})
 
     for o in objs:
         if o.is_record:
@@ -980,7 +995,7 @@ def cxx_entries(cfg, objs, rx, tx):
             elif not isinstance(s["value"], str):
                 constant = int(s["value"])
             add(o.index, s["sub"], s["name"], s["type"], s["access_name"],
-                s["bits"], storage, constant, text)
+                s["bits"], storage, constant, text, s["store"])
 
     for pdo in rx + tx:
         entries = pdo["entries"]
@@ -1040,7 +1055,8 @@ def emit_cxx_table_cpp(cfg, objs, rx, tx, src):
     for r in rows:
         out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\"},"
                    % (r["index"], r["sub"], CXX_TYPES[r["type"]],
-                      CXX_ACCESS[r["access"]], r["bits"], r["storage"],
+                      CXX_ACCESS[r["access"]] + (" | kStore" if r["store"] else ""),
+                      r["bits"], r["storage"],
                       r["constant"], r["text"], r["name"]))
     out.append("};")
     out.append("")

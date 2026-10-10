@@ -137,6 +137,23 @@ objects:
   - {index: 0x1009, name: "Hardware Version",  type: string, value: "1.0"}
   - {index: 0x100A, name: "Software Version",  type: string, value: "0.1"}
 
+  # Store Parameters and Restore Default Parameters, CiA 301. Writing "save"
+  # (0x65766173) to 0x1010:01 saves every entry marked `store: true` below;
+  # writing "load" (0x64616F6C) to 0x1011:01 deletes the saved set, and the
+  # defaults return at the next restart. Both reply only once the file is
+  # written or removed, and both are refused in Operation Enabled. Reading
+  # either returns 1: saves on command, never autonomously.
+  - index: 0x1010
+    name: "Store Parameters"
+    object_code: array
+    subs:
+      - {sub: 1, name: "Save All Parameters",    type: u32, access: rw, var: "StoreParameters", value: 1}
+  - index: 0x1011
+    name: "Restore Default Parameters"
+    object_code: array
+    subs:
+      - {sub: 1, name: "Restore All Defaults",   type: u32, access: rw, var: "RestoreParameters", value: 1}
+
   - index: 0x1018
     name: "Identity Object"
     type: record
@@ -205,23 +222,24 @@ objects:
   # Following error supervision in cyclic synchronous position: outside the
   # window for longer than the timeout is a fault, error code 0x8611.
   # 0xFFFFFFFF switches supervision off.
-  - {index: 0x6065, axis: true, name: "Following Error Window",  type: u32, access: rw, var: "FollowingErrorWindow", value: 8192}
-  - {index: 0x6066, axis: true, name: "Following Error Time Out", type: u16, access: rw, var: "FollowingErrorTimeout", value: 50}
+  - {index: 0x6065, axis: true, name: "Following Error Window",  type: u32, access: rw, var: "FollowingErrorWindow", value: 8192, store: true}
+  - {index: 0x6066, axis: true, name: "Following Error Time Out", type: u16, access: rw, var: "FollowingErrorTimeout", value: 50, store: true}
   - {index: 0x606C, axis: true, name: "Velocity Actual Value",   type: i32, access: ro, var: "VelocityActual"}
   - {index: 0x6071, axis: true, name: "Target Torque",           type: i16, access: rw, var: "TargetTorque"}
-  - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000}
+  - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000, store: true}
   # Motor Rated Current, mA. The reference for 0x6071, 0x6072 and 0x6077:
   # the drive controls current, and per mille of rated current is per mille
   # of rated torque for a constant torque constant. 0 means not commissioned,
   # and cyclic synchronous torque is then refused.
-  - {index: 0x6075, axis: true, name: "Motor Rated Current",     type: u32, access: rw, var: "MotorRatedCurrent"}
-  - {index: 0x6076, axis: true, name: "Motor Rated Torque",      type: u32, access: rw, var: "MotorRatedTorque"}
+  - {index: 0x6075, axis: true, name: "Motor Rated Current",     type: u32, access: rw, var: "MotorRatedCurrent", store: true}
+  - {index: 0x6076, axis: true, name: "Motor Rated Torque",      type: u32, access: rw, var: "MotorRatedTorque", store: true}
   - {index: 0x6077, axis: true, name: "Torque Actual Value",     type: i16, access: ro, var: "TorqueActual"}
   - {index: 0x607A, axis: true, name: "Target Position",         type: i32, access: rw, var: "TargetPosition"}
   # Software position limits, in position units. The defaults span the full
   # range, which leaves them inactive.
   - index: 0x607D
     axis: true
+    store: true
     name: "Software Position Limit"
     type: record
     subs:
@@ -229,10 +247,10 @@ objects:
       - {sub: 2, name: "Max Position Limit", type: i32, access: rw, var: "PositionLimitMax", value: 2147483647}
   # Max Motor Speed, rpm: caps velocity targets and the velocity limit. The
   # default is the maxon EC-i 496654's no-load speed at 18 V.
-  - {index: 0x6080, axis: true, name: "Max Motor Speed",         type: u32, access: rw, var: "MaxMotorSpeed", value: 7840}
+  - {index: 0x6080, axis: true, name: "Max Motor Speed",         type: u32, access: rw, var: "MaxMotorSpeed", value: 7840, store: true}
   # Decelerations in rpm per second, the drive's velocity unit per second.
-  - {index: 0x6084, axis: true, name: "Profile Deceleration",    type: u32, access: rw, var: "ProfileDeceleration", value: 10000}
-  - {index: 0x6085, axis: true, name: "Quick Stop Deceleration", type: u32, access: rw, var: "QuickStopDeceleration", value: 10000}
+  - {index: 0x6084, axis: true, name: "Profile Deceleration",    type: u32, access: rw, var: "ProfileDeceleration", value: 10000, store: true}
+  - {index: 0x6085, axis: true, name: "Quick Stop Deceleration", type: u32, access: rw, var: "QuickStopDeceleration", value: 10000, store: true}
   - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
   - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00000380}
@@ -288,7 +306,7 @@ objects:
       # Cycles between samples of this record and 0x2002; 0 stops sampling.
       # Each sample costs SPI time in that cycle, so this is also a diagnostic
       # switch for disturbances in step with it.
-      - {sub: 4, name: "Sample Period",       type: u16, access: rw, var: "BoardTelemetryPeriod", value: 50}
+      - {sub: 4, name: "Sample Period",       type: u16, access: rw, var: "BoardTelemetryPeriod", value: 50, store: true}
 
   # Phase currents in mA, the TMC4671's measured values after its own offset
   # and scale correction. Sampled at a low rate, like 0x2001.
@@ -329,9 +347,10 @@ objects:
   # Control loop tuning, in the TMC4671's own register units -- the same
   # numbers as foc.* in bsp.yaml, which seed these at startup. Writable at any
   # time so the loops can be tuned live; a change reaches the chip within one
-  # cycle. Not stored: a restart returns to bsp.yaml.
+  # cycle. Stored by 0x1010, which then overrides bsp.yaml at startup.
   - index: 0x2010
     axis: true
+    store: true
     name: "Control Loop Tuning"
     type: record
     subs:

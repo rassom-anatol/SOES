@@ -81,6 +81,8 @@ typedef struct
 typedef struct
 {
    uint8_t    ErrorRegister;
+   uint32_t   RestoreParameters;
+   uint32_t   StoreParameters;
    uint32_t   serial;
    struct
    {

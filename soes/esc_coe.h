@@ -111,7 +111,24 @@ typedef struct
 
 #define COMPLETE_ACCESS_FLAG    (1 << 15)
 
+/* Returned by the pre-download hook to hold back the SDO reply: the write has
+ * started something that takes longer than a cycle, such as storing parameters
+ * to flash, and CiA 301 wants the reply only once it is done. Not a valid abort
+ * code, so it cannot be confused with one. The application finishes the write
+ * with ESC_SDO_complete. Only an expedited or normal single-entry download may
+ * be held; a segmented or Complete Access one is refused instead. */
+#define ESC_SDO_PENDING         0xFFFFFFFFu
+
 void ESC_coeprocess (void);
+/* Send the reply to the download held back with ESC_SDO_PENDING: a download
+ * response for abortcode 0, an SDO abort otherwise. Ignored when nothing is
+ * held, which is the case after the mailbox was stopped in the meantime. */
+void ESC_SDO_complete (uint32_t abortcode);
+/* Forget a held-back download without replying. Called when the mailbox
+ * stops, because the master that asked is gone. */
+void ESC_SDO_cancel (void);
+/* Nonzero while a download is held back. */
+int ESC_SDO_pending (void);
 int16_t SDO_findsubindex (int32_t nidx, uint8_t subindex);
 int32_t SDO_findobject (uint16_t index);
 uint16_t sizeOfPDO (uint16_t index, int * nmappings, _SMmap * sm, int max_mappings);

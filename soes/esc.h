@@ -176,6 +176,7 @@
 #define MBXERR_SIZETOOSHORT             0x0006
 #define MBXERR_NOMOREMEMORY             0x0007
 #define MBXERR_INVALIDSIZE              0x0008
+#define MBXERR_SERVICEINWORK            0x0009
 
 #define ABORT_NOTOGGLE                  0x05030000
 #define ABORT_TRANSFER_TIMEOUT          0x05040000

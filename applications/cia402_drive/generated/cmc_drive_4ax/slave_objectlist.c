@@ -22,6 +22,10 @@ static const char acName1009[] = "Hardware Version";
 static const char acName1009_00[] = "Hardware Version";
 static const char acName100A[] = "Software Version";
 static const char acName100A_00[] = "Software Version";
+static const char acName1010[] = "Store Parameters";
+static const char acName1010_01[] = "Save All Parameters";
+static const char acName1011[] = "Restore Default Parameters";
+static const char acName1011_01[] = "Restore All Defaults";
 static const char acName1018[] = "Identity Object";
 static const char acName1018_01[] = "Vendor ID";
 static const char acName1018_02[] = "Product Code";
@@ -685,6 +689,20 @@ const _objd SDO1009[] =
 const _objd SDO100A[] =
 {
    {0x00, DTYPE_VISIBLE_STRING, 24, ATYPE_RO, acName100A_00, 0, (void *)"0.1"},
+};
+
+/* 0x1010 Store Parameters */
+const _objd SDO1010[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1010, 1, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName1010_01, 1, &Obj.StoreParameters},
+};
+
+/* 0x1011 Restore Default Parameters */
+const _objd SDO1011[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1011, 1, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName1011_01, 1, &Obj.RestoreParameters},
 };
 
 /* 0x1018 Identity Object */
@@ -1664,6 +1682,8 @@ const _objectlist SDOobjects[] =
    {0x1008, OTYPE_VAR, 0, 0, acName1008, SDO1008},
    {0x1009, OTYPE_VAR, 0, 0, acName1009, SDO1009},
    {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
+   {0x1010, OTYPE_ARRAY, 1, 0, acName1010, SDO1010},
+   {0x1011, OTYPE_ARRAY, 1, 0, acName1011, SDO1011},
    {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
    {0x10F1, OTYPE_RECORD, 2, 0, acName10F1, SDO10F1},
    {0x1600, OTYPE_RECORD, 7, 0, acNamePDO1600, SDO1600},

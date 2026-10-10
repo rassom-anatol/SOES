@@ -427,6 +427,8 @@ void ESC_stopmbx (void)
    ESCvar.index = 0;
    ESCvar.subindex = 0;
    ESCvar.flags = 0;
+   /* The master that asked for a held-back reply is gone. */
+   ESC_SDO_cancel ();
 }
 
 /** Read Receive mailbox and store data in local ESCvar.MBX variable.
