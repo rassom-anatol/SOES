@@ -101,6 +101,141 @@ static const char acName2011_08[] = "Position I";
 static const char acName2011_09[] = "Velocity Filter";
 static const char acName2012[] = "Loop Structure";
 static const char acName2012_00[] = "Loop Structure";
+static const char acName2013[] = "Anti-Cogging";
+static const char acName2013_01[] = "Enable";
+static const char acName2013_02[] = "Gain";
+static const char acName2013_03[] = "Fade Speed";
+static const char acName2013_04[] = "Status";
+static const char acName2013_05[] = "Shaft Angle";
+static const char acName2014[] = "Anti-Cogging Table";
+static const char acName2014_01[] = "Point 0";
+static const char acName2014_02[] = "Point 1";
+static const char acName2014_03[] = "Point 2";
+static const char acName2014_04[] = "Point 3";
+static const char acName2014_05[] = "Point 4";
+static const char acName2014_06[] = "Point 5";
+static const char acName2014_07[] = "Point 6";
+static const char acName2014_08[] = "Point 7";
+static const char acName2014_09[] = "Point 8";
+static const char acName2014_0A[] = "Point 9";
+static const char acName2014_0B[] = "Point 10";
+static const char acName2014_0C[] = "Point 11";
+static const char acName2014_0D[] = "Point 12";
+static const char acName2014_0E[] = "Point 13";
+static const char acName2014_0F[] = "Point 14";
+static const char acName2014_10[] = "Point 15";
+static const char acName2014_11[] = "Point 16";
+static const char acName2014_12[] = "Point 17";
+static const char acName2014_13[] = "Point 18";
+static const char acName2014_14[] = "Point 19";
+static const char acName2014_15[] = "Point 20";
+static const char acName2014_16[] = "Point 21";
+static const char acName2014_17[] = "Point 22";
+static const char acName2014_18[] = "Point 23";
+static const char acName2014_19[] = "Point 24";
+static const char acName2014_1A[] = "Point 25";
+static const char acName2014_1B[] = "Point 26";
+static const char acName2014_1C[] = "Point 27";
+static const char acName2014_1D[] = "Point 28";
+static const char acName2014_1E[] = "Point 29";
+static const char acName2014_1F[] = "Point 30";
+static const char acName2014_20[] = "Point 31";
+static const char acName2014_21[] = "Point 32";
+static const char acName2014_22[] = "Point 33";
+static const char acName2014_23[] = "Point 34";
+static const char acName2014_24[] = "Point 35";
+static const char acName2014_25[] = "Point 36";
+static const char acName2014_26[] = "Point 37";
+static const char acName2014_27[] = "Point 38";
+static const char acName2014_28[] = "Point 39";
+static const char acName2014_29[] = "Point 40";
+static const char acName2014_2A[] = "Point 41";
+static const char acName2014_2B[] = "Point 42";
+static const char acName2014_2C[] = "Point 43";
+static const char acName2014_2D[] = "Point 44";
+static const char acName2014_2E[] = "Point 45";
+static const char acName2014_2F[] = "Point 46";
+static const char acName2014_30[] = "Point 47";
+static const char acName2014_31[] = "Point 48";
+static const char acName2014_32[] = "Point 49";
+static const char acName2014_33[] = "Point 50";
+static const char acName2014_34[] = "Point 51";
+static const char acName2014_35[] = "Point 52";
+static const char acName2014_36[] = "Point 53";
+static const char acName2014_37[] = "Point 54";
+static const char acName2014_38[] = "Point 55";
+static const char acName2014_39[] = "Point 56";
+static const char acName2014_3A[] = "Point 57";
+static const char acName2014_3B[] = "Point 58";
+static const char acName2014_3C[] = "Point 59";
+static const char acName2014_3D[] = "Point 60";
+static const char acName2014_3E[] = "Point 61";
+static const char acName2014_3F[] = "Point 62";
+static const char acName2014_40[] = "Point 63";
+static const char acName2014_41[] = "Point 64";
+static const char acName2014_42[] = "Point 65";
+static const char acName2014_43[] = "Point 66";
+static const char acName2014_44[] = "Point 67";
+static const char acName2014_45[] = "Point 68";
+static const char acName2014_46[] = "Point 69";
+static const char acName2014_47[] = "Point 70";
+static const char acName2014_48[] = "Point 71";
+static const char acName2014_49[] = "Point 72";
+static const char acName2014_4A[] = "Point 73";
+static const char acName2014_4B[] = "Point 74";
+static const char acName2014_4C[] = "Point 75";
+static const char acName2014_4D[] = "Point 76";
+static const char acName2014_4E[] = "Point 77";
+static const char acName2014_4F[] = "Point 78";
+static const char acName2014_50[] = "Point 79";
+static const char acName2014_51[] = "Point 80";
+static const char acName2014_52[] = "Point 81";
+static const char acName2014_53[] = "Point 82";
+static const char acName2014_54[] = "Point 83";
+static const char acName2014_55[] = "Point 84";
+static const char acName2014_56[] = "Point 85";
+static const char acName2014_57[] = "Point 86";
+static const char acName2014_58[] = "Point 87";
+static const char acName2014_59[] = "Point 88";
+static const char acName2014_5A[] = "Point 89";
+static const char acName2014_5B[] = "Point 90";
+static const char acName2014_5C[] = "Point 91";
+static const char acName2014_5D[] = "Point 92";
+static const char acName2014_5E[] = "Point 93";
+static const char acName2014_5F[] = "Point 94";
+static const char acName2014_60[] = "Point 95";
+static const char acName2014_61[] = "Point 96";
+static const char acName2014_62[] = "Point 97";
+static const char acName2014_63[] = "Point 98";
+static const char acName2014_64[] = "Point 99";
+static const char acName2014_65[] = "Point 100";
+static const char acName2014_66[] = "Point 101";
+static const char acName2014_67[] = "Point 102";
+static const char acName2014_68[] = "Point 103";
+static const char acName2014_69[] = "Point 104";
+static const char acName2014_6A[] = "Point 105";
+static const char acName2014_6B[] = "Point 106";
+static const char acName2014_6C[] = "Point 107";
+static const char acName2014_6D[] = "Point 108";
+static const char acName2014_6E[] = "Point 109";
+static const char acName2014_6F[] = "Point 110";
+static const char acName2014_70[] = "Point 111";
+static const char acName2014_71[] = "Point 112";
+static const char acName2014_72[] = "Point 113";
+static const char acName2014_73[] = "Point 114";
+static const char acName2014_74[] = "Point 115";
+static const char acName2014_75[] = "Point 116";
+static const char acName2014_76[] = "Point 117";
+static const char acName2014_77[] = "Point 118";
+static const char acName2014_78[] = "Point 119";
+static const char acName2014_79[] = "Point 120";
+static const char acName2014_7A[] = "Point 121";
+static const char acName2014_7B[] = "Point 122";
+static const char acName2014_7C[] = "Point 123";
+static const char acName2014_7D[] = "Point 124";
+static const char acName2014_7E[] = "Point 125";
+static const char acName2014_7F[] = "Point 126";
+static const char acName2014_80[] = "Point 127";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -156,6 +291,141 @@ static const char acName2811_08[] = "Position I";
 static const char acName2811_09[] = "Velocity Filter";
 static const char acName2812[] = "Loop Structure";
 static const char acName2812_00[] = "Loop Structure";
+static const char acName2813[] = "Anti-Cogging";
+static const char acName2813_01[] = "Enable";
+static const char acName2813_02[] = "Gain";
+static const char acName2813_03[] = "Fade Speed";
+static const char acName2813_04[] = "Status";
+static const char acName2813_05[] = "Shaft Angle";
+static const char acName2814[] = "Anti-Cogging Table";
+static const char acName2814_01[] = "Point 0";
+static const char acName2814_02[] = "Point 1";
+static const char acName2814_03[] = "Point 2";
+static const char acName2814_04[] = "Point 3";
+static const char acName2814_05[] = "Point 4";
+static const char acName2814_06[] = "Point 5";
+static const char acName2814_07[] = "Point 6";
+static const char acName2814_08[] = "Point 7";
+static const char acName2814_09[] = "Point 8";
+static const char acName2814_0A[] = "Point 9";
+static const char acName2814_0B[] = "Point 10";
+static const char acName2814_0C[] = "Point 11";
+static const char acName2814_0D[] = "Point 12";
+static const char acName2814_0E[] = "Point 13";
+static const char acName2814_0F[] = "Point 14";
+static const char acName2814_10[] = "Point 15";
+static const char acName2814_11[] = "Point 16";
+static const char acName2814_12[] = "Point 17";
+static const char acName2814_13[] = "Point 18";
+static const char acName2814_14[] = "Point 19";
+static const char acName2814_15[] = "Point 20";
+static const char acName2814_16[] = "Point 21";
+static const char acName2814_17[] = "Point 22";
+static const char acName2814_18[] = "Point 23";
+static const char acName2814_19[] = "Point 24";
+static const char acName2814_1A[] = "Point 25";
+static const char acName2814_1B[] = "Point 26";
+static const char acName2814_1C[] = "Point 27";
+static const char acName2814_1D[] = "Point 28";
+static const char acName2814_1E[] = "Point 29";
+static const char acName2814_1F[] = "Point 30";
+static const char acName2814_20[] = "Point 31";
+static const char acName2814_21[] = "Point 32";
+static const char acName2814_22[] = "Point 33";
+static const char acName2814_23[] = "Point 34";
+static const char acName2814_24[] = "Point 35";
+static const char acName2814_25[] = "Point 36";
+static const char acName2814_26[] = "Point 37";
+static const char acName2814_27[] = "Point 38";
+static const char acName2814_28[] = "Point 39";
+static const char acName2814_29[] = "Point 40";
+static const char acName2814_2A[] = "Point 41";
+static const char acName2814_2B[] = "Point 42";
+static const char acName2814_2C[] = "Point 43";
+static const char acName2814_2D[] = "Point 44";
+static const char acName2814_2E[] = "Point 45";
+static const char acName2814_2F[] = "Point 46";
+static const char acName2814_30[] = "Point 47";
+static const char acName2814_31[] = "Point 48";
+static const char acName2814_32[] = "Point 49";
+static const char acName2814_33[] = "Point 50";
+static const char acName2814_34[] = "Point 51";
+static const char acName2814_35[] = "Point 52";
+static const char acName2814_36[] = "Point 53";
+static const char acName2814_37[] = "Point 54";
+static const char acName2814_38[] = "Point 55";
+static const char acName2814_39[] = "Point 56";
+static const char acName2814_3A[] = "Point 57";
+static const char acName2814_3B[] = "Point 58";
+static const char acName2814_3C[] = "Point 59";
+static const char acName2814_3D[] = "Point 60";
+static const char acName2814_3E[] = "Point 61";
+static const char acName2814_3F[] = "Point 62";
+static const char acName2814_40[] = "Point 63";
+static const char acName2814_41[] = "Point 64";
+static const char acName2814_42[] = "Point 65";
+static const char acName2814_43[] = "Point 66";
+static const char acName2814_44[] = "Point 67";
+static const char acName2814_45[] = "Point 68";
+static const char acName2814_46[] = "Point 69";
+static const char acName2814_47[] = "Point 70";
+static const char acName2814_48[] = "Point 71";
+static const char acName2814_49[] = "Point 72";
+static const char acName2814_4A[] = "Point 73";
+static const char acName2814_4B[] = "Point 74";
+static const char acName2814_4C[] = "Point 75";
+static const char acName2814_4D[] = "Point 76";
+static const char acName2814_4E[] = "Point 77";
+static const char acName2814_4F[] = "Point 78";
+static const char acName2814_50[] = "Point 79";
+static const char acName2814_51[] = "Point 80";
+static const char acName2814_52[] = "Point 81";
+static const char acName2814_53[] = "Point 82";
+static const char acName2814_54[] = "Point 83";
+static const char acName2814_55[] = "Point 84";
+static const char acName2814_56[] = "Point 85";
+static const char acName2814_57[] = "Point 86";
+static const char acName2814_58[] = "Point 87";
+static const char acName2814_59[] = "Point 88";
+static const char acName2814_5A[] = "Point 89";
+static const char acName2814_5B[] = "Point 90";
+static const char acName2814_5C[] = "Point 91";
+static const char acName2814_5D[] = "Point 92";
+static const char acName2814_5E[] = "Point 93";
+static const char acName2814_5F[] = "Point 94";
+static const char acName2814_60[] = "Point 95";
+static const char acName2814_61[] = "Point 96";
+static const char acName2814_62[] = "Point 97";
+static const char acName2814_63[] = "Point 98";
+static const char acName2814_64[] = "Point 99";
+static const char acName2814_65[] = "Point 100";
+static const char acName2814_66[] = "Point 101";
+static const char acName2814_67[] = "Point 102";
+static const char acName2814_68[] = "Point 103";
+static const char acName2814_69[] = "Point 104";
+static const char acName2814_6A[] = "Point 105";
+static const char acName2814_6B[] = "Point 106";
+static const char acName2814_6C[] = "Point 107";
+static const char acName2814_6D[] = "Point 108";
+static const char acName2814_6E[] = "Point 109";
+static const char acName2814_6F[] = "Point 110";
+static const char acName2814_70[] = "Point 111";
+static const char acName2814_71[] = "Point 112";
+static const char acName2814_72[] = "Point 113";
+static const char acName2814_73[] = "Point 114";
+static const char acName2814_74[] = "Point 115";
+static const char acName2814_75[] = "Point 116";
+static const char acName2814_76[] = "Point 117";
+static const char acName2814_77[] = "Point 118";
+static const char acName2814_78[] = "Point 119";
+static const char acName2814_79[] = "Point 120";
+static const char acName2814_7A[] = "Point 121";
+static const char acName2814_7B[] = "Point 122";
+static const char acName2814_7C[] = "Point 123";
+static const char acName2814_7D[] = "Point 124";
+static const char acName2814_7E[] = "Point 125";
+static const char acName2814_7F[] = "Point 126";
+static const char acName2814_80[] = "Point 127";
 static const char acName3000[] = "Drive Faults and Status";
 static const char acName3000_01[] = "Gate Driver Faults";
 static const char acName3000_02[] = "Drive Status Flags";
@@ -211,6 +481,141 @@ static const char acName3011_08[] = "Position I";
 static const char acName3011_09[] = "Velocity Filter";
 static const char acName3012[] = "Loop Structure";
 static const char acName3012_00[] = "Loop Structure";
+static const char acName3013[] = "Anti-Cogging";
+static const char acName3013_01[] = "Enable";
+static const char acName3013_02[] = "Gain";
+static const char acName3013_03[] = "Fade Speed";
+static const char acName3013_04[] = "Status";
+static const char acName3013_05[] = "Shaft Angle";
+static const char acName3014[] = "Anti-Cogging Table";
+static const char acName3014_01[] = "Point 0";
+static const char acName3014_02[] = "Point 1";
+static const char acName3014_03[] = "Point 2";
+static const char acName3014_04[] = "Point 3";
+static const char acName3014_05[] = "Point 4";
+static const char acName3014_06[] = "Point 5";
+static const char acName3014_07[] = "Point 6";
+static const char acName3014_08[] = "Point 7";
+static const char acName3014_09[] = "Point 8";
+static const char acName3014_0A[] = "Point 9";
+static const char acName3014_0B[] = "Point 10";
+static const char acName3014_0C[] = "Point 11";
+static const char acName3014_0D[] = "Point 12";
+static const char acName3014_0E[] = "Point 13";
+static const char acName3014_0F[] = "Point 14";
+static const char acName3014_10[] = "Point 15";
+static const char acName3014_11[] = "Point 16";
+static const char acName3014_12[] = "Point 17";
+static const char acName3014_13[] = "Point 18";
+static const char acName3014_14[] = "Point 19";
+static const char acName3014_15[] = "Point 20";
+static const char acName3014_16[] = "Point 21";
+static const char acName3014_17[] = "Point 22";
+static const char acName3014_18[] = "Point 23";
+static const char acName3014_19[] = "Point 24";
+static const char acName3014_1A[] = "Point 25";
+static const char acName3014_1B[] = "Point 26";
+static const char acName3014_1C[] = "Point 27";
+static const char acName3014_1D[] = "Point 28";
+static const char acName3014_1E[] = "Point 29";
+static const char acName3014_1F[] = "Point 30";
+static const char acName3014_20[] = "Point 31";
+static const char acName3014_21[] = "Point 32";
+static const char acName3014_22[] = "Point 33";
+static const char acName3014_23[] = "Point 34";
+static const char acName3014_24[] = "Point 35";
+static const char acName3014_25[] = "Point 36";
+static const char acName3014_26[] = "Point 37";
+static const char acName3014_27[] = "Point 38";
+static const char acName3014_28[] = "Point 39";
+static const char acName3014_29[] = "Point 40";
+static const char acName3014_2A[] = "Point 41";
+static const char acName3014_2B[] = "Point 42";
+static const char acName3014_2C[] = "Point 43";
+static const char acName3014_2D[] = "Point 44";
+static const char acName3014_2E[] = "Point 45";
+static const char acName3014_2F[] = "Point 46";
+static const char acName3014_30[] = "Point 47";
+static const char acName3014_31[] = "Point 48";
+static const char acName3014_32[] = "Point 49";
+static const char acName3014_33[] = "Point 50";
+static const char acName3014_34[] = "Point 51";
+static const char acName3014_35[] = "Point 52";
+static const char acName3014_36[] = "Point 53";
+static const char acName3014_37[] = "Point 54";
+static const char acName3014_38[] = "Point 55";
+static const char acName3014_39[] = "Point 56";
+static const char acName3014_3A[] = "Point 57";
+static const char acName3014_3B[] = "Point 58";
+static const char acName3014_3C[] = "Point 59";
+static const char acName3014_3D[] = "Point 60";
+static const char acName3014_3E[] = "Point 61";
+static const char acName3014_3F[] = "Point 62";
+static const char acName3014_40[] = "Point 63";
+static const char acName3014_41[] = "Point 64";
+static const char acName3014_42[] = "Point 65";
+static const char acName3014_43[] = "Point 66";
+static const char acName3014_44[] = "Point 67";
+static const char acName3014_45[] = "Point 68";
+static const char acName3014_46[] = "Point 69";
+static const char acName3014_47[] = "Point 70";
+static const char acName3014_48[] = "Point 71";
+static const char acName3014_49[] = "Point 72";
+static const char acName3014_4A[] = "Point 73";
+static const char acName3014_4B[] = "Point 74";
+static const char acName3014_4C[] = "Point 75";
+static const char acName3014_4D[] = "Point 76";
+static const char acName3014_4E[] = "Point 77";
+static const char acName3014_4F[] = "Point 78";
+static const char acName3014_50[] = "Point 79";
+static const char acName3014_51[] = "Point 80";
+static const char acName3014_52[] = "Point 81";
+static const char acName3014_53[] = "Point 82";
+static const char acName3014_54[] = "Point 83";
+static const char acName3014_55[] = "Point 84";
+static const char acName3014_56[] = "Point 85";
+static const char acName3014_57[] = "Point 86";
+static const char acName3014_58[] = "Point 87";
+static const char acName3014_59[] = "Point 88";
+static const char acName3014_5A[] = "Point 89";
+static const char acName3014_5B[] = "Point 90";
+static const char acName3014_5C[] = "Point 91";
+static const char acName3014_5D[] = "Point 92";
+static const char acName3014_5E[] = "Point 93";
+static const char acName3014_5F[] = "Point 94";
+static const char acName3014_60[] = "Point 95";
+static const char acName3014_61[] = "Point 96";
+static const char acName3014_62[] = "Point 97";
+static const char acName3014_63[] = "Point 98";
+static const char acName3014_64[] = "Point 99";
+static const char acName3014_65[] = "Point 100";
+static const char acName3014_66[] = "Point 101";
+static const char acName3014_67[] = "Point 102";
+static const char acName3014_68[] = "Point 103";
+static const char acName3014_69[] = "Point 104";
+static const char acName3014_6A[] = "Point 105";
+static const char acName3014_6B[] = "Point 106";
+static const char acName3014_6C[] = "Point 107";
+static const char acName3014_6D[] = "Point 108";
+static const char acName3014_6E[] = "Point 109";
+static const char acName3014_6F[] = "Point 110";
+static const char acName3014_70[] = "Point 111";
+static const char acName3014_71[] = "Point 112";
+static const char acName3014_72[] = "Point 113";
+static const char acName3014_73[] = "Point 114";
+static const char acName3014_74[] = "Point 115";
+static const char acName3014_75[] = "Point 116";
+static const char acName3014_76[] = "Point 117";
+static const char acName3014_77[] = "Point 118";
+static const char acName3014_78[] = "Point 119";
+static const char acName3014_79[] = "Point 120";
+static const char acName3014_7A[] = "Point 121";
+static const char acName3014_7B[] = "Point 122";
+static const char acName3014_7C[] = "Point 123";
+static const char acName3014_7D[] = "Point 124";
+static const char acName3014_7E[] = "Point 125";
+static const char acName3014_7F[] = "Point 126";
+static const char acName3014_80[] = "Point 127";
 static const char acName3800[] = "Drive Faults and Status";
 static const char acName3800_01[] = "Gate Driver Faults";
 static const char acName3800_02[] = "Drive Status Flags";
@@ -266,6 +671,141 @@ static const char acName3811_08[] = "Position I";
 static const char acName3811_09[] = "Velocity Filter";
 static const char acName3812[] = "Loop Structure";
 static const char acName3812_00[] = "Loop Structure";
+static const char acName3813[] = "Anti-Cogging";
+static const char acName3813_01[] = "Enable";
+static const char acName3813_02[] = "Gain";
+static const char acName3813_03[] = "Fade Speed";
+static const char acName3813_04[] = "Status";
+static const char acName3813_05[] = "Shaft Angle";
+static const char acName3814[] = "Anti-Cogging Table";
+static const char acName3814_01[] = "Point 0";
+static const char acName3814_02[] = "Point 1";
+static const char acName3814_03[] = "Point 2";
+static const char acName3814_04[] = "Point 3";
+static const char acName3814_05[] = "Point 4";
+static const char acName3814_06[] = "Point 5";
+static const char acName3814_07[] = "Point 6";
+static const char acName3814_08[] = "Point 7";
+static const char acName3814_09[] = "Point 8";
+static const char acName3814_0A[] = "Point 9";
+static const char acName3814_0B[] = "Point 10";
+static const char acName3814_0C[] = "Point 11";
+static const char acName3814_0D[] = "Point 12";
+static const char acName3814_0E[] = "Point 13";
+static const char acName3814_0F[] = "Point 14";
+static const char acName3814_10[] = "Point 15";
+static const char acName3814_11[] = "Point 16";
+static const char acName3814_12[] = "Point 17";
+static const char acName3814_13[] = "Point 18";
+static const char acName3814_14[] = "Point 19";
+static const char acName3814_15[] = "Point 20";
+static const char acName3814_16[] = "Point 21";
+static const char acName3814_17[] = "Point 22";
+static const char acName3814_18[] = "Point 23";
+static const char acName3814_19[] = "Point 24";
+static const char acName3814_1A[] = "Point 25";
+static const char acName3814_1B[] = "Point 26";
+static const char acName3814_1C[] = "Point 27";
+static const char acName3814_1D[] = "Point 28";
+static const char acName3814_1E[] = "Point 29";
+static const char acName3814_1F[] = "Point 30";
+static const char acName3814_20[] = "Point 31";
+static const char acName3814_21[] = "Point 32";
+static const char acName3814_22[] = "Point 33";
+static const char acName3814_23[] = "Point 34";
+static const char acName3814_24[] = "Point 35";
+static const char acName3814_25[] = "Point 36";
+static const char acName3814_26[] = "Point 37";
+static const char acName3814_27[] = "Point 38";
+static const char acName3814_28[] = "Point 39";
+static const char acName3814_29[] = "Point 40";
+static const char acName3814_2A[] = "Point 41";
+static const char acName3814_2B[] = "Point 42";
+static const char acName3814_2C[] = "Point 43";
+static const char acName3814_2D[] = "Point 44";
+static const char acName3814_2E[] = "Point 45";
+static const char acName3814_2F[] = "Point 46";
+static const char acName3814_30[] = "Point 47";
+static const char acName3814_31[] = "Point 48";
+static const char acName3814_32[] = "Point 49";
+static const char acName3814_33[] = "Point 50";
+static const char acName3814_34[] = "Point 51";
+static const char acName3814_35[] = "Point 52";
+static const char acName3814_36[] = "Point 53";
+static const char acName3814_37[] = "Point 54";
+static const char acName3814_38[] = "Point 55";
+static const char acName3814_39[] = "Point 56";
+static const char acName3814_3A[] = "Point 57";
+static const char acName3814_3B[] = "Point 58";
+static const char acName3814_3C[] = "Point 59";
+static const char acName3814_3D[] = "Point 60";
+static const char acName3814_3E[] = "Point 61";
+static const char acName3814_3F[] = "Point 62";
+static const char acName3814_40[] = "Point 63";
+static const char acName3814_41[] = "Point 64";
+static const char acName3814_42[] = "Point 65";
+static const char acName3814_43[] = "Point 66";
+static const char acName3814_44[] = "Point 67";
+static const char acName3814_45[] = "Point 68";
+static const char acName3814_46[] = "Point 69";
+static const char acName3814_47[] = "Point 70";
+static const char acName3814_48[] = "Point 71";
+static const char acName3814_49[] = "Point 72";
+static const char acName3814_4A[] = "Point 73";
+static const char acName3814_4B[] = "Point 74";
+static const char acName3814_4C[] = "Point 75";
+static const char acName3814_4D[] = "Point 76";
+static const char acName3814_4E[] = "Point 77";
+static const char acName3814_4F[] = "Point 78";
+static const char acName3814_50[] = "Point 79";
+static const char acName3814_51[] = "Point 80";
+static const char acName3814_52[] = "Point 81";
+static const char acName3814_53[] = "Point 82";
+static const char acName3814_54[] = "Point 83";
+static const char acName3814_55[] = "Point 84";
+static const char acName3814_56[] = "Point 85";
+static const char acName3814_57[] = "Point 86";
+static const char acName3814_58[] = "Point 87";
+static const char acName3814_59[] = "Point 88";
+static const char acName3814_5A[] = "Point 89";
+static const char acName3814_5B[] = "Point 90";
+static const char acName3814_5C[] = "Point 91";
+static const char acName3814_5D[] = "Point 92";
+static const char acName3814_5E[] = "Point 93";
+static const char acName3814_5F[] = "Point 94";
+static const char acName3814_60[] = "Point 95";
+static const char acName3814_61[] = "Point 96";
+static const char acName3814_62[] = "Point 97";
+static const char acName3814_63[] = "Point 98";
+static const char acName3814_64[] = "Point 99";
+static const char acName3814_65[] = "Point 100";
+static const char acName3814_66[] = "Point 101";
+static const char acName3814_67[] = "Point 102";
+static const char acName3814_68[] = "Point 103";
+static const char acName3814_69[] = "Point 104";
+static const char acName3814_6A[] = "Point 105";
+static const char acName3814_6B[] = "Point 106";
+static const char acName3814_6C[] = "Point 107";
+static const char acName3814_6D[] = "Point 108";
+static const char acName3814_6E[] = "Point 109";
+static const char acName3814_6F[] = "Point 110";
+static const char acName3814_70[] = "Point 111";
+static const char acName3814_71[] = "Point 112";
+static const char acName3814_72[] = "Point 113";
+static const char acName3814_73[] = "Point 114";
+static const char acName3814_74[] = "Point 115";
+static const char acName3814_75[] = "Point 116";
+static const char acName3814_76[] = "Point 117";
+static const char acName3814_77[] = "Point 118";
+static const char acName3814_78[] = "Point 119";
+static const char acName3814_79[] = "Point 120";
+static const char acName3814_7A[] = "Point 121";
+static const char acName3814_7B[] = "Point 122";
+static const char acName3814_7C[] = "Point 123";
+static const char acName3814_7D[] = "Point 124";
+static const char acName3814_7E[] = "Point 125";
+static const char acName3814_7F[] = "Point 126";
+static const char acName3814_80[] = "Point 127";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -911,6 +1451,151 @@ const _objd SDO2012[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2012_00, 0, &Obj.axis[0].LoopStructure},
 };
 
+/* 0x2013 Anti-Cogging */
+const _objd SDO2013[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2013, 5, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2013_01, 0, &Obj.axis[0].CoggingEnable},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2013_02, 1000, &Obj.axis[0].CoggingGain},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2013_03, 300, &Obj.axis[0].CoggingFadeRpm},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2013_04, 0, &Obj.axis[0].CoggingStatus},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2013_05, 0, &Obj.axis[0].ShaftAngle},
+};
+
+/* 0x2014 Anti-Cogging Table */
+const _objd SDO2014[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2014, 128, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_01, 0, &Obj.axis[0].CoggingTable[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_02, 0, &Obj.axis[0].CoggingTable[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_03, 0, &Obj.axis[0].CoggingTable[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_04, 0, &Obj.axis[0].CoggingTable[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_05, 0, &Obj.axis[0].CoggingTable[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_06, 0, &Obj.axis[0].CoggingTable[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_07, 0, &Obj.axis[0].CoggingTable[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_08, 0, &Obj.axis[0].CoggingTable[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_09, 0, &Obj.axis[0].CoggingTable[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_0A, 0, &Obj.axis[0].CoggingTable[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_0B, 0, &Obj.axis[0].CoggingTable[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_0C, 0, &Obj.axis[0].CoggingTable[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_0D, 0, &Obj.axis[0].CoggingTable[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_0E, 0, &Obj.axis[0].CoggingTable[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_0F, 0, &Obj.axis[0].CoggingTable[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_10, 0, &Obj.axis[0].CoggingTable[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_11, 0, &Obj.axis[0].CoggingTable[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_12, 0, &Obj.axis[0].CoggingTable[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_13, 0, &Obj.axis[0].CoggingTable[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_14, 0, &Obj.axis[0].CoggingTable[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_15, 0, &Obj.axis[0].CoggingTable[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_16, 0, &Obj.axis[0].CoggingTable[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_17, 0, &Obj.axis[0].CoggingTable[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_18, 0, &Obj.axis[0].CoggingTable[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_19, 0, &Obj.axis[0].CoggingTable[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_1A, 0, &Obj.axis[0].CoggingTable[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_1B, 0, &Obj.axis[0].CoggingTable[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_1C, 0, &Obj.axis[0].CoggingTable[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_1D, 0, &Obj.axis[0].CoggingTable[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_1E, 0, &Obj.axis[0].CoggingTable[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_1F, 0, &Obj.axis[0].CoggingTable[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_20, 0, &Obj.axis[0].CoggingTable[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_21, 0, &Obj.axis[0].CoggingTable[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_22, 0, &Obj.axis[0].CoggingTable[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_23, 0, &Obj.axis[0].CoggingTable[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_24, 0, &Obj.axis[0].CoggingTable[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_25, 0, &Obj.axis[0].CoggingTable[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_26, 0, &Obj.axis[0].CoggingTable[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_27, 0, &Obj.axis[0].CoggingTable[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_28, 0, &Obj.axis[0].CoggingTable[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_29, 0, &Obj.axis[0].CoggingTable[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_2A, 0, &Obj.axis[0].CoggingTable[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_2B, 0, &Obj.axis[0].CoggingTable[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_2C, 0, &Obj.axis[0].CoggingTable[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_2D, 0, &Obj.axis[0].CoggingTable[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_2E, 0, &Obj.axis[0].CoggingTable[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_2F, 0, &Obj.axis[0].CoggingTable[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_30, 0, &Obj.axis[0].CoggingTable[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_31, 0, &Obj.axis[0].CoggingTable[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_32, 0, &Obj.axis[0].CoggingTable[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_33, 0, &Obj.axis[0].CoggingTable[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_34, 0, &Obj.axis[0].CoggingTable[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_35, 0, &Obj.axis[0].CoggingTable[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_36, 0, &Obj.axis[0].CoggingTable[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_37, 0, &Obj.axis[0].CoggingTable[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_38, 0, &Obj.axis[0].CoggingTable[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_39, 0, &Obj.axis[0].CoggingTable[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_3A, 0, &Obj.axis[0].CoggingTable[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_3B, 0, &Obj.axis[0].CoggingTable[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_3C, 0, &Obj.axis[0].CoggingTable[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_3D, 0, &Obj.axis[0].CoggingTable[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_3E, 0, &Obj.axis[0].CoggingTable[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_3F, 0, &Obj.axis[0].CoggingTable[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_40, 0, &Obj.axis[0].CoggingTable[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_41, 0, &Obj.axis[0].CoggingTable[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_42, 0, &Obj.axis[0].CoggingTable[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_43, 0, &Obj.axis[0].CoggingTable[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_44, 0, &Obj.axis[0].CoggingTable[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_45, 0, &Obj.axis[0].CoggingTable[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_46, 0, &Obj.axis[0].CoggingTable[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_47, 0, &Obj.axis[0].CoggingTable[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_48, 0, &Obj.axis[0].CoggingTable[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_49, 0, &Obj.axis[0].CoggingTable[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_4A, 0, &Obj.axis[0].CoggingTable[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_4B, 0, &Obj.axis[0].CoggingTable[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_4C, 0, &Obj.axis[0].CoggingTable[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_4D, 0, &Obj.axis[0].CoggingTable[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_4E, 0, &Obj.axis[0].CoggingTable[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_4F, 0, &Obj.axis[0].CoggingTable[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_50, 0, &Obj.axis[0].CoggingTable[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_51, 0, &Obj.axis[0].CoggingTable[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_52, 0, &Obj.axis[0].CoggingTable[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_53, 0, &Obj.axis[0].CoggingTable[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_54, 0, &Obj.axis[0].CoggingTable[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_55, 0, &Obj.axis[0].CoggingTable[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_56, 0, &Obj.axis[0].CoggingTable[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_57, 0, &Obj.axis[0].CoggingTable[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_58, 0, &Obj.axis[0].CoggingTable[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_59, 0, &Obj.axis[0].CoggingTable[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_5A, 0, &Obj.axis[0].CoggingTable[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_5B, 0, &Obj.axis[0].CoggingTable[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_5C, 0, &Obj.axis[0].CoggingTable[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_5D, 0, &Obj.axis[0].CoggingTable[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_5E, 0, &Obj.axis[0].CoggingTable[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_5F, 0, &Obj.axis[0].CoggingTable[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_60, 0, &Obj.axis[0].CoggingTable[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_61, 0, &Obj.axis[0].CoggingTable[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_62, 0, &Obj.axis[0].CoggingTable[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_63, 0, &Obj.axis[0].CoggingTable[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_64, 0, &Obj.axis[0].CoggingTable[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_65, 0, &Obj.axis[0].CoggingTable[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_66, 0, &Obj.axis[0].CoggingTable[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_67, 0, &Obj.axis[0].CoggingTable[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_68, 0, &Obj.axis[0].CoggingTable[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_69, 0, &Obj.axis[0].CoggingTable[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_6A, 0, &Obj.axis[0].CoggingTable[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_6B, 0, &Obj.axis[0].CoggingTable[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_6C, 0, &Obj.axis[0].CoggingTable[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_6D, 0, &Obj.axis[0].CoggingTable[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_6E, 0, &Obj.axis[0].CoggingTable[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_6F, 0, &Obj.axis[0].CoggingTable[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_70, 0, &Obj.axis[0].CoggingTable[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_71, 0, &Obj.axis[0].CoggingTable[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_72, 0, &Obj.axis[0].CoggingTable[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_73, 0, &Obj.axis[0].CoggingTable[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_74, 0, &Obj.axis[0].CoggingTable[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_75, 0, &Obj.axis[0].CoggingTable[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_76, 0, &Obj.axis[0].CoggingTable[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_77, 0, &Obj.axis[0].CoggingTable[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_78, 0, &Obj.axis[0].CoggingTable[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_79, 0, &Obj.axis[0].CoggingTable[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_7A, 0, &Obj.axis[0].CoggingTable[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_7B, 0, &Obj.axis[0].CoggingTable[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_7C, 0, &Obj.axis[0].CoggingTable[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_7D, 0, &Obj.axis[0].CoggingTable[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_7E, 0, &Obj.axis[0].CoggingTable[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_7F, 0, &Obj.axis[0].CoggingTable[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RW, acName2014_80, 0, &Obj.axis[0].CoggingTable[127]},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -1003,6 +1688,151 @@ const _objd SDO2811[] =
 const _objd SDO2812[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2812_00, 0, &Obj.axis[1].LoopStructure},
+};
+
+/* 0x2813 Anti-Cogging */
+const _objd SDO2813[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2813, 5, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2813_01, 0, &Obj.axis[1].CoggingEnable},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2813_02, 1000, &Obj.axis[1].CoggingGain},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2813_03, 300, &Obj.axis[1].CoggingFadeRpm},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2813_04, 0, &Obj.axis[1].CoggingStatus},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2813_05, 0, &Obj.axis[1].ShaftAngle},
+};
+
+/* 0x2814 Anti-Cogging Table */
+const _objd SDO2814[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2814, 128, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_01, 0, &Obj.axis[1].CoggingTable[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_02, 0, &Obj.axis[1].CoggingTable[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_03, 0, &Obj.axis[1].CoggingTable[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_04, 0, &Obj.axis[1].CoggingTable[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_05, 0, &Obj.axis[1].CoggingTable[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_06, 0, &Obj.axis[1].CoggingTable[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_07, 0, &Obj.axis[1].CoggingTable[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_08, 0, &Obj.axis[1].CoggingTable[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_09, 0, &Obj.axis[1].CoggingTable[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_0A, 0, &Obj.axis[1].CoggingTable[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_0B, 0, &Obj.axis[1].CoggingTable[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_0C, 0, &Obj.axis[1].CoggingTable[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_0D, 0, &Obj.axis[1].CoggingTable[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_0E, 0, &Obj.axis[1].CoggingTable[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_0F, 0, &Obj.axis[1].CoggingTable[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_10, 0, &Obj.axis[1].CoggingTable[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_11, 0, &Obj.axis[1].CoggingTable[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_12, 0, &Obj.axis[1].CoggingTable[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_13, 0, &Obj.axis[1].CoggingTable[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_14, 0, &Obj.axis[1].CoggingTable[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_15, 0, &Obj.axis[1].CoggingTable[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_16, 0, &Obj.axis[1].CoggingTable[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_17, 0, &Obj.axis[1].CoggingTable[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_18, 0, &Obj.axis[1].CoggingTable[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_19, 0, &Obj.axis[1].CoggingTable[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_1A, 0, &Obj.axis[1].CoggingTable[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_1B, 0, &Obj.axis[1].CoggingTable[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_1C, 0, &Obj.axis[1].CoggingTable[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_1D, 0, &Obj.axis[1].CoggingTable[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_1E, 0, &Obj.axis[1].CoggingTable[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_1F, 0, &Obj.axis[1].CoggingTable[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_20, 0, &Obj.axis[1].CoggingTable[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_21, 0, &Obj.axis[1].CoggingTable[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_22, 0, &Obj.axis[1].CoggingTable[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_23, 0, &Obj.axis[1].CoggingTable[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_24, 0, &Obj.axis[1].CoggingTable[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_25, 0, &Obj.axis[1].CoggingTable[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_26, 0, &Obj.axis[1].CoggingTable[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_27, 0, &Obj.axis[1].CoggingTable[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_28, 0, &Obj.axis[1].CoggingTable[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_29, 0, &Obj.axis[1].CoggingTable[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_2A, 0, &Obj.axis[1].CoggingTable[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_2B, 0, &Obj.axis[1].CoggingTable[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_2C, 0, &Obj.axis[1].CoggingTable[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_2D, 0, &Obj.axis[1].CoggingTable[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_2E, 0, &Obj.axis[1].CoggingTable[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_2F, 0, &Obj.axis[1].CoggingTable[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_30, 0, &Obj.axis[1].CoggingTable[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_31, 0, &Obj.axis[1].CoggingTable[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_32, 0, &Obj.axis[1].CoggingTable[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_33, 0, &Obj.axis[1].CoggingTable[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_34, 0, &Obj.axis[1].CoggingTable[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_35, 0, &Obj.axis[1].CoggingTable[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_36, 0, &Obj.axis[1].CoggingTable[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_37, 0, &Obj.axis[1].CoggingTable[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_38, 0, &Obj.axis[1].CoggingTable[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_39, 0, &Obj.axis[1].CoggingTable[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_3A, 0, &Obj.axis[1].CoggingTable[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_3B, 0, &Obj.axis[1].CoggingTable[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_3C, 0, &Obj.axis[1].CoggingTable[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_3D, 0, &Obj.axis[1].CoggingTable[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_3E, 0, &Obj.axis[1].CoggingTable[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_3F, 0, &Obj.axis[1].CoggingTable[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_40, 0, &Obj.axis[1].CoggingTable[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_41, 0, &Obj.axis[1].CoggingTable[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_42, 0, &Obj.axis[1].CoggingTable[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_43, 0, &Obj.axis[1].CoggingTable[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_44, 0, &Obj.axis[1].CoggingTable[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_45, 0, &Obj.axis[1].CoggingTable[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_46, 0, &Obj.axis[1].CoggingTable[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_47, 0, &Obj.axis[1].CoggingTable[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_48, 0, &Obj.axis[1].CoggingTable[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_49, 0, &Obj.axis[1].CoggingTable[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_4A, 0, &Obj.axis[1].CoggingTable[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_4B, 0, &Obj.axis[1].CoggingTable[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_4C, 0, &Obj.axis[1].CoggingTable[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_4D, 0, &Obj.axis[1].CoggingTable[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_4E, 0, &Obj.axis[1].CoggingTable[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_4F, 0, &Obj.axis[1].CoggingTable[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_50, 0, &Obj.axis[1].CoggingTable[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_51, 0, &Obj.axis[1].CoggingTable[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_52, 0, &Obj.axis[1].CoggingTable[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_53, 0, &Obj.axis[1].CoggingTable[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_54, 0, &Obj.axis[1].CoggingTable[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_55, 0, &Obj.axis[1].CoggingTable[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_56, 0, &Obj.axis[1].CoggingTable[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_57, 0, &Obj.axis[1].CoggingTable[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_58, 0, &Obj.axis[1].CoggingTable[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_59, 0, &Obj.axis[1].CoggingTable[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_5A, 0, &Obj.axis[1].CoggingTable[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_5B, 0, &Obj.axis[1].CoggingTable[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_5C, 0, &Obj.axis[1].CoggingTable[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_5D, 0, &Obj.axis[1].CoggingTable[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_5E, 0, &Obj.axis[1].CoggingTable[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_5F, 0, &Obj.axis[1].CoggingTable[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_60, 0, &Obj.axis[1].CoggingTable[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_61, 0, &Obj.axis[1].CoggingTable[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_62, 0, &Obj.axis[1].CoggingTable[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_63, 0, &Obj.axis[1].CoggingTable[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_64, 0, &Obj.axis[1].CoggingTable[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_65, 0, &Obj.axis[1].CoggingTable[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_66, 0, &Obj.axis[1].CoggingTable[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_67, 0, &Obj.axis[1].CoggingTable[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_68, 0, &Obj.axis[1].CoggingTable[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_69, 0, &Obj.axis[1].CoggingTable[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_6A, 0, &Obj.axis[1].CoggingTable[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_6B, 0, &Obj.axis[1].CoggingTable[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_6C, 0, &Obj.axis[1].CoggingTable[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_6D, 0, &Obj.axis[1].CoggingTable[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_6E, 0, &Obj.axis[1].CoggingTable[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_6F, 0, &Obj.axis[1].CoggingTable[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_70, 0, &Obj.axis[1].CoggingTable[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_71, 0, &Obj.axis[1].CoggingTable[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_72, 0, &Obj.axis[1].CoggingTable[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_73, 0, &Obj.axis[1].CoggingTable[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_74, 0, &Obj.axis[1].CoggingTable[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_75, 0, &Obj.axis[1].CoggingTable[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_76, 0, &Obj.axis[1].CoggingTable[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_77, 0, &Obj.axis[1].CoggingTable[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_78, 0, &Obj.axis[1].CoggingTable[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_79, 0, &Obj.axis[1].CoggingTable[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_7A, 0, &Obj.axis[1].CoggingTable[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_7B, 0, &Obj.axis[1].CoggingTable[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_7C, 0, &Obj.axis[1].CoggingTable[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_7D, 0, &Obj.axis[1].CoggingTable[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_7E, 0, &Obj.axis[1].CoggingTable[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_7F, 0, &Obj.axis[1].CoggingTable[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RW, acName2814_80, 0, &Obj.axis[1].CoggingTable[127]},
 };
 
 /* 0x3000 Drive Faults and Status */
@@ -1099,6 +1929,151 @@ const _objd SDO3012[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3012_00, 0, &Obj.axis[2].LoopStructure},
 };
 
+/* 0x3013 Anti-Cogging */
+const _objd SDO3013[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3013, 5, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3013_01, 0, &Obj.axis[2].CoggingEnable},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3013_02, 1000, &Obj.axis[2].CoggingGain},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3013_03, 300, &Obj.axis[2].CoggingFadeRpm},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3013_04, 0, &Obj.axis[2].CoggingStatus},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3013_05, 0, &Obj.axis[2].ShaftAngle},
+};
+
+/* 0x3014 Anti-Cogging Table */
+const _objd SDO3014[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3014, 128, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_01, 0, &Obj.axis[2].CoggingTable[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_02, 0, &Obj.axis[2].CoggingTable[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_03, 0, &Obj.axis[2].CoggingTable[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_04, 0, &Obj.axis[2].CoggingTable[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_05, 0, &Obj.axis[2].CoggingTable[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_06, 0, &Obj.axis[2].CoggingTable[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_07, 0, &Obj.axis[2].CoggingTable[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_08, 0, &Obj.axis[2].CoggingTable[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_09, 0, &Obj.axis[2].CoggingTable[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_0A, 0, &Obj.axis[2].CoggingTable[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_0B, 0, &Obj.axis[2].CoggingTable[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_0C, 0, &Obj.axis[2].CoggingTable[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_0D, 0, &Obj.axis[2].CoggingTable[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_0E, 0, &Obj.axis[2].CoggingTable[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_0F, 0, &Obj.axis[2].CoggingTable[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_10, 0, &Obj.axis[2].CoggingTable[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_11, 0, &Obj.axis[2].CoggingTable[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_12, 0, &Obj.axis[2].CoggingTable[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_13, 0, &Obj.axis[2].CoggingTable[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_14, 0, &Obj.axis[2].CoggingTable[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_15, 0, &Obj.axis[2].CoggingTable[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_16, 0, &Obj.axis[2].CoggingTable[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_17, 0, &Obj.axis[2].CoggingTable[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_18, 0, &Obj.axis[2].CoggingTable[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_19, 0, &Obj.axis[2].CoggingTable[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_1A, 0, &Obj.axis[2].CoggingTable[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_1B, 0, &Obj.axis[2].CoggingTable[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_1C, 0, &Obj.axis[2].CoggingTable[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_1D, 0, &Obj.axis[2].CoggingTable[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_1E, 0, &Obj.axis[2].CoggingTable[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_1F, 0, &Obj.axis[2].CoggingTable[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_20, 0, &Obj.axis[2].CoggingTable[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_21, 0, &Obj.axis[2].CoggingTable[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_22, 0, &Obj.axis[2].CoggingTable[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_23, 0, &Obj.axis[2].CoggingTable[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_24, 0, &Obj.axis[2].CoggingTable[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_25, 0, &Obj.axis[2].CoggingTable[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_26, 0, &Obj.axis[2].CoggingTable[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_27, 0, &Obj.axis[2].CoggingTable[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_28, 0, &Obj.axis[2].CoggingTable[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_29, 0, &Obj.axis[2].CoggingTable[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_2A, 0, &Obj.axis[2].CoggingTable[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_2B, 0, &Obj.axis[2].CoggingTable[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_2C, 0, &Obj.axis[2].CoggingTable[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_2D, 0, &Obj.axis[2].CoggingTable[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_2E, 0, &Obj.axis[2].CoggingTable[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_2F, 0, &Obj.axis[2].CoggingTable[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_30, 0, &Obj.axis[2].CoggingTable[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_31, 0, &Obj.axis[2].CoggingTable[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_32, 0, &Obj.axis[2].CoggingTable[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_33, 0, &Obj.axis[2].CoggingTable[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_34, 0, &Obj.axis[2].CoggingTable[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_35, 0, &Obj.axis[2].CoggingTable[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_36, 0, &Obj.axis[2].CoggingTable[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_37, 0, &Obj.axis[2].CoggingTable[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_38, 0, &Obj.axis[2].CoggingTable[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_39, 0, &Obj.axis[2].CoggingTable[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_3A, 0, &Obj.axis[2].CoggingTable[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_3B, 0, &Obj.axis[2].CoggingTable[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_3C, 0, &Obj.axis[2].CoggingTable[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_3D, 0, &Obj.axis[2].CoggingTable[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_3E, 0, &Obj.axis[2].CoggingTable[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_3F, 0, &Obj.axis[2].CoggingTable[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_40, 0, &Obj.axis[2].CoggingTable[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_41, 0, &Obj.axis[2].CoggingTable[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_42, 0, &Obj.axis[2].CoggingTable[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_43, 0, &Obj.axis[2].CoggingTable[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_44, 0, &Obj.axis[2].CoggingTable[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_45, 0, &Obj.axis[2].CoggingTable[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_46, 0, &Obj.axis[2].CoggingTable[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_47, 0, &Obj.axis[2].CoggingTable[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_48, 0, &Obj.axis[2].CoggingTable[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_49, 0, &Obj.axis[2].CoggingTable[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_4A, 0, &Obj.axis[2].CoggingTable[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_4B, 0, &Obj.axis[2].CoggingTable[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_4C, 0, &Obj.axis[2].CoggingTable[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_4D, 0, &Obj.axis[2].CoggingTable[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_4E, 0, &Obj.axis[2].CoggingTable[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_4F, 0, &Obj.axis[2].CoggingTable[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_50, 0, &Obj.axis[2].CoggingTable[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_51, 0, &Obj.axis[2].CoggingTable[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_52, 0, &Obj.axis[2].CoggingTable[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_53, 0, &Obj.axis[2].CoggingTable[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_54, 0, &Obj.axis[2].CoggingTable[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_55, 0, &Obj.axis[2].CoggingTable[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_56, 0, &Obj.axis[2].CoggingTable[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_57, 0, &Obj.axis[2].CoggingTable[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_58, 0, &Obj.axis[2].CoggingTable[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_59, 0, &Obj.axis[2].CoggingTable[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_5A, 0, &Obj.axis[2].CoggingTable[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_5B, 0, &Obj.axis[2].CoggingTable[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_5C, 0, &Obj.axis[2].CoggingTable[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_5D, 0, &Obj.axis[2].CoggingTable[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_5E, 0, &Obj.axis[2].CoggingTable[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_5F, 0, &Obj.axis[2].CoggingTable[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_60, 0, &Obj.axis[2].CoggingTable[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_61, 0, &Obj.axis[2].CoggingTable[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_62, 0, &Obj.axis[2].CoggingTable[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_63, 0, &Obj.axis[2].CoggingTable[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_64, 0, &Obj.axis[2].CoggingTable[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_65, 0, &Obj.axis[2].CoggingTable[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_66, 0, &Obj.axis[2].CoggingTable[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_67, 0, &Obj.axis[2].CoggingTable[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_68, 0, &Obj.axis[2].CoggingTable[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_69, 0, &Obj.axis[2].CoggingTable[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_6A, 0, &Obj.axis[2].CoggingTable[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_6B, 0, &Obj.axis[2].CoggingTable[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_6C, 0, &Obj.axis[2].CoggingTable[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_6D, 0, &Obj.axis[2].CoggingTable[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_6E, 0, &Obj.axis[2].CoggingTable[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_6F, 0, &Obj.axis[2].CoggingTable[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_70, 0, &Obj.axis[2].CoggingTable[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_71, 0, &Obj.axis[2].CoggingTable[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_72, 0, &Obj.axis[2].CoggingTable[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_73, 0, &Obj.axis[2].CoggingTable[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_74, 0, &Obj.axis[2].CoggingTable[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_75, 0, &Obj.axis[2].CoggingTable[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_76, 0, &Obj.axis[2].CoggingTable[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_77, 0, &Obj.axis[2].CoggingTable[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_78, 0, &Obj.axis[2].CoggingTable[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_79, 0, &Obj.axis[2].CoggingTable[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_7A, 0, &Obj.axis[2].CoggingTable[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_7B, 0, &Obj.axis[2].CoggingTable[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_7C, 0, &Obj.axis[2].CoggingTable[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_7D, 0, &Obj.axis[2].CoggingTable[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_7E, 0, &Obj.axis[2].CoggingTable[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_7F, 0, &Obj.axis[2].CoggingTable[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RW, acName3014_80, 0, &Obj.axis[2].CoggingTable[127]},
+};
+
 /* 0x3800 Drive Faults and Status */
 const _objd SDO3800[] =
 {
@@ -1191,6 +2166,151 @@ const _objd SDO3811[] =
 const _objd SDO3812[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3812_00, 0, &Obj.axis[3].LoopStructure},
+};
+
+/* 0x3813 Anti-Cogging */
+const _objd SDO3813[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3813, 5, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3813_01, 0, &Obj.axis[3].CoggingEnable},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3813_02, 1000, &Obj.axis[3].CoggingGain},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3813_03, 300, &Obj.axis[3].CoggingFadeRpm},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3813_04, 0, &Obj.axis[3].CoggingStatus},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3813_05, 0, &Obj.axis[3].ShaftAngle},
+};
+
+/* 0x3814 Anti-Cogging Table */
+const _objd SDO3814[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3814, 128, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_01, 0, &Obj.axis[3].CoggingTable[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_02, 0, &Obj.axis[3].CoggingTable[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_03, 0, &Obj.axis[3].CoggingTable[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_04, 0, &Obj.axis[3].CoggingTable[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_05, 0, &Obj.axis[3].CoggingTable[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_06, 0, &Obj.axis[3].CoggingTable[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_07, 0, &Obj.axis[3].CoggingTable[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_08, 0, &Obj.axis[3].CoggingTable[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_09, 0, &Obj.axis[3].CoggingTable[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_0A, 0, &Obj.axis[3].CoggingTable[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_0B, 0, &Obj.axis[3].CoggingTable[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_0C, 0, &Obj.axis[3].CoggingTable[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_0D, 0, &Obj.axis[3].CoggingTable[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_0E, 0, &Obj.axis[3].CoggingTable[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_0F, 0, &Obj.axis[3].CoggingTable[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_10, 0, &Obj.axis[3].CoggingTable[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_11, 0, &Obj.axis[3].CoggingTable[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_12, 0, &Obj.axis[3].CoggingTable[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_13, 0, &Obj.axis[3].CoggingTable[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_14, 0, &Obj.axis[3].CoggingTable[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_15, 0, &Obj.axis[3].CoggingTable[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_16, 0, &Obj.axis[3].CoggingTable[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_17, 0, &Obj.axis[3].CoggingTable[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_18, 0, &Obj.axis[3].CoggingTable[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_19, 0, &Obj.axis[3].CoggingTable[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_1A, 0, &Obj.axis[3].CoggingTable[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_1B, 0, &Obj.axis[3].CoggingTable[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_1C, 0, &Obj.axis[3].CoggingTable[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_1D, 0, &Obj.axis[3].CoggingTable[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_1E, 0, &Obj.axis[3].CoggingTable[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_1F, 0, &Obj.axis[3].CoggingTable[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_20, 0, &Obj.axis[3].CoggingTable[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_21, 0, &Obj.axis[3].CoggingTable[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_22, 0, &Obj.axis[3].CoggingTable[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_23, 0, &Obj.axis[3].CoggingTable[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_24, 0, &Obj.axis[3].CoggingTable[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_25, 0, &Obj.axis[3].CoggingTable[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_26, 0, &Obj.axis[3].CoggingTable[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_27, 0, &Obj.axis[3].CoggingTable[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_28, 0, &Obj.axis[3].CoggingTable[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_29, 0, &Obj.axis[3].CoggingTable[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_2A, 0, &Obj.axis[3].CoggingTable[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_2B, 0, &Obj.axis[3].CoggingTable[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_2C, 0, &Obj.axis[3].CoggingTable[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_2D, 0, &Obj.axis[3].CoggingTable[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_2E, 0, &Obj.axis[3].CoggingTable[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_2F, 0, &Obj.axis[3].CoggingTable[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_30, 0, &Obj.axis[3].CoggingTable[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_31, 0, &Obj.axis[3].CoggingTable[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_32, 0, &Obj.axis[3].CoggingTable[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_33, 0, &Obj.axis[3].CoggingTable[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_34, 0, &Obj.axis[3].CoggingTable[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_35, 0, &Obj.axis[3].CoggingTable[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_36, 0, &Obj.axis[3].CoggingTable[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_37, 0, &Obj.axis[3].CoggingTable[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_38, 0, &Obj.axis[3].CoggingTable[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_39, 0, &Obj.axis[3].CoggingTable[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_3A, 0, &Obj.axis[3].CoggingTable[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_3B, 0, &Obj.axis[3].CoggingTable[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_3C, 0, &Obj.axis[3].CoggingTable[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_3D, 0, &Obj.axis[3].CoggingTable[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_3E, 0, &Obj.axis[3].CoggingTable[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_3F, 0, &Obj.axis[3].CoggingTable[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_40, 0, &Obj.axis[3].CoggingTable[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_41, 0, &Obj.axis[3].CoggingTable[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_42, 0, &Obj.axis[3].CoggingTable[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_43, 0, &Obj.axis[3].CoggingTable[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_44, 0, &Obj.axis[3].CoggingTable[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_45, 0, &Obj.axis[3].CoggingTable[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_46, 0, &Obj.axis[3].CoggingTable[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_47, 0, &Obj.axis[3].CoggingTable[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_48, 0, &Obj.axis[3].CoggingTable[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_49, 0, &Obj.axis[3].CoggingTable[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_4A, 0, &Obj.axis[3].CoggingTable[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_4B, 0, &Obj.axis[3].CoggingTable[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_4C, 0, &Obj.axis[3].CoggingTable[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_4D, 0, &Obj.axis[3].CoggingTable[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_4E, 0, &Obj.axis[3].CoggingTable[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_4F, 0, &Obj.axis[3].CoggingTable[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_50, 0, &Obj.axis[3].CoggingTable[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_51, 0, &Obj.axis[3].CoggingTable[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_52, 0, &Obj.axis[3].CoggingTable[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_53, 0, &Obj.axis[3].CoggingTable[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_54, 0, &Obj.axis[3].CoggingTable[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_55, 0, &Obj.axis[3].CoggingTable[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_56, 0, &Obj.axis[3].CoggingTable[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_57, 0, &Obj.axis[3].CoggingTable[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_58, 0, &Obj.axis[3].CoggingTable[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_59, 0, &Obj.axis[3].CoggingTable[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_5A, 0, &Obj.axis[3].CoggingTable[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_5B, 0, &Obj.axis[3].CoggingTable[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_5C, 0, &Obj.axis[3].CoggingTable[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_5D, 0, &Obj.axis[3].CoggingTable[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_5E, 0, &Obj.axis[3].CoggingTable[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_5F, 0, &Obj.axis[3].CoggingTable[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_60, 0, &Obj.axis[3].CoggingTable[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_61, 0, &Obj.axis[3].CoggingTable[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_62, 0, &Obj.axis[3].CoggingTable[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_63, 0, &Obj.axis[3].CoggingTable[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_64, 0, &Obj.axis[3].CoggingTable[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_65, 0, &Obj.axis[3].CoggingTable[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_66, 0, &Obj.axis[3].CoggingTable[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_67, 0, &Obj.axis[3].CoggingTable[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_68, 0, &Obj.axis[3].CoggingTable[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_69, 0, &Obj.axis[3].CoggingTable[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_6A, 0, &Obj.axis[3].CoggingTable[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_6B, 0, &Obj.axis[3].CoggingTable[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_6C, 0, &Obj.axis[3].CoggingTable[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_6D, 0, &Obj.axis[3].CoggingTable[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_6E, 0, &Obj.axis[3].CoggingTable[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_6F, 0, &Obj.axis[3].CoggingTable[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_70, 0, &Obj.axis[3].CoggingTable[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_71, 0, &Obj.axis[3].CoggingTable[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_72, 0, &Obj.axis[3].CoggingTable[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_73, 0, &Obj.axis[3].CoggingTable[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_74, 0, &Obj.axis[3].CoggingTable[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_75, 0, &Obj.axis[3].CoggingTable[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_76, 0, &Obj.axis[3].CoggingTable[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_77, 0, &Obj.axis[3].CoggingTable[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_78, 0, &Obj.axis[3].CoggingTable[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_79, 0, &Obj.axis[3].CoggingTable[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_7A, 0, &Obj.axis[3].CoggingTable[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_7B, 0, &Obj.axis[3].CoggingTable[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_7C, 0, &Obj.axis[3].CoggingTable[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_7D, 0, &Obj.axis[3].CoggingTable[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_7E, 0, &Obj.axis[3].CoggingTable[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_7F, 0, &Obj.axis[3].CoggingTable[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RW, acName3814_80, 0, &Obj.axis[3].CoggingTable[127]},
 };
 
 /* 0x603F Error Code */
@@ -1907,6 +3027,8 @@ const _objectlist SDOobjects[] =
    {0x2010, OTYPE_RECORD, 10, 0, acName2010, SDO2010},
    {0x2011, OTYPE_RECORD, 9, 0, acName2011, SDO2011},
    {0x2012, OTYPE_VAR, 0, 0, acName2012, SDO2012},
+   {0x2013, OTYPE_RECORD, 5, 0, acName2013, SDO2013},
+   {0x2014, OTYPE_ARRAY, 128, 0, acName2014, SDO2014},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
@@ -1915,6 +3037,8 @@ const _objectlist SDOobjects[] =
    {0x2810, OTYPE_RECORD, 10, 0, acName2810, SDO2810},
    {0x2811, OTYPE_RECORD, 9, 0, acName2811, SDO2811},
    {0x2812, OTYPE_VAR, 0, 0, acName2812, SDO2812},
+   {0x2813, OTYPE_RECORD, 5, 0, acName2813, SDO2813},
+   {0x2814, OTYPE_ARRAY, 128, 0, acName2814, SDO2814},
    {0x3000, OTYPE_RECORD, 2, 0, acName3000, SDO3000},
    {0x3001, OTYPE_RECORD, 4, 0, acName3001, SDO3001},
    {0x3002, OTYPE_RECORD, 3, 0, acName3002, SDO3002},
@@ -1923,6 +3047,8 @@ const _objectlist SDOobjects[] =
    {0x3010, OTYPE_RECORD, 10, 0, acName3010, SDO3010},
    {0x3011, OTYPE_RECORD, 9, 0, acName3011, SDO3011},
    {0x3012, OTYPE_VAR, 0, 0, acName3012, SDO3012},
+   {0x3013, OTYPE_RECORD, 5, 0, acName3013, SDO3013},
+   {0x3014, OTYPE_ARRAY, 128, 0, acName3014, SDO3014},
    {0x3800, OTYPE_RECORD, 2, 0, acName3800, SDO3800},
    {0x3801, OTYPE_RECORD, 4, 0, acName3801, SDO3801},
    {0x3802, OTYPE_RECORD, 3, 0, acName3802, SDO3802},
@@ -1931,6 +3057,8 @@ const _objectlist SDOobjects[] =
    {0x3810, OTYPE_RECORD, 10, 0, acName3810, SDO3810},
    {0x3811, OTYPE_RECORD, 9, 0, acName3811, SDO3811},
    {0x3812, OTYPE_VAR, 0, 0, acName3812, SDO3812},
+   {0x3813, OTYPE_RECORD, 5, 0, acName3813, SDO3813},
+   {0x3814, OTYPE_ARRAY, 128, 0, acName3814, SDO3814},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

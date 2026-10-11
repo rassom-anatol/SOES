@@ -38,6 +38,10 @@ typedef struct
    uint16_t   AdvVelocityI;
    uint16_t   AdvVelocityP;
    uint16_t   BoardTelemetryPeriod;
+   uint8_t    CoggingEnable;
+   uint16_t   CoggingFadeRpm;
+   uint16_t   CoggingGain;
+   uint8_t    CoggingStatus;
    uint16_t   Controlword;
    int16_t    CurrentU;
    int16_t    CurrentV;
@@ -78,6 +82,7 @@ typedef struct
    uint32_t   ProfileDeceleration;
    uint32_t   QuickStopDeceleration;
    int16_t    QuickStopOptionCode;
+   uint16_t   ShaftAngle;
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;
    int32_t    TargetPosition;
@@ -91,6 +96,7 @@ typedef struct
    uint16_t   VelocityI;
    uint32_t   VelocityLimit;
    uint16_t   VelocityP;
+   int16_t    CoggingTable[128];
 } _Axis;
 
 typedef struct

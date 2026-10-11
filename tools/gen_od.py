@@ -134,6 +134,16 @@ class Object:
         self.index = index
         self.axis = axis
         self.name = spec["name"]
+        # `elements: {count, type, var, access, name}` expands to that many
+        # sub-entries 1..count stored in one C array `var[count]`, for tables
+        # too long to list one by one.
+        if "elements" in spec:
+            e = spec["elements"]
+            spec = dict(spec)
+            spec["subs"] = [{"sub": i + 1, "name": f"{e.get('name', 'Element')} {i}",
+                             "type": e["type"], "access": e.get("access", "rw"),
+                             "var": f"{e['var']}[{i}]", "value": e.get("value", 0)}
+                            for i in range(e["count"])]
         self.is_record = "subs" in spec
         self.subs = []
 
@@ -531,11 +541,20 @@ def emit_utypes(cfg, objs, src):
 
     out.append("/* Per-axis process and parameter data. */")
     out.append("typedef struct\n{")
+    arrays = {}
     for var in sorted(per_axis):
         member = var.split(".")[-1] if "." not in var else None
         if member is None:
             continue
+        if "[" in var:
+            # An `elements` table: declare the array once, at its full size.
+            base, idx = var[:-1].split("[")
+            arrays[base] = (per_axis[var], max(arrays.get(base, ("", 0))[1], int(idx) + 1))
+            continue
         out.append(f"   {per_axis[var]:<10} {var};")
+    for base in sorted(arrays):
+        ctype, count = arrays[base]
+        out.append(f"   {ctype:<10} {base}[{count}];")
     out.append("} _Axis;\n")
 
     out.append("typedef struct\n{")

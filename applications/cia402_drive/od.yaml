@@ -413,6 +413,34 @@ objects:
   # axis is in Operation Enabled.
   - {index: 0x2012, axis: true, name: "Loop Structure", type: u8, access: rw, var: "LoopStructure", store: true, disabled_only: true}
 
+  # Anti-cogging: a torque the drive adds as a function of shaft angle,
+  # measured once with tools/twincat/cogging.py and held in 0x2014. The angle
+  # is counted from the encoder's index pulse, so it is the same after every
+  # power-up; until the motor has passed the index once, Status reads 1 and
+  # nothing is added. Gain scales the table (per mille); the compensation is
+  # full up to Fade Speed and falls to nothing at twice it (rpm), where the
+  # rotor's inertia smooths cogging anyway.
+  - index: 0x2013
+    axis: true
+    name: "Anti-Cogging"
+    type: record
+    subs:
+      - {sub: 1, name: "Enable",      type: u8,  access: rw, var: "CoggingEnable", store: true}
+      - {sub: 2, name: "Gain",        type: u16, access: rw, var: "CoggingGain", value: 1000, store: true}
+      - {sub: 3, name: "Fade Speed",  type: u16, access: rw, var: "CoggingFadeRpm", value: 300, store: true}
+      - {sub: 4, name: "Status",      type: u8,  access: ro, var: "CoggingStatus"}
+      - {sub: 5, name: "Shaft Angle", type: u16, access: ro, var: "ShaftAngle"}
+
+  # The anti-cogging table: 128 points over one revolution from the index, in
+  # per mille of 0x6075 Motor Rated Current, interpolated linearly between
+  # points. The torque the motor needs at each angle to turn smoothly.
+  - index: 0x2014
+    axis: true
+    store: true
+    name: "Anti-Cogging Table"
+    object_code: array
+    elements: {count: 128, type: i16, access: rw, var: "CoggingTable", name: "Point"}
+
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
 # only in C so the master side and the drive side have one source.
