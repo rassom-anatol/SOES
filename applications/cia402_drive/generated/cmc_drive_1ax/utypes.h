@@ -73,6 +73,7 @@ typedef struct
    uint16_t   TorqueI;
    uint16_t   TorqueP;
    int32_t    VelocityActual;
+   uint16_t   VelocityFeedForward;
    uint16_t   VelocityI;
    uint32_t   VelocityLimit;
    uint16_t   VelocityP;

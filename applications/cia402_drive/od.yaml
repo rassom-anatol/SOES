@@ -363,6 +363,11 @@ objects:
       - {sub: 7, name: "Position P",     type: u16, access: rw, var: "PositionP"}
       - {sub: 8, name: "Position I",     type: u16, access: rw, var: "PositionI"}
       - {sub: 9, name: "Velocity Limit", type: u32, access: rw, var: "VelocityLimit"}
+      # Velocity feed-forward in CSP, per mille of the target's own speed
+      # (computed from the change in target position each cycle) added to the
+      # velocity loop's target. Without it the position loop lags in
+      # proportion to speed (measured: 40-75 counts per rpm). 0 turns it off.
+      - {sub: 10, name: "Velocity Feed-Forward", type: u16, access: rw, var: "VelocityFeedForward", value: 1000}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
