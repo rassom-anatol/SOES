@@ -183,7 +183,7 @@ This becomes the regression harness for every later phase — it measures its ow
 
 ### Rationale
 
-SOES names its application callbacks from the **master's** point of view, which is the standard EtherCAT convention: the ETG specification, the ESI format (`<Sm>Outputs</Sm>` / `<Sm>Inputs</Sm>`), Beckhoff's SSC (`APPL_InputMapping` / `APPL_OutputMapping`) and the CANopen index ranges (0x6000 = inputs, 0x7000 = outputs) all use it. `cb_get_inputs` therefore means "sample hardware into the TxPDO the master will read", and `cb_set_outputs` means "apply the RxPDO the master sent". The stack states this plainly at [`ecat_slv.c:144`](../soes/ecat_slv.c#L144) ("Master Inputs", SM3) and [`ecat_slv.c:162`](../soes/ecat_slv.c#L162) ("Master Outputs", SM2).
+SOES names its application callbacks from the **master's** point of view, which is the standard EtherCAT convention: the ETG specification, the ESI format (`<Sm>Outputs</Sm>` / `<Sm>Inputs</Sm>`). `cb_get_inputs` therefore means "sample hardware into the TxPDO the master will read", and `cb_set_outputs` means "apply the RxPDO the master sent". The stack states this plainly at [`ecat_slv.c:144`](../soes/ecat_slv.c#L144) ("Master Inputs", SM3) and [`ecat_slv.c:162`](../soes/ecat_slv.c#L162) ("Master Outputs", SM2).
 
 The convention is correct but easy to invert, and the Raspberry Pi demo did invert it. The fix is to rename to **PDO-centric** names.
 
