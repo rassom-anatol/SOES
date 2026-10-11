@@ -73,6 +73,11 @@ static const char acName2003_0B[] = "I1 at zero current";
 static const char acName2003_0C[] = "VM pin";
 static const char acName2003_0D[] = "AGPI_A pin";
 static const char acName2003_0E[] = "AGPI_B pin";
+static const char acName2005[] = "Register Monitor";
+static const char acName2005_01[] = "Data Register";
+static const char acName2005_02[] = "Select Register";
+static const char acName2005_03[] = "Select Value";
+static const char acName2005_04[] = "Value";
 static const char acName2010[] = "Control Loop Tuning";
 static const char acName2010_01[] = "Torque P";
 static const char acName2010_02[] = "Torque I";
@@ -111,6 +116,11 @@ static const char acName2803_0B[] = "I1 at zero current";
 static const char acName2803_0C[] = "VM pin";
 static const char acName2803_0D[] = "AGPI_A pin";
 static const char acName2803_0E[] = "AGPI_B pin";
+static const char acName2805[] = "Register Monitor";
+static const char acName2805_01[] = "Data Register";
+static const char acName2805_02[] = "Select Register";
+static const char acName2805_03[] = "Select Value";
+static const char acName2805_04[] = "Value";
 static const char acName2810[] = "Control Loop Tuning";
 static const char acName2810_01[] = "Torque P";
 static const char acName2810_02[] = "Torque I";
@@ -149,6 +159,11 @@ static const char acName3003_0B[] = "I1 at zero current";
 static const char acName3003_0C[] = "VM pin";
 static const char acName3003_0D[] = "AGPI_A pin";
 static const char acName3003_0E[] = "AGPI_B pin";
+static const char acName3005[] = "Register Monitor";
+static const char acName3005_01[] = "Data Register";
+static const char acName3005_02[] = "Select Register";
+static const char acName3005_03[] = "Select Value";
+static const char acName3005_04[] = "Value";
 static const char acName3010[] = "Control Loop Tuning";
 static const char acName3010_01[] = "Torque P";
 static const char acName3010_02[] = "Torque I";
@@ -187,6 +202,11 @@ static const char acName3803_0B[] = "I1 at zero current";
 static const char acName3803_0C[] = "VM pin";
 static const char acName3803_0D[] = "AGPI_A pin";
 static const char acName3803_0E[] = "AGPI_B pin";
+static const char acName3805[] = "Register Monitor";
+static const char acName3805_01[] = "Data Register";
+static const char acName3805_02[] = "Select Register";
+static const char acName3805_03[] = "Select Value";
+static const char acName3805_04[] = "Value";
 static const char acName3810[] = "Control Loop Tuning";
 static const char acName3810_01[] = "Torque P";
 static const char acName3810_02[] = "Torque I";
@@ -796,6 +816,16 @@ const _objd SDO2003[] =
    {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0E, 0, &Obj.axis[0].AdcCalAgpiBPin},
 };
 
+/* 0x2005 Register Monitor */
+const _objd SDO2005[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2005, 4, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2005_01, 0, &Obj.axis[0].MonitorDataRegister},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2005_02, 0, &Obj.axis[0].MonitorSelectRegister},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2005_03, 0, &Obj.axis[0].MonitorSelectValue},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RO, acName2005_04, 0, &Obj.axis[0].MonitorValue},
+};
+
 /* 0x2010 Control Loop Tuning */
 const _objd SDO2010[] =
 {
@@ -857,6 +887,16 @@ const _objd SDO2803[] =
    {0x0C, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2803_0C, 0, &Obj.axis[1].AdcCalVmPin},
    {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2803_0D, 0, &Obj.axis[1].AdcCalAgpiAPin},
    {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2803_0E, 0, &Obj.axis[1].AdcCalAgpiBPin},
+};
+
+/* 0x2805 Register Monitor */
+const _objd SDO2805[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2805, 4, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2805_01, 0, &Obj.axis[1].MonitorDataRegister},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2805_02, 0, &Obj.axis[1].MonitorSelectRegister},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2805_03, 0, &Obj.axis[1].MonitorSelectValue},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RO, acName2805_04, 0, &Obj.axis[1].MonitorValue},
 };
 
 /* 0x2810 Control Loop Tuning */
@@ -922,6 +962,16 @@ const _objd SDO3003[] =
    {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3003_0E, 0, &Obj.axis[2].AdcCalAgpiBPin},
 };
 
+/* 0x3005 Register Monitor */
+const _objd SDO3005[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3005, 4, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3005_01, 0, &Obj.axis[2].MonitorDataRegister},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3005_02, 0, &Obj.axis[2].MonitorSelectRegister},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3005_03, 0, &Obj.axis[2].MonitorSelectValue},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RO, acName3005_04, 0, &Obj.axis[2].MonitorValue},
+};
+
 /* 0x3010 Control Loop Tuning */
 const _objd SDO3010[] =
 {
@@ -983,6 +1033,16 @@ const _objd SDO3803[] =
    {0x0C, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3803_0C, 0, &Obj.axis[3].AdcCalVmPin},
    {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3803_0D, 0, &Obj.axis[3].AdcCalAgpiAPin},
    {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3803_0E, 0, &Obj.axis[3].AdcCalAgpiBPin},
+};
+
+/* 0x3805 Register Monitor */
+const _objd SDO3805[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3805, 4, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3805_01, 0, &Obj.axis[3].MonitorDataRegister},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3805_02, 0, &Obj.axis[3].MonitorSelectRegister},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3805_03, 0, &Obj.axis[3].MonitorSelectValue},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RO, acName3805_04, 0, &Obj.axis[3].MonitorValue},
 };
 
 /* 0x3810 Control Loop Tuning */
@@ -1711,21 +1771,25 @@ const _objectlist SDOobjects[] =
    {0x2001, OTYPE_RECORD, 4, 0, acName2001, SDO2001},
    {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},
    {0x2003, OTYPE_RECORD, 14, 0, acName2003, SDO2003},
+   {0x2005, OTYPE_RECORD, 4, 0, acName2005, SDO2005},
    {0x2010, OTYPE_RECORD, 10, 0, acName2010, SDO2010},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
    {0x2803, OTYPE_RECORD, 14, 0, acName2803, SDO2803},
+   {0x2805, OTYPE_RECORD, 4, 0, acName2805, SDO2805},
    {0x2810, OTYPE_RECORD, 10, 0, acName2810, SDO2810},
    {0x3000, OTYPE_RECORD, 2, 0, acName3000, SDO3000},
    {0x3001, OTYPE_RECORD, 4, 0, acName3001, SDO3001},
    {0x3002, OTYPE_RECORD, 3, 0, acName3002, SDO3002},
    {0x3003, OTYPE_RECORD, 14, 0, acName3003, SDO3003},
+   {0x3005, OTYPE_RECORD, 4, 0, acName3005, SDO3005},
    {0x3010, OTYPE_RECORD, 10, 0, acName3010, SDO3010},
    {0x3800, OTYPE_RECORD, 2, 0, acName3800, SDO3800},
    {0x3801, OTYPE_RECORD, 4, 0, acName3801, SDO3801},
    {0x3802, OTYPE_RECORD, 3, 0, acName3802, SDO3802},
    {0x3803, OTYPE_RECORD, 14, 0, acName3803, SDO3803},
+   {0x3805, OTYPE_RECORD, 4, 0, acName3805, SDO3805},
    {0x3810, OTYPE_RECORD, 10, 0, acName3810, SDO3810},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},

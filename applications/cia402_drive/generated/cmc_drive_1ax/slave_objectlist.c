@@ -73,6 +73,11 @@ static const char acName2003_0B[] = "I1 at zero current";
 static const char acName2003_0C[] = "VM pin";
 static const char acName2003_0D[] = "AGPI_A pin";
 static const char acName2003_0E[] = "AGPI_B pin";
+static const char acName2005[] = "Register Monitor";
+static const char acName2005_01[] = "Data Register";
+static const char acName2005_02[] = "Select Register";
+static const char acName2005_03[] = "Select Value";
+static const char acName2005_04[] = "Value";
 static const char acName2010[] = "Control Loop Tuning";
 static const char acName2010_01[] = "Torque P";
 static const char acName2010_02[] = "Torque I";
@@ -352,6 +357,16 @@ const _objd SDO2003[] =
    {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2003_0E, 0, &Obj.axis[0].AdcCalAgpiBPin},
 };
 
+/* 0x2005 Register Monitor */
+const _objd SDO2005[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2005, 4, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2005_01, 0, &Obj.axis[0].MonitorDataRegister},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2005_02, 0, &Obj.axis[0].MonitorSelectRegister},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2005_03, 0, &Obj.axis[0].MonitorSelectValue},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RO, acName2005_04, 0, &Obj.axis[0].MonitorValue},
+};
+
 /* 0x2010 Control Loop Tuning */
 const _objd SDO2010[] =
 {
@@ -562,6 +577,7 @@ const _objectlist SDOobjects[] =
    {0x2001, OTYPE_RECORD, 4, 0, acName2001, SDO2001},
    {0x2002, OTYPE_RECORD, 3, 0, acName2002, SDO2002},
    {0x2003, OTYPE_RECORD, 14, 0, acName2003, SDO2003},
+   {0x2005, OTYPE_RECORD, 4, 0, acName2005, SDO2005},
    {0x2010, OTYPE_RECORD, 10, 0, acName2010, SDO2010},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},

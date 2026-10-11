@@ -344,6 +344,22 @@ objects:
       - {sub: 13, name: "AGPI_A pin",        type: u16, access: ro, var: "AdcCalAgpiAPin"}
       - {sub: 14, name: "AGPI_B pin",        type: u16, access: ro, var: "AdcCalAgpiBPin"}
 
+  # Register Monitor, a diagnostic: the cyclic thread reads Data Register of
+  # the motion controller every cycle and reports it in Value, first writing
+  # Select Value into Select Register if one is named. Only the TMC4671's two
+  # monitor selectors may be named (0x6D PID_ERROR_ADDR, 0x6F INTERIM_ADDR);
+  # any other is ignored. Data Register 0 turns the monitor off. This is how
+  # chip internals are read now that no adapter may touch the chip.
+  - index: 0x2005
+    axis: true
+    name: "Register Monitor"
+    type: record
+    subs:
+      - {sub: 1, name: "Data Register",   type: u8,  access: rw, var: "MonitorDataRegister"}
+      - {sub: 2, name: "Select Register", type: u8,  access: rw, var: "MonitorSelectRegister"}
+      - {sub: 3, name: "Select Value",    type: u8,  access: rw, var: "MonitorSelectValue"}
+      - {sub: 4, name: "Value",           type: i32, access: ro, var: "MonitorValue"}
+
   # Control loop tuning, in the TMC4671's own register units -- the same
   # numbers as foc.* in bsp.yaml, which seed these at startup. Writable at any
   # time so the loops can be tuned live; a change reaches the chip within one

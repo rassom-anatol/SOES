@@ -51,6 +51,10 @@ typedef struct
    uint16_t   MaxTorque;
    int8_t     ModesOfOperation;
    int8_t     ModesOfOperationDisplay;
+   uint8_t    MonitorDataRegister;
+   uint8_t    MonitorSelectRegister;
+   uint8_t    MonitorSelectValue;
+   int32_t    MonitorValue;
    int32_t    MosfetTemp_mC;
    uint32_t   MotorRatedCurrent;
    uint32_t   MotorRatedTorque;
