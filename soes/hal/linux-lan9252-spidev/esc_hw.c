@@ -1072,6 +1072,10 @@ int ESC_init (const esc_cfg_t * config)
  */
 static int irq_wait_fd = -1;
 static int sync0_wait_fd = -1;
+/* Diagnostics: the kernel timestamp (CLOCK_MONOTONIC) of the last SYNC0
+ * edge waited on, and a separate watch on the IRQ pin, see ESC_hw_irq_edges. */
+static uint64_t sync0_last_ns = 0;
+static int irq_watch_fd = -1;
 
 /** esc_cfg_t.esc_hw_wait: block until the LAN9252 asserts its IRQ pin.
  *
@@ -1081,7 +1085,7 @@ static int sync0_wait_fd = -1;
  * deadline, for a mechanism this already is.
  */
 static int hw_wait_on (int * fd, int offset, const char * what,
-                       uint64_t timeout_ns)
+                       uint64_t timeout_ns, uint64_t * timestamp_ns)
 {
    if (*fd < 0)
    {
@@ -1097,12 +1101,12 @@ static int hw_wait_on (int * fd, int offset, const char * what,
       }
    }
 
-   return ESC_hw_edge_wait (*fd, timeout_ns, NULL, NULL);
+   return ESC_hw_edge_wait (*fd, timeout_ns, timestamp_ns, NULL);
 }
 
 int ESC_hw_wait (uint64_t timeout_ns)
 {
-   return hw_wait_on (&irq_wait_fd, irq_offset, "IRQ", timeout_ns);
+   return hw_wait_on (&irq_wait_fd, irq_offset, "IRQ", timeout_ns, NULL);
 }
 
 /** esc_cfg_t.esc_hw_wait: block on a rising edge of the SYNC0 pin.
@@ -1119,7 +1123,61 @@ int ESC_hw_wait (uint64_t timeout_ns)
  */
 int ESC_hw_wait_sync0 (uint64_t timeout_ns)
 {
-   return hw_wait_on (&sync0_wait_fd, sync0_offset, "SYNC0", timeout_ns);
+   return hw_wait_on (&sync0_wait_fd, sync0_offset, "SYNC0", timeout_ns,
+                      &sync0_last_ns);
+}
+
+uint64_t ESC_hw_sync0_timestamp (void)
+{
+   return sync0_last_ns;
+}
+
+int ESC_hw_irq_edges (uint64_t * timestamps_ns, int max)
+{
+   struct gpio_v2_line_event ev[16];
+   struct pollfd pfd;
+   int count = 0;
+
+   if (irq_watch_fd < 0)
+   {
+      if (irq_offset < 0 || irq_chip == NULL)
+      {
+         return -1;
+      }
+      irq_watch_fd = ESC_hw_edge_open (irq_chip, irq_offset);
+      if (irq_watch_fd < 0)
+      {
+         return -1;
+      }
+   }
+
+   for (;;)
+   {
+      ssize_t n;
+      int i;
+
+      pfd.fd = irq_watch_fd;
+      pfd.events = POLLIN;
+      pfd.revents = 0;
+      if (poll (&pfd, 1, 0) <= 0)
+      {
+         break;
+      }
+      n = read (irq_watch_fd, ev, sizeof (ev));
+      if (n < (ssize_t)sizeof (ev[0]))
+      {
+         break;
+      }
+      for (i = 0; i < (int)(n / (ssize_t)sizeof (ev[0])); i++)
+      {
+         if (count < max)
+         {
+            timestamps_ns[count] = ev[i].timestamp_ns;
+         }
+         count++;
+      }
+   }
+   return count;
 }
 
 void ESC_interrupt_enable (uint32_t mask)

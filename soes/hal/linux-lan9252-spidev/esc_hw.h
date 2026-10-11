@@ -81,6 +81,17 @@ int  ESC_hw_wait (uint64_t timeout_ns);
  */
 int  ESC_hw_wait_sync0 (uint64_t timeout_ns);
 
+/** Diagnostics: kernel timestamp (CLOCK_MONOTONIC, ns) of the last SYNC0
+ *  edge ESC_hw_wait_sync0 returned on. */
+uint64_t ESC_hw_sync0_timestamp (void);
+
+/** Diagnostics: kernel timestamps of the IRQ pin's rising edges since the
+ *  last call, without blocking; the pin rises when a frame raises an enabled
+ *  AL event while none is pending. Opens a watch on the pin on first use.
+ *  Returns how many edges there were (timestamps beyond `max` are dropped),
+ *  or -1 if the pin cannot be watched. */
+int ESC_hw_irq_edges (uint64_t * timestamps_ns, int max);
+
 void ESC_interrupt_enable (uint32_t mask);
 void ESC_interrupt_disable (uint32_t mask);
 
