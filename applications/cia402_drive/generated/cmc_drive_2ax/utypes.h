@@ -28,6 +28,15 @@ typedef struct
    uint16_t   AdcCalVm50;
    uint16_t   AdcCalVm75;
    uint16_t   AdcCalVmPin;
+   uint16_t   AdvFluxI;
+   uint16_t   AdvFluxP;
+   uint16_t   AdvPositionI;
+   uint16_t   AdvPositionP;
+   uint16_t   AdvTorqueI;
+   uint16_t   AdvTorqueP;
+   uint16_t   AdvVelocityFilterHz;
+   uint16_t   AdvVelocityI;
+   uint16_t   AdvVelocityP;
    uint16_t   BoardTelemetryPeriod;
    uint16_t   Controlword;
    int16_t    CurrentU;
@@ -47,6 +56,7 @@ typedef struct
    uint32_t   GearMotorRevolutions;
    uint32_t   GearShaftRevolutions;
    int16_t    HaltOptionCode;
+   uint8_t    LoopStructure;
    uint32_t   MaxMotorSpeed;
    uint16_t   MaxTorque;
    int8_t     ModesOfOperation;

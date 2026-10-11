@@ -149,13 +149,16 @@ class Object:
         # may override it. Stored entries are what 0x1010 Store Parameters
         # saves and what is loaded back at startup.
         store = spec.get("store", False)
+        # `disabled_only: true`: writable only while no axis is in Operation
+        # Enabled, for settings that must not change under a running motor.
+        disabled_only = spec.get("disabled_only", False)
         if self.is_record:
             for sub in spec["subs"]:
-                self.subs.append(self._sub(sub, cfg, store))
+                self.subs.append(self._sub(sub, cfg, store, disabled_only))
         else:
-            self.subs.append(self._sub(dict(spec, sub=0), cfg, store))
+            self.subs.append(self._sub(dict(spec, sub=0), cfg, store, disabled_only))
 
-    def _sub(self, spec, cfg, store_default=False):
+    def _sub(self, spec, cfg, store_default=False, disabled_only_default=False):
         t = spec.get("type", "u32")
         if t == "record":
             die(f"0x{self.index:04X}: nested records are not supported")
@@ -198,6 +201,7 @@ class Object:
             # advertised limit and the enforced one drift apart silently.
             "define": spec.get("define"),
             "store": bool(store),
+            "disabled_only": bool(spec.get("disabled_only", disabled_only_default)),
         }
 
     @property
@@ -815,6 +819,9 @@ constexpr uint8_t kPreopOnly = 0x04;
  *  the YAML with `store: true`, so the stored set is part of the description
  *  rather than a list kept somewhere else. */
 constexpr uint8_t kStore     = 0x08;
+/** Writable only while no axis is in Operation Enabled (YAML
+ *  `disabled_only: true`); refused otherwise with 0x08000022. */
+constexpr uint8_t kDisabledOnly = 0x10;
 
 /**
  * One sub-entry.
@@ -971,10 +978,11 @@ def cxx_entries(cfg, objs, rx, tx):
     rows = []
 
     def add(index, sub, name, type_, access, bits, storage, constant, text,
-            store=False):
+            store=False, disabled_only=False):
         rows.append({"index": index, "sub": sub, "name": name, "type": type_,
                      "access": access, "bits": bits, "storage": storage,
-                     "constant": constant, "text": text, "store": store})
+                     "constant": constant, "text": text, "store": store,
+                     "disabled_only": disabled_only})
 
     for o in objs:
         if o.is_record:
@@ -995,7 +1003,7 @@ def cxx_entries(cfg, objs, rx, tx):
             elif not isinstance(s["value"], str):
                 constant = int(s["value"])
             add(o.index, s["sub"], s["name"], s["type"], s["access_name"],
-                s["bits"], storage, constant, text, s["store"])
+                s["bits"], storage, constant, text, s["store"], s["disabled_only"])
 
     for pdo in rx + tx:
         entries = pdo["entries"]
@@ -1055,7 +1063,8 @@ def emit_cxx_table_cpp(cfg, objs, rx, tx, src):
     for r in rows:
         out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\"},"
                    % (r["index"], r["sub"], CXX_TYPES[r["type"]],
-                      CXX_ACCESS[r["access"]] + (" | kStore" if r["store"] else ""),
+                      CXX_ACCESS[r["access"]] + (" | kStore" if r["store"] else "")
+                      + (" | kDisabledOnly" if r["disabled_only"] else ""),
                       r["bits"], r["storage"],
                       r["constant"], r["text"], r["name"]))
     out.append("};")

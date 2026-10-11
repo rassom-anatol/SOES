@@ -385,6 +385,34 @@ objects:
       # proportion to speed (measured: 40-75 counts per rpm). 0 turns it off.
       - {sub: 10, name: "Velocity Feed-Forward", type: u16, access: rw, var: "VelocityFeedForward", value: 1000}
 
+  # Gains for the advanced (sequential) PI structure, kept apart from 0x2010
+  # so the classic tuning survives a trial of the other. Same order as 0x2010.
+  # Position P and velocity I are Q4.12, the rest Q8.8 (ADVANCED_PI_REPRESENT);
+  # the velocity loop runs at the PWM rate. Velocity Filter is the cutoff of
+  # the second-order low-pass on measured velocity, 0 off. The velocity limit
+  # is 0x2010:09 for both. Seeded from foc_advanced in bsp.yaml.
+  - index: 0x2011
+    axis: true
+    store: true
+    name: "Advanced Loop Tuning"
+    type: record
+    subs:
+      - {sub: 1, name: "Torque P",        type: u16, access: rw, var: "AdvTorqueP"}
+      - {sub: 2, name: "Torque I",        type: u16, access: rw, var: "AdvTorqueI"}
+      - {sub: 3, name: "Flux P",          type: u16, access: rw, var: "AdvFluxP"}
+      - {sub: 4, name: "Flux I",          type: u16, access: rw, var: "AdvFluxI"}
+      - {sub: 5, name: "Velocity P",      type: u16, access: rw, var: "AdvVelocityP"}
+      - {sub: 6, name: "Velocity I",      type: u16, access: rw, var: "AdvVelocityI"}
+      - {sub: 7, name: "Position P",      type: u16, access: rw, var: "AdvPositionP"}
+      - {sub: 8, name: "Position I",      type: u16, access: rw, var: "AdvPositionI"}
+      - {sub: 9, name: "Velocity Filter", type: u16, access: rw, var: "AdvVelocityFilterHz"}
+
+  # Which loop structure runs: 0 classic PI with the TMC4671's standard
+  # velocity meter (fixed 20 Hz filter) and the 0x2010 gains; 1 advanced PI
+  # with the PWM-synchronous meter, the 0x2011 filter and gains. Only while no
+  # axis is in Operation Enabled.
+  - {index: 0x2012, axis: true, name: "Loop Structure", type: u8, access: rw, var: "LoopStructure", store: true, disabled_only: true}
+
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
 # only in C so the master side and the drive side have one source.

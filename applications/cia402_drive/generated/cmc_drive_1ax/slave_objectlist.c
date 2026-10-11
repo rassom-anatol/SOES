@@ -89,6 +89,18 @@ static const char acName2010_07[] = "Position P";
 static const char acName2010_08[] = "Position I";
 static const char acName2010_09[] = "Velocity Limit";
 static const char acName2010_0A[] = "Velocity Feed-Forward";
+static const char acName2011[] = "Advanced Loop Tuning";
+static const char acName2011_01[] = "Torque P";
+static const char acName2011_02[] = "Torque I";
+static const char acName2011_03[] = "Flux P";
+static const char acName2011_04[] = "Flux I";
+static const char acName2011_05[] = "Velocity P";
+static const char acName2011_06[] = "Velocity I";
+static const char acName2011_07[] = "Position P";
+static const char acName2011_08[] = "Position I";
+static const char acName2011_09[] = "Velocity Filter";
+static const char acName2012[] = "Loop Structure";
+static const char acName2012_00[] = "Loop Structure";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -383,6 +395,27 @@ const _objd SDO2010[] =
    {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_0A, 1000, &Obj.axis[0].VelocityFeedForward},
 };
 
+/* 0x2011 Advanced Loop Tuning */
+const _objd SDO2011[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2011, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_01, 0, &Obj.axis[0].AdvTorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_02, 0, &Obj.axis[0].AdvTorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_03, 0, &Obj.axis[0].AdvFluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_04, 0, &Obj.axis[0].AdvFluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_05, 0, &Obj.axis[0].AdvVelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_06, 0, &Obj.axis[0].AdvVelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_07, 0, &Obj.axis[0].AdvPositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_08, 0, &Obj.axis[0].AdvPositionI},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_09, 0, &Obj.axis[0].AdvVelocityFilterHz},
+};
+
+/* 0x2012 Loop Structure */
+const _objd SDO2012[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2012_00, 0, &Obj.axis[0].LoopStructure},
+};
+
 /* 0x603F Error Code */
 const _objd SDO603F[] =
 {
@@ -579,6 +612,8 @@ const _objectlist SDOobjects[] =
    {0x2003, OTYPE_RECORD, 14, 0, acName2003, SDO2003},
    {0x2005, OTYPE_RECORD, 4, 0, acName2005, SDO2005},
    {0x2010, OTYPE_RECORD, 10, 0, acName2010, SDO2010},
+   {0x2011, OTYPE_RECORD, 9, 0, acName2011, SDO2011},
+   {0x2012, OTYPE_VAR, 0, 0, acName2012, SDO2012},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

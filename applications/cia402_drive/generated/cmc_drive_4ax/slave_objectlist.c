@@ -89,6 +89,18 @@ static const char acName2010_07[] = "Position P";
 static const char acName2010_08[] = "Position I";
 static const char acName2010_09[] = "Velocity Limit";
 static const char acName2010_0A[] = "Velocity Feed-Forward";
+static const char acName2011[] = "Advanced Loop Tuning";
+static const char acName2011_01[] = "Torque P";
+static const char acName2011_02[] = "Torque I";
+static const char acName2011_03[] = "Flux P";
+static const char acName2011_04[] = "Flux I";
+static const char acName2011_05[] = "Velocity P";
+static const char acName2011_06[] = "Velocity I";
+static const char acName2011_07[] = "Position P";
+static const char acName2011_08[] = "Position I";
+static const char acName2011_09[] = "Velocity Filter";
+static const char acName2012[] = "Loop Structure";
+static const char acName2012_00[] = "Loop Structure";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -132,6 +144,18 @@ static const char acName2810_07[] = "Position P";
 static const char acName2810_08[] = "Position I";
 static const char acName2810_09[] = "Velocity Limit";
 static const char acName2810_0A[] = "Velocity Feed-Forward";
+static const char acName2811[] = "Advanced Loop Tuning";
+static const char acName2811_01[] = "Torque P";
+static const char acName2811_02[] = "Torque I";
+static const char acName2811_03[] = "Flux P";
+static const char acName2811_04[] = "Flux I";
+static const char acName2811_05[] = "Velocity P";
+static const char acName2811_06[] = "Velocity I";
+static const char acName2811_07[] = "Position P";
+static const char acName2811_08[] = "Position I";
+static const char acName2811_09[] = "Velocity Filter";
+static const char acName2812[] = "Loop Structure";
+static const char acName2812_00[] = "Loop Structure";
 static const char acName3000[] = "Drive Faults and Status";
 static const char acName3000_01[] = "Gate Driver Faults";
 static const char acName3000_02[] = "Drive Status Flags";
@@ -175,6 +199,18 @@ static const char acName3010_07[] = "Position P";
 static const char acName3010_08[] = "Position I";
 static const char acName3010_09[] = "Velocity Limit";
 static const char acName3010_0A[] = "Velocity Feed-Forward";
+static const char acName3011[] = "Advanced Loop Tuning";
+static const char acName3011_01[] = "Torque P";
+static const char acName3011_02[] = "Torque I";
+static const char acName3011_03[] = "Flux P";
+static const char acName3011_04[] = "Flux I";
+static const char acName3011_05[] = "Velocity P";
+static const char acName3011_06[] = "Velocity I";
+static const char acName3011_07[] = "Position P";
+static const char acName3011_08[] = "Position I";
+static const char acName3011_09[] = "Velocity Filter";
+static const char acName3012[] = "Loop Structure";
+static const char acName3012_00[] = "Loop Structure";
 static const char acName3800[] = "Drive Faults and Status";
 static const char acName3800_01[] = "Gate Driver Faults";
 static const char acName3800_02[] = "Drive Status Flags";
@@ -218,6 +254,18 @@ static const char acName3810_07[] = "Position P";
 static const char acName3810_08[] = "Position I";
 static const char acName3810_09[] = "Velocity Limit";
 static const char acName3810_0A[] = "Velocity Feed-Forward";
+static const char acName3811[] = "Advanced Loop Tuning";
+static const char acName3811_01[] = "Torque P";
+static const char acName3811_02[] = "Torque I";
+static const char acName3811_03[] = "Flux P";
+static const char acName3811_04[] = "Flux I";
+static const char acName3811_05[] = "Velocity P";
+static const char acName3811_06[] = "Velocity I";
+static const char acName3811_07[] = "Position P";
+static const char acName3811_08[] = "Position I";
+static const char acName3811_09[] = "Velocity Filter";
+static const char acName3812[] = "Loop Structure";
+static const char acName3812_00[] = "Loop Structure";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -842,6 +890,27 @@ const _objd SDO2010[] =
    {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2010_0A, 1000, &Obj.axis[0].VelocityFeedForward},
 };
 
+/* 0x2011 Advanced Loop Tuning */
+const _objd SDO2011[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2011, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_01, 0, &Obj.axis[0].AdvTorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_02, 0, &Obj.axis[0].AdvTorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_03, 0, &Obj.axis[0].AdvFluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_04, 0, &Obj.axis[0].AdvFluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_05, 0, &Obj.axis[0].AdvVelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_06, 0, &Obj.axis[0].AdvVelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_07, 0, &Obj.axis[0].AdvPositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_08, 0, &Obj.axis[0].AdvPositionI},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2011_09, 0, &Obj.axis[0].AdvVelocityFilterHz},
+};
+
+/* 0x2012 Loop Structure */
+const _objd SDO2012[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2012_00, 0, &Obj.axis[0].LoopStructure},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -913,6 +982,27 @@ const _objd SDO2810[] =
    {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_08, 0, &Obj.axis[1].PositionI},
    {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2810_09, 0, &Obj.axis[1].VelocityLimit},
    {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2810_0A, 1000, &Obj.axis[1].VelocityFeedForward},
+};
+
+/* 0x2811 Advanced Loop Tuning */
+const _objd SDO2811[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2811, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_01, 0, &Obj.axis[1].AdvTorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_02, 0, &Obj.axis[1].AdvTorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_03, 0, &Obj.axis[1].AdvFluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_04, 0, &Obj.axis[1].AdvFluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_05, 0, &Obj.axis[1].AdvVelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_06, 0, &Obj.axis[1].AdvVelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_07, 0, &Obj.axis[1].AdvPositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_08, 0, &Obj.axis[1].AdvPositionI},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2811_09, 0, &Obj.axis[1].AdvVelocityFilterHz},
+};
+
+/* 0x2812 Loop Structure */
+const _objd SDO2812[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2812_00, 0, &Obj.axis[1].LoopStructure},
 };
 
 /* 0x3000 Drive Faults and Status */
@@ -988,6 +1078,27 @@ const _objd SDO3010[] =
    {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3010_0A, 1000, &Obj.axis[2].VelocityFeedForward},
 };
 
+/* 0x3011 Advanced Loop Tuning */
+const _objd SDO3011[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3011, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_01, 0, &Obj.axis[2].AdvTorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_02, 0, &Obj.axis[2].AdvTorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_03, 0, &Obj.axis[2].AdvFluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_04, 0, &Obj.axis[2].AdvFluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_05, 0, &Obj.axis[2].AdvVelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_06, 0, &Obj.axis[2].AdvVelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_07, 0, &Obj.axis[2].AdvPositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_08, 0, &Obj.axis[2].AdvPositionI},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3011_09, 0, &Obj.axis[2].AdvVelocityFilterHz},
+};
+
+/* 0x3012 Loop Structure */
+const _objd SDO3012[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3012_00, 0, &Obj.axis[2].LoopStructure},
+};
+
 /* 0x3800 Drive Faults and Status */
 const _objd SDO3800[] =
 {
@@ -1059,6 +1170,27 @@ const _objd SDO3810[] =
    {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3810_08, 0, &Obj.axis[3].PositionI},
    {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName3810_09, 0, &Obj.axis[3].VelocityLimit},
    {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3810_0A, 1000, &Obj.axis[3].VelocityFeedForward},
+};
+
+/* 0x3811 Advanced Loop Tuning */
+const _objd SDO3811[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3811, 9, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_01, 0, &Obj.axis[3].AdvTorqueP},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_02, 0, &Obj.axis[3].AdvTorqueI},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_03, 0, &Obj.axis[3].AdvFluxP},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_04, 0, &Obj.axis[3].AdvFluxI},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_05, 0, &Obj.axis[3].AdvVelocityP},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_06, 0, &Obj.axis[3].AdvVelocityI},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_07, 0, &Obj.axis[3].AdvPositionP},
+   {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_08, 0, &Obj.axis[3].AdvPositionI},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3811_09, 0, &Obj.axis[3].AdvVelocityFilterHz},
+};
+
+/* 0x3812 Loop Structure */
+const _objd SDO3812[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3812_00, 0, &Obj.axis[3].LoopStructure},
 };
 
 /* 0x603F Error Code */
@@ -1773,24 +1905,32 @@ const _objectlist SDOobjects[] =
    {0x2003, OTYPE_RECORD, 14, 0, acName2003, SDO2003},
    {0x2005, OTYPE_RECORD, 4, 0, acName2005, SDO2005},
    {0x2010, OTYPE_RECORD, 10, 0, acName2010, SDO2010},
+   {0x2011, OTYPE_RECORD, 9, 0, acName2011, SDO2011},
+   {0x2012, OTYPE_VAR, 0, 0, acName2012, SDO2012},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
    {0x2803, OTYPE_RECORD, 14, 0, acName2803, SDO2803},
    {0x2805, OTYPE_RECORD, 4, 0, acName2805, SDO2805},
    {0x2810, OTYPE_RECORD, 10, 0, acName2810, SDO2810},
+   {0x2811, OTYPE_RECORD, 9, 0, acName2811, SDO2811},
+   {0x2812, OTYPE_VAR, 0, 0, acName2812, SDO2812},
    {0x3000, OTYPE_RECORD, 2, 0, acName3000, SDO3000},
    {0x3001, OTYPE_RECORD, 4, 0, acName3001, SDO3001},
    {0x3002, OTYPE_RECORD, 3, 0, acName3002, SDO3002},
    {0x3003, OTYPE_RECORD, 14, 0, acName3003, SDO3003},
    {0x3005, OTYPE_RECORD, 4, 0, acName3005, SDO3005},
    {0x3010, OTYPE_RECORD, 10, 0, acName3010, SDO3010},
+   {0x3011, OTYPE_RECORD, 9, 0, acName3011, SDO3011},
+   {0x3012, OTYPE_VAR, 0, 0, acName3012, SDO3012},
    {0x3800, OTYPE_RECORD, 2, 0, acName3800, SDO3800},
    {0x3801, OTYPE_RECORD, 4, 0, acName3801, SDO3801},
    {0x3802, OTYPE_RECORD, 3, 0, acName3802, SDO3802},
    {0x3803, OTYPE_RECORD, 14, 0, acName3803, SDO3803},
    {0x3805, OTYPE_RECORD, 4, 0, acName3805, SDO3805},
    {0x3810, OTYPE_RECORD, 10, 0, acName3810, SDO3810},
+   {0x3811, OTYPE_RECORD, 9, 0, acName3811, SDO3811},
+   {0x3812, OTYPE_VAR, 0, 0, acName3812, SDO3812},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
