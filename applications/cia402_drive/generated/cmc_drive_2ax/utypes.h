@@ -91,6 +91,7 @@ typedef struct
    uint16_t   MechMaxTorque;
    uint16_t   MechPeakSpeed;
    uint16_t   MechQuality;
+   uint16_t   MechUncertainty;
    float      MechViscous;
    int32_t    MechWindowEnd;
    int32_t    MechWindowStart;

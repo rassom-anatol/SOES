@@ -576,6 +576,11 @@ objects:
       # The current that started motion from standstill, averaged over the
       # strokes: static friction, often well above sub 8.
       - {sub: 12, name: "Breakaway A",        type: real32, access: ro, var: "MechBreakaway"}
+      # The inertia's relative standard error, per mille: the routine fails
+      # above 50. Sub 10 (R squared) is for information: cogging and friction
+      # that vary around the turn keep it low without making the inertia
+      # less certain.
+      - {sub: 13, name: "Inertia Uncertainty", type: u16, access: ro, var: "MechUncertainty"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than

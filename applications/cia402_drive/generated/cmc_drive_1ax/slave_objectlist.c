@@ -423,6 +423,7 @@ static const char acName2031_09[] = "Constant Load A";
 static const char acName2031_0A[] = "Fit Quality";
 static const char acName2031_0B[] = "Peak Speed rpm";
 static const char acName2031_0C[] = "Breakaway A";
+static const char acName2031_0D[] = "Inertia Uncertainty";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1084,7 +1085,7 @@ const _objd SDO2030[] =
 /* 0x2031 Mechanical Identification */
 const _objd SDO2031[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2031, 12, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2031, 13, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2031_01, 0, &Obj.axis[0].MechWindowStart},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName2031_02, 0, &Obj.axis[0].MechWindowEnd},
    {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2031_03, 300, &Obj.axis[0].MechMaxTorque},
@@ -1097,6 +1098,7 @@ const _objd SDO2031[] =
    {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0A, 0, &Obj.axis[0].MechQuality},
    {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0B, 0, &Obj.axis[0].MechPeakSpeed},
    {0x0C, DTYPE_REAL32, 32, ATYPE_RO, acName2031_0C, 0, &Obj.axis[0].MechBreakaway},
+   {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0D, 0, &Obj.axis[0].MechUncertainty},
 };
 
 /* 0x603F Error Code */
@@ -1304,7 +1306,7 @@ const _objectlist SDOobjects[] =
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
-   {0x2031, OTYPE_RECORD, 12, 0, acName2031, SDO2031},
+   {0x2031, OTYPE_RECORD, 13, 0, acName2031, SDO2031},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
