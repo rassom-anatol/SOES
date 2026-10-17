@@ -430,16 +430,28 @@ objects:
       - {sub: 3, name: "Fade Speed",  type: u16, access: rw, var: "CoggingFadeRpm", value: 300, store: true}
       - {sub: 4, name: "Status",      type: u8,  access: ro, var: "CoggingStatus"}
       - {sub: 5, name: "Shaft Angle", type: u16, access: ro, var: "ShaftAngle"}
+      # Between minus and plus this speed (rpm) the two direction tables are
+      # blended in proportion; at standstill their average applies.
+      - {sub: 6, name: "Blend Speed", type: u16, access: rw, var: "CoggingBlendRpm", value: 10, store: true}
 
-  # The anti-cogging table: 128 points over one revolution from the index, in
-  # per mille of 0x6075 Motor Rated Current, interpolated linearly between
-  # points. The torque the motor needs at each angle to turn smoothly.
+  # The anti-cogging tables: 128 points over one revolution from the index,
+  # in per mille of 0x6075 Motor Rated Current, interpolated linearly between
+  # points: the angle-dependent part of the torque the motor needs at each
+  # angle to turn smoothly, for positive (0x2014) and negative (0x2015)
+  # rotation. Part of it depends on direction (friction varying around the
+  # turn). A 0x2015 left all zero means 0x2014 serves both directions.
   - index: 0x2014
     axis: true
     store: true
     name: "Anti-Cogging Table"
     object_code: array
     elements: {count: 128, type: i16, access: rw, var: "CoggingTable", name: "Point"}
+  - index: 0x2015
+    axis: true
+    store: true
+    name: "Anti-Cogging Table Negative"
+    object_code: array
+    elements: {count: 128, type: i16, access: rw, var: "CoggingTableNeg", name: "Point"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
