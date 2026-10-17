@@ -573,6 +573,9 @@ objects:
       - {sub: 9, name: "Constant Load A",     type: real32, access: ro, var: "MechLoad"}
       - {sub: 10, name: "Fit Quality",        type: u16, access: ro, var: "MechQuality"}
       - {sub: 11, name: "Peak Speed rpm",     type: u16, access: ro, var: "MechPeakSpeed"}
+      # The current that started motion from standstill, averaged over the
+      # strokes: static friction, often well above sub 8.
+      - {sub: 12, name: "Breakaway A",        type: real32, access: ro, var: "MechBreakaway"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
