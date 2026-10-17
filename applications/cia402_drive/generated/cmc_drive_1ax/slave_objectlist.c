@@ -401,6 +401,13 @@ static const char acName2030_06[] = "Inductance uH";
 static const char acName2030_07[] = "Time Constant us";
 static const char acName2030_08[] = "Supply Voltage mV";
 static const char acName2030_09[] = "Fit Quality";
+static const char acName2030_0A[] = "Current Loop Bandwidth Hz";
+static const char acName2030_0B[] = "Current P";
+static const char acName2030_0C[] = "Current I Classic";
+static const char acName2030_0D[] = "Current I Advanced";
+static const char acName2030_0E[] = "Step Rise Time us";
+static const char acName2030_0F[] = "Step Overshoot";
+static const char acName2030_10[] = "Step Settling Time us";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1038,7 +1045,7 @@ const _objd SDO2021[] =
 /* 0x2030 Identification */
 const _objd SDO2030[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030, 9, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030, 16, NULL},
    {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2030_01, 1, &Obj.axis[0].IdentRoutine},
    {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2030_02, 800, &Obj.axis[0].IdentTestCurrent},
    {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_03, 0, &Obj.axis[0].IdentState},
@@ -1048,6 +1055,13 @@ const _objd SDO2030[] =
    {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_07, 0, &Obj.axis[0].IdentTimeConstant},
    {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_08, 0, &Obj.axis[0].IdentSupply},
    {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_09, 0, &Obj.axis[0].IdentFitQuality},
+   {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2030_0A, 1000, &Obj.axis[0].IdentBandwidth},
+   {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_0B, 0, &Obj.axis[0].IdentCurrentP},
+   {0x0C, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_0C, 0, &Obj.axis[0].IdentCurrentIClassic},
+   {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_0D, 0, &Obj.axis[0].IdentCurrentIAdvanced},
+   {0x0E, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_0E, 0, &Obj.axis[0].IdentStepRise},
+   {0x0F, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_0F, 0, &Obj.axis[0].IdentStepOvershoot},
+   {0x10, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_10, 0, &Obj.axis[0].IdentStepSettling},
 };
 
 /* 0x603F Error Code */
@@ -1254,7 +1268,7 @@ const _objectlist SDOobjects[] =
    {0x2016, OTYPE_RECORD, 2, 0, acName2016, SDO2016},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
-   {0x2030, OTYPE_RECORD, 9, 0, acName2030, SDO2030},
+   {0x2030, OTYPE_RECORD, 16, 0, acName2030, SDO2030},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

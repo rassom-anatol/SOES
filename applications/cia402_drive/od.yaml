@@ -513,6 +513,11 @@ objects:
   # calibrated, motor turning, no supply or 0x6075 unset), 2 current not
   # reached (open phase), 3 overcurrent, 4 fit failed, 5 aborted, 6 unknown
   # routine, 7 rotor moved. Fit Quality: the step response fit's R squared.
+  # Routine 1 also gives current loop gains for Current Loop Bandwidth, in the
+  # chip's units: P for both structures, I per structure. They are not
+  # applied; 0x2010:01-04 and 0x2011:01-04 take them. Routine 2 steps the flux
+  # current in closed loop with the gains in use and reports the averaged
+  # response: rise time 10-90 %, overshoot per mille, settling within 5 %.
   - index: 0x2030
     axis: true
     name: "Identification"
@@ -527,6 +532,13 @@ objects:
       - {sub: 7, name: "Time Constant us",   type: u32, access: ro, var: "IdentTimeConstant"}
       - {sub: 8, name: "Supply Voltage mV",  type: u32, access: ro, var: "IdentSupply"}
       - {sub: 9, name: "Fit Quality",        type: u16, access: ro, var: "IdentFitQuality"}
+      - {sub: 10, name: "Current Loop Bandwidth Hz", type: u16, access: rw, var: "IdentBandwidth", value: 1000, store: true}
+      - {sub: 11, name: "Current P",          type: u16, access: ro, var: "IdentCurrentP"}
+      - {sub: 12, name: "Current I Classic",  type: u16, access: ro, var: "IdentCurrentIClassic"}
+      - {sub: 13, name: "Current I Advanced", type: u16, access: ro, var: "IdentCurrentIAdvanced"}
+      - {sub: 14, name: "Step Rise Time us",  type: u32, access: ro, var: "IdentStepRise"}
+      - {sub: 15, name: "Step Overshoot",     type: u16, access: ro, var: "IdentStepOvershoot"}
+      - {sub: 16, name: "Step Settling Time us", type: u32, access: ro, var: "IdentStepSettling"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
