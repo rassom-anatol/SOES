@@ -410,6 +410,18 @@ static const char acName2030_0F[] = "Step Overshoot";
 static const char acName2030_10[] = "Step Settling Time us";
 static const char acName2030_11[] = "Motor Resistance mOhm";
 static const char acName2030_12[] = "Bridge Resistance mOhm";
+static const char acName2031[] = "Mechanical Identification";
+static const char acName2031_01[] = "Window Start";
+static const char acName2031_02[] = "Window End";
+static const char acName2031_03[] = "Max Torque";
+static const char acName2031_04[] = "Max Speed rpm";
+static const char acName2031_05[] = "Inertia kgm2";
+static const char acName2031_06[] = "Inertia A per rad/s2";
+static const char acName2031_07[] = "Viscous Friction A per rad/s";
+static const char acName2031_08[] = "Coulomb Friction A";
+static const char acName2031_09[] = "Constant Load A";
+static const char acName2031_0A[] = "Fit Quality";
+static const char acName2031_0B[] = "Peak Speed rpm";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -752,6 +764,18 @@ static const char acName2830_0F[] = "Step Overshoot";
 static const char acName2830_10[] = "Step Settling Time us";
 static const char acName2830_11[] = "Motor Resistance mOhm";
 static const char acName2830_12[] = "Bridge Resistance mOhm";
+static const char acName2831[] = "Mechanical Identification";
+static const char acName2831_01[] = "Window Start";
+static const char acName2831_02[] = "Window End";
+static const char acName2831_03[] = "Max Torque";
+static const char acName2831_04[] = "Max Speed rpm";
+static const char acName2831_05[] = "Inertia kgm2";
+static const char acName2831_06[] = "Inertia A per rad/s2";
+static const char acName2831_07[] = "Viscous Friction A per rad/s";
+static const char acName2831_08[] = "Coulomb Friction A";
+static const char acName2831_09[] = "Constant Load A";
+static const char acName2831_0A[] = "Fit Quality";
+static const char acName2831_0B[] = "Peak Speed rpm";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1520,6 +1544,23 @@ const _objd SDO2030[] =
    {0x12, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_12, 0, &Obj.axis[0].IdentBridgeResistance},
 };
 
+/* 0x2031 Mechanical Identification */
+const _objd SDO2031[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2031, 11, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2031_01, 0, &Obj.axis[0].MechWindowStart},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName2031_02, 0, &Obj.axis[0].MechWindowEnd},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2031_03, 300, &Obj.axis[0].MechMaxTorque},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2031_04, 300, &Obj.axis[0].MechMaxSpeed},
+   {0x05, DTYPE_REAL32, 32, ATYPE_RO, acName2031_05, 0, &Obj.axis[0].MechInertiaKgm2},
+   {0x06, DTYPE_REAL32, 32, ATYPE_RO, acName2031_06, 0, &Obj.axis[0].MechInertia},
+   {0x07, DTYPE_REAL32, 32, ATYPE_RO, acName2031_07, 0, &Obj.axis[0].MechViscous},
+   {0x08, DTYPE_REAL32, 32, ATYPE_RO, acName2031_08, 0, &Obj.axis[0].MechCoulomb},
+   {0x09, DTYPE_REAL32, 32, ATYPE_RO, acName2031_09, 0, &Obj.axis[0].MechLoad},
+   {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0A, 0, &Obj.axis[0].MechQuality},
+   {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0B, 0, &Obj.axis[0].MechPeakSpeed},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -1926,6 +1967,23 @@ const _objd SDO2830[] =
    {0x12, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2830_12, 0, &Obj.axis[1].IdentBridgeResistance},
 };
 
+/* 0x2831 Mechanical Identification */
+const _objd SDO2831[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2831, 11, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2831_01, 0, &Obj.axis[1].MechWindowStart},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName2831_02, 0, &Obj.axis[1].MechWindowEnd},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2831_03, 300, &Obj.axis[1].MechMaxTorque},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2831_04, 300, &Obj.axis[1].MechMaxSpeed},
+   {0x05, DTYPE_REAL32, 32, ATYPE_RO, acName2831_05, 0, &Obj.axis[1].MechInertiaKgm2},
+   {0x06, DTYPE_REAL32, 32, ATYPE_RO, acName2831_06, 0, &Obj.axis[1].MechInertia},
+   {0x07, DTYPE_REAL32, 32, ATYPE_RO, acName2831_07, 0, &Obj.axis[1].MechViscous},
+   {0x08, DTYPE_REAL32, 32, ATYPE_RO, acName2831_08, 0, &Obj.axis[1].MechCoulomb},
+   {0x09, DTYPE_REAL32, 32, ATYPE_RO, acName2831_09, 0, &Obj.axis[1].MechLoad},
+   {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_0A, 0, &Obj.axis[1].MechQuality},
+   {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_0B, 0, &Obj.axis[1].MechPeakSpeed},
+};
+
 /* 0x603F Error Code */
 const _objd SDO603F[] =
 {
@@ -2303,6 +2361,7 @@ const _objectlist SDOobjects[] =
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
+   {0x2031, OTYPE_RECORD, 11, 0, acName2031, SDO2031},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
@@ -2316,6 +2375,7 @@ const _objectlist SDOobjects[] =
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
    {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
    {0x2830, OTYPE_RECORD, 18, 0, acName2830, SDO2830},
+   {0x2831, OTYPE_RECORD, 11, 0, acName2831, SDO2831},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

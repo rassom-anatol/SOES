@@ -82,6 +82,17 @@ typedef struct
    uint8_t    LoopStructure;
    uint32_t   MaxMotorSpeed;
    uint16_t   MaxTorque;
+   float      MechCoulomb;
+   float      MechInertia;
+   float      MechInertiaKgm2;
+   float      MechLoad;
+   uint16_t   MechMaxSpeed;
+   uint16_t   MechMaxTorque;
+   uint16_t   MechPeakSpeed;
+   uint16_t   MechQuality;
+   float      MechViscous;
+   int32_t    MechWindowEnd;
+   int32_t    MechWindowStart;
    int8_t     ModesOfOperation;
    int8_t     ModesOfOperationDisplay;
    uint8_t    MonitorDataRegister;

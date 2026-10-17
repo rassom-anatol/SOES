@@ -547,6 +547,33 @@ objects:
       - {sub: 17, name: "Motor Resistance mOhm",  type: u32, access: ro, var: "IdentMotorResistance"}
       - {sub: 18, name: "Bridge Resistance mOhm", type: u32, access: ro, var: "IdentBridgeResistance"}
 
+  # Routine 3 of mode -1 (0x2030:01 = 3): inertia and friction. The axis moves
+  # with torque pulses inside the travel window, which must be set: the
+  # routine refuses to start while it is narrower than half a turn or the axis
+  # is outside it, and stops if the axis leaves it. State and error are
+  # 0x2030:03 and :04 (8 window not usable, 9 left the window, 10 no motion at
+  # Max Torque, 11 a stroke did not finish). The model, at the motor shaft:
+  #   current = J a + B w + C (forward) or -C (backward) + constant load
+  # Inertia in kg m^2 needs 0x6076 Motor Rated Torque (the torque constant is
+  # 0x6076 / 0x6075); the others are in current. Constant Load is the current
+  # the axis needs whatever the direction, such as against gravity.
+  - index: 0x2031
+    axis: true
+    name: "Mechanical Identification"
+    type: record
+    subs:
+      - {sub: 1, name: "Window Start",        type: i32, access: rw, var: "MechWindowStart", store: true}
+      - {sub: 2, name: "Window End",          type: i32, access: rw, var: "MechWindowEnd", store: true}
+      - {sub: 3, name: "Max Torque",          type: u16, access: rw, var: "MechMaxTorque", value: 300, store: true}
+      - {sub: 4, name: "Max Speed rpm",       type: u16, access: rw, var: "MechMaxSpeed", value: 300, store: true}
+      - {sub: 5, name: "Inertia kgm2",        type: real32, access: ro, var: "MechInertiaKgm2"}
+      - {sub: 6, name: "Inertia A per rad/s2", type: real32, access: ro, var: "MechInertia"}
+      - {sub: 7, name: "Viscous Friction A per rad/s", type: real32, access: ro, var: "MechViscous"}
+      - {sub: 8, name: "Coulomb Friction A",  type: real32, access: ro, var: "MechCoulomb"}
+      - {sub: 9, name: "Constant Load A",     type: real32, access: ro, var: "MechLoad"}
+      - {sub: 10, name: "Fit Quality",        type: u16, access: ro, var: "MechQuality"}
+      - {sub: 11, name: "Peak Speed rpm",     type: u16, access: ro, var: "MechPeakSpeed"}
+
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
 # only in C so the master side and the drive side have one source.
