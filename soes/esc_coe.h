@@ -18,7 +18,9 @@ typedef struct
 {
    uint16_t subindex;
    uint16_t datatype;
-   uint16_t bitlength;
+   /* 32 bits, not the upstream 16: a DOMAIN such as a recorder's data can be
+    * far larger than the 8191 bytes 16 bits can describe. */
+   uint32_t bitlength;
    uint16_t flags;
    const char *name;
    uint32_t value;
@@ -64,6 +66,9 @@ typedef struct
 #define DTYPE_REAL32            0x0008
 #define DTYPE_VISIBLE_STRING    0x0009
 #define DTYPE_OCTET_STRING      0x000A
+/* Arbitrary-length data (CiA 301). Its bitlength is the maximum; the
+ * application's upload hook reports the length actually available. */
+#define DTYPE_DOMAIN            0x000F
 #define DTYPE_UNICODE_STRING    0x000B
 #define DTYPE_INTEGER24         0x0010
 #define DTYPE_UNSIGNED24        0x0016

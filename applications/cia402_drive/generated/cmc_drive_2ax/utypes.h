@@ -84,6 +84,8 @@ typedef struct
    uint32_t   QuickStopDeceleration;
    int16_t    QuickStopOptionCode;
    uint16_t   ShaftAngle;
+   int32_t    SigCoggingTorque;
+   int32_t    SigVelocityFeedForward;
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;
    int32_t    TargetPosition;
@@ -104,6 +106,26 @@ typedef struct
 typedef struct
 {
    uint8_t    ErrorRegister;
+   uint32_t   RecChannel1;
+   uint32_t   RecChannel2;
+   uint32_t   RecChannel3;
+   uint32_t   RecChannel4;
+   uint32_t   RecChannel5;
+   uint32_t   RecChannel6;
+   uint32_t   RecChannel7;
+   uint32_t   RecChannel8;
+   uint8_t    RecChannels;
+   uint8_t    RecCommand;
+   uint16_t   RecDivider;
+   uint16_t   RecPreTrigger;
+   uint16_t   RecRecorded;
+   uint16_t   RecSamples;
+   uint8_t    RecState;
+   uint8_t    RecTriggerChannel;
+   uint8_t    RecTriggerEdge;
+   int32_t    RecTriggerLevel;
+   uint8_t    RecorderData[131072];
+   uint32_t   RecorderDataLength;
    uint32_t   RestoreParameters;
    uint32_t   StoreParameters;
    uint32_t   serial;

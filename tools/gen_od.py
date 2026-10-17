@@ -45,6 +45,9 @@ TYPES = {
     "u64":    ("DTYPE_UNSIGNED64",    64,  "uint64_t"),
     "real32": ("DTYPE_REAL32",        32,  "float"),
     "string": ("DTYPE_VISIBLE_STRING", 0,  "char"),
+    # Arbitrary-length data: `size` bytes at most, the length available now in
+    # the u32 named by `length_var`. Stored as a byte array.
+    "domain": ("DTYPE_DOMAIN",         0,  "uint8_t"),
 }
 
 # IEC 61131 type names as the ESI uses them. A master takes its PDO
@@ -184,6 +187,10 @@ class Object:
 
         if t == "string":
             bits = 8 * (len(str(value)) if value else 1)
+        if t == "domain":
+            if "size" not in spec or "length_var" not in spec or not spec.get("var"):
+                die(f"0x{self.index:04X}: a domain needs size, var and length_var")
+            bits = 8 * int(spec["size"])
 
         var = spec.get("var")
         access = spec.get("access", "ro")
@@ -211,6 +218,8 @@ class Object:
             # advertised limit and the enforced one drift apart silently.
             "define": spec.get("define"),
             "store": bool(store),
+            "array_size": int(spec["size"]) if t == "domain" else None,
+            "length_var": spec.get("length_var"),
             "disabled_only": bool(spec.get("disabled_only", disabled_only_default)),
         }
 
@@ -532,12 +541,14 @@ def emit_utypes(cfg, objs, src):
     out.append("#ifndef __UTYPES_H__\n#define __UTYPES_H__\n")
     out.append('#include "cc.h"\n')
 
-    per_axis, global_vars = {}, {}
+    per_axis, global_vars, sizes = {}, {}, {}
     for o in objs:
         for s in o.subs:
             if not s["var"]:
                 continue
             (per_axis if o.axis is not None else global_vars)[s["var"]] = s["ctype"]
+            if s.get("array_size"):
+                sizes[s["var"]] = s["array_size"]
 
     out.append("/* Per-axis process and parameter data. */")
     out.append("typedef struct\n{")
@@ -565,6 +576,8 @@ def emit_utypes(cfg, objs, src):
         if "." in var:
             g, m = var.split(".", 1)
             groups.setdefault(g, {})[m] = global_vars[var]
+        elif var in sizes:
+            out.append(f"   {global_vars[var]:<10} {var}[{sizes[var]}];")
         else:
             out.append(f"   {global_vars[var]:<10} {var};")
     for g in sorted(groups):
@@ -825,7 +838,7 @@ namespace od
  *  then reports -1 as 4294967295, which is why the declaration is carried. */
 enum class Type : uint8_t
 {
-   Bool, I8, U8, I16, U16, I32, U32, I64, U64, Real32, String
+   Bool, I8, U8, I16, U16, I32, U32, I64, U64, Real32, String, Domain
 };
 
 /** Access rights, as a bitmask. */
@@ -857,11 +870,13 @@ struct Entry
    uint8_t      sub;
    Type         type;
    uint8_t      access;
-   uint16_t     bits;
+   uint32_t     bits;        /**< for a Domain, the most it can hold */
    void *       storage;
    int64_t      constant;
    const char * text;
    const char * name;
+   /** A Domain's present length in bytes; null for every other type. */
+   const uint32_t * length;
 };
 
 extern const Entry       kEntries[];
@@ -945,6 +960,7 @@ std::size_t ByteWidth (Type type)
       case Type::I64:
       case Type::U64:    return 8;
       case Type::String: return 0;
+      case Type::Domain: return 0;   /* variable; see ObjectDictionary */
    }
    return 0;
 }
@@ -973,6 +989,7 @@ CXX_TYPES = {
     "u64":    "U64",
     "real32": "Real32",
     "string": "String",
+    "domain": "Domain",
 }
 
 # Access rights as meaning rather than as the stack's encoding. rwpre is
@@ -997,11 +1014,11 @@ def cxx_entries(cfg, objs, rx, tx):
     rows = []
 
     def add(index, sub, name, type_, access, bits, storage, constant, text,
-            store=False, disabled_only=False):
+            store=False, disabled_only=False, length="nullptr"):
         rows.append({"index": index, "sub": sub, "name": name, "type": type_,
                      "access": access, "bits": bits, "storage": storage,
                      "constant": constant, "text": text, "store": store,
-                     "disabled_only": disabled_only})
+                     "disabled_only": disabled_only, "length": length})
 
     for o in objs:
         if o.is_record:
@@ -1021,8 +1038,12 @@ def cxx_entries(cfg, objs, rx, tx):
                     text = '"%s"' % s["value"]
             elif not isinstance(s["value"], str):
                 constant = int(s["value"])
+            length = "nullptr"
+            if s["type"] == "domain":
+                length = f"&Obj.{s['length_var']}"
             add(o.index, s["sub"], s["name"], s["type"], s["access_name"],
-                s["bits"], storage, constant, text, s["store"], s["disabled_only"])
+                s["bits"], storage, constant, text, s["store"], s["disabled_only"],
+                length)
 
     for pdo in rx + tx:
         entries = pdo["entries"]
@@ -1080,12 +1101,12 @@ def emit_cxx_table_cpp(cfg, objs, rx, tx, src):
     out.append("const Entry kEntries[] =")
     out.append("{")
     for r in rows:
-        out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\"},"
+        out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\", %s},"
                    % (r["index"], r["sub"], CXX_TYPES[r["type"]],
                       CXX_ACCESS[r["access"]] + (" | kStore" if r["store"] else "")
                       + (" | kDisabledOnly" if r["disabled_only"] else ""),
                       r["bits"], r["storage"],
-                      r["constant"], r["text"], r["name"]))
+                      r["constant"], r["text"], r["name"], r["length"]))
     out.append("};")
     out.append("")
     out.append("const std::size_t kEntryCount = "

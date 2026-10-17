@@ -366,6 +366,31 @@ static const char acName2015_7D[] = "Point 124";
 static const char acName2015_7E[] = "Point 125";
 static const char acName2015_7F[] = "Point 126";
 static const char acName2015_80[] = "Point 127";
+static const char acName2016[] = "Loop Signals";
+static const char acName2016_01[] = "Velocity Feed-Forward";
+static const char acName2016_02[] = "Cogging Torque mA";
+static const char acName2020[] = "Recorder";
+static const char acName2020_01[] = "Command";
+static const char acName2020_02[] = "State";
+static const char acName2020_03[] = "Divider";
+static const char acName2020_04[] = "Samples";
+static const char acName2020_05[] = "Pre-Trigger";
+static const char acName2020_06[] = "Trigger Channel";
+static const char acName2020_07[] = "Trigger Edge";
+static const char acName2020_08[] = "Trigger Level";
+static const char acName2020_09[] = "Channels Recorded";
+static const char acName2020_0A[] = "Samples Recorded";
+static const char acName2020_0B[] = "Data Length";
+static const char acName2020_0C[] = "Channel 1";
+static const char acName2020_0D[] = "Channel 2";
+static const char acName2020_0E[] = "Channel 3";
+static const char acName2020_0F[] = "Channel 4";
+static const char acName2020_10[] = "Channel 5";
+static const char acName2020_11[] = "Channel 6";
+static const char acName2020_12[] = "Channel 7";
+static const char acName2020_13[] = "Channel 8";
+static const char acName2021[] = "Recorder Data";
+static const char acName2021_00[] = "Recorder Data";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -686,6 +711,9 @@ static const char acName2815_7D[] = "Point 124";
 static const char acName2815_7E[] = "Point 125";
 static const char acName2815_7F[] = "Point 126";
 static const char acName2815_80[] = "Point 127";
+static const char acName2816[] = "Loop Signals";
+static const char acName2816_01[] = "Velocity Feed-Forward";
+static const char acName2816_02[] = "Cogging Torque mA";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1391,6 +1419,45 @@ const _objd SDO2015[] =
    {0x80, DTYPE_INTEGER16, 16, ATYPE_RW, acName2015_80, 0, &Obj.axis[0].CoggingTableNeg[127]},
 };
 
+/* 0x2016 Loop Signals */
+const _objd SDO2016[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2016, 2, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_01, 0, &Obj.axis[0].SigVelocityFeedForward},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_02, 0, &Obj.axis[0].SigCoggingTorque},
+};
+
+/* 0x2020 Recorder */
+const _objd SDO2020[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2020, 19, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2020_01, 0, &Obj.RecCommand},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2020_02, 0, &Obj.RecState},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2020_03, 1, &Obj.RecDivider},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2020_04, 2000, &Obj.RecSamples},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2020_05, 0, &Obj.RecPreTrigger},
+   {0x06, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2020_06, 0, &Obj.RecTriggerChannel},
+   {0x07, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2020_07, 1, &Obj.RecTriggerEdge},
+   {0x08, DTYPE_INTEGER32, 32, ATYPE_RW, acName2020_08, 0, &Obj.RecTriggerLevel},
+   {0x09, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2020_09, 0, &Obj.RecChannels},
+   {0x0A, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2020_0A, 0, &Obj.RecRecorded},
+   {0x0B, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2020_0B, 0, &Obj.RecorderDataLength},
+   {0x0C, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_0C, 0, &Obj.RecChannel1},
+   {0x0D, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_0D, 0, &Obj.RecChannel2},
+   {0x0E, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_0E, 0, &Obj.RecChannel3},
+   {0x0F, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_0F, 0, &Obj.RecChannel4},
+   {0x10, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_10, 0, &Obj.RecChannel5},
+   {0x11, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_11, 0, &Obj.RecChannel6},
+   {0x12, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_12, 0, &Obj.RecChannel7},
+   {0x13, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_13, 0, &Obj.RecChannel8},
+};
+
+/* 0x2021 Recorder Data */
+const _objd SDO2021[] =
+{
+   {0x00, DTYPE_DOMAIN, 1048576, ATYPE_RO, acName2021_00, 0, &Obj.RecorderData},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -1763,6 +1830,14 @@ const _objd SDO2815[] =
    {0x7E, DTYPE_INTEGER16, 16, ATYPE_RW, acName2815_7E, 0, &Obj.axis[1].CoggingTableNeg[125]},
    {0x7F, DTYPE_INTEGER16, 16, ATYPE_RW, acName2815_7F, 0, &Obj.axis[1].CoggingTableNeg[126]},
    {0x80, DTYPE_INTEGER16, 16, ATYPE_RW, acName2815_80, 0, &Obj.axis[1].CoggingTableNeg[127]},
+};
+
+/* 0x2816 Loop Signals */
+const _objd SDO2816[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 2, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_01, 0, &Obj.axis[1].SigVelocityFeedForward},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_02, 0, &Obj.axis[1].SigCoggingTorque},
 };
 
 /* 0x603F Error Code */
@@ -2138,6 +2213,9 @@ const _objectlist SDOobjects[] =
    {0x2013, OTYPE_RECORD, 6, 0, acName2013, SDO2013},
    {0x2014, OTYPE_ARRAY, 128, 0, acName2014, SDO2014},
    {0x2015, OTYPE_ARRAY, 128, 0, acName2015, SDO2015},
+   {0x2016, OTYPE_RECORD, 2, 0, acName2016, SDO2016},
+   {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
+   {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
@@ -2149,6 +2227,7 @@ const _objectlist SDOobjects[] =
    {0x2813, OTYPE_RECORD, 6, 0, acName2813, SDO2813},
    {0x2814, OTYPE_ARRAY, 128, 0, acName2814, SDO2814},
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
+   {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

@@ -413,8 +413,15 @@ static void SDO_upload (void)
                coeres->command |= (COE_EXPEDITED_INDICATOR | dss);
                void *dataptr = ((objd + nsub)->data) ?
                      (objd + nsub)->data : (void *)&((objd + nsub)->value);
-               abort = ESC_upload_pre_objecthandler (index, subindex,
-                     dataptr, (size_t *)&size, (objd + nsub)->flags);
+               {
+                  /* A size_t for the hook, never a cast of &size: size is 32
+                   * bits, and a hook writing through a 64-bit size_t pointer
+                   * would overwrite the stack beyond it. */
+                  size_t hook_size = size;
+                  abort = ESC_upload_pre_objecthandler (index, subindex,
+                        dataptr, &hook_size, (objd + nsub)->flags);
+                  size = (uint32_t)hook_size;
+               }
                if (abort == 0)
                {
                   if ((objd + nsub)->data == NULL)
@@ -437,8 +444,12 @@ static void SDO_upload (void)
             else
             {
                /* normal response i.e. length>4 bytes */
-               abort = ESC_upload_pre_objecthandler (index, subindex,
-                     (objd + nsub)->data, (size_t *)&size, (objd + nsub)->flags);
+               {
+                  size_t hook_size = size;   /* see the expedited path */
+                  abort = ESC_upload_pre_objecthandler (index, subindex,
+                        (objd + nsub)->data, &hook_size, (objd + nsub)->flags);
+                  size = (uint32_t)hook_size;
+               }
                if (abort == 0)
                {
                   /* set total size in bytes */
@@ -550,7 +561,7 @@ static uint32_t complete_access_subindex_loop(const _objd *objd,
 
    while (nsub <= SDOobjects[nidx].maxsub)
    {
-      uint16_t bitlen = (objd + nsub)->bitlength;
+      uint32_t bitlen = (objd + nsub)->bitlength;
       void *ul_source = ((objd + nsub)->data != NULL) ?
             (objd + nsub)->data : (void *)&((objd + nsub)->value);
       uint8_t bitoffset = size % 8;
@@ -693,8 +704,12 @@ static void SDO_upload_complete_access (void)
       set_state_idle (MBXout, index, subindex, ABORT_CA_NOT_SUPPORTED);
       return;
    }
-   abortcode = ESC_upload_pre_objecthandler(index, subindex,
-         objd->data, (size_t *)&size, objd->flags | COMPLETE_ACCESS_FLAG);
+   {
+      size_t hook_size = size;   /* see SDO_upload */
+      abortcode = ESC_upload_pre_objecthandler(index, subindex,
+            objd->data, &hook_size, objd->flags | COMPLETE_ACCESS_FLAG);
+      size = (uint32_t)hook_size;
+   }
    if (abortcode != 0)
    {
       set_state_idle (MBXout, index, subindex, abortcode);
@@ -1475,7 +1490,11 @@ static void SDO_geted (void)
             coel->valueinfo = COE_VALUEINFO_ACCESS +
                COE_VALUEINFO_OBJECT + COE_VALUEINFO_MAPPABLE;
             coel->datatype = htoes ((objd + nsub)->datatype);
-            coel->bitlength = htoes ((objd + nsub)->bitlength);
+            /* The description carries 16 bits by protocol. A DOMAIN reports
+             * 0, variable length; nothing else exceeds 16 bits. */
+            coel->bitlength = htoes ((uint16_t)(((objd + nsub)->datatype == DTYPE_DOMAIN ||
+                                                 (objd + nsub)->bitlength > 0xFFFF)
+                                                ? 0 : (objd + nsub)->bitlength));
             coel->access = htoes ((objd + nsub)->flags);
             s = (uint8_t *) (objd + nsub)->name;
             d = (uint8_t *) &(coel->name);

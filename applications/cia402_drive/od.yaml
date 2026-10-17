@@ -453,6 +453,53 @@ objects:
     object_code: array
     elements: {count: 128, type: i16, access: rw, var: "CoggingTableNeg", name: "Point"}
 
+  # Signals inside the drive's control, as objects so the recorder (0x2020)
+  # and any client can see them.
+  - index: 0x2016
+    axis: true
+    name: "Loop Signals"
+    type: record
+    subs:
+      - {sub: 1, name: "Velocity Feed-Forward", type: i32, access: ro, var: "SigVelocityFeedForward"}
+      - {sub: 2, name: "Cogging Torque mA",     type: i32, access: ro, var: "SigCoggingTorque"}
+
+  # The recorder: up to 8 channels, each naming an object in the PDO mapping
+  # format (index << 16 | sub << 8, the low byte ignored), sampled by the
+  # cyclic thread every Divider cycles into 0x2021. Command 1 arms it, 2
+  # triggers at once, 3 stops. With Trigger Channel 0 it records from the moment
+  # it is armed; otherwise it keeps Pre-Trigger samples and records the rest
+  # once that channel crosses Trigger Level (Edge 1 rising, 2 falling, 3
+  # either). State: 0 idle, 1 armed, 2 recording, 3 done, 4 refused (a channel
+  # names no recordable object, or the record would not fit).
+  - index: 0x2020
+    name: "Recorder"
+    type: record
+    subs:
+      - {sub: 1,  name: "Command",           type: u8,  access: rw, var: "RecCommand"}
+      - {sub: 2,  name: "State",             type: u8,  access: ro, var: "RecState"}
+      - {sub: 3,  name: "Divider",           type: u16, access: rw, var: "RecDivider", value: 1}
+      - {sub: 4,  name: "Samples",           type: u16, access: rw, var: "RecSamples", value: 2000}
+      - {sub: 5,  name: "Pre-Trigger",       type: u16, access: rw, var: "RecPreTrigger"}
+      - {sub: 6,  name: "Trigger Channel",   type: u8,  access: rw, var: "RecTriggerChannel"}
+      - {sub: 7,  name: "Trigger Edge",      type: u8,  access: rw, var: "RecTriggerEdge", value: 1}
+      - {sub: 8,  name: "Trigger Level",     type: i32, access: rw, var: "RecTriggerLevel"}
+      - {sub: 9,  name: "Channels Recorded", type: u8,  access: ro, var: "RecChannels"}
+      - {sub: 10, name: "Samples Recorded",  type: u16, access: ro, var: "RecRecorded"}
+      - {sub: 11, name: "Data Length",       type: u32, access: ro, var: "RecorderDataLength"}
+      - {sub: 12, name: "Channel 1",         type: u32, access: rw, var: "RecChannel1"}
+      - {sub: 13, name: "Channel 2",         type: u32, access: rw, var: "RecChannel2"}
+      - {sub: 14, name: "Channel 3",         type: u32, access: rw, var: "RecChannel3"}
+      - {sub: 15, name: "Channel 4",         type: u32, access: rw, var: "RecChannel4"}
+      - {sub: 16, name: "Channel 5",         type: u32, access: rw, var: "RecChannel5"}
+      - {sub: 17, name: "Channel 6",         type: u32, access: rw, var: "RecChannel6"}
+      - {sub: 18, name: "Channel 7",         type: u32, access: rw, var: "RecChannel7"}
+      - {sub: 19, name: "Channel 8",         type: u32, access: rw, var: "RecChannel8"}
+
+  # The record: Samples Recorded samples, oldest first, each the recorded
+  # channels in order as little-endian int32. Readable once State is 3;
+  # otherwise the read is refused with 0x08000024, no data available.
+  - {index: 0x2021, name: "Recorder Data", type: domain, size: 131072, access: ro, var: "RecorderData", length_var: "RecorderDataLength"}
+
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
 # only in C so the master side and the drive side have one source.
