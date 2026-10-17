@@ -1483,7 +1483,7 @@ const _objd SDO2030[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030, 9, NULL},
    {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2030_01, 1, &Obj.axis[0].IdentRoutine},
-   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2030_02, 300, &Obj.axis[0].IdentTestCurrent},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2030_02, 800, &Obj.axis[0].IdentTestCurrent},
    {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_03, 0, &Obj.axis[0].IdentState},
    {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_04, 0, &Obj.axis[0].IdentError},
    {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_05, 0, &Obj.axis[0].IdentResistance},
@@ -1880,7 +1880,7 @@ const _objd SDO2830[] =
 {
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2830, 9, NULL},
    {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2830_01, 1, &Obj.axis[1].IdentRoutine},
-   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2830_02, 300, &Obj.axis[1].IdentTestCurrent},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2830_02, 800, &Obj.axis[1].IdentTestCurrent},
    {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2830_03, 0, &Obj.axis[1].IdentState},
    {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2830_04, 0, &Obj.axis[1].IdentError},
    {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2830_05, 0, &Obj.axis[1].IdentResistance},

@@ -505,7 +505,10 @@ objects:
   # routine; statusword bit 10 finished, 12 succeeded, 13 failed. Routine 1
   # measures the motor's resistance and inductance at standstill with a d-axis
   # current, which makes no torque, of up to Test Current (per mille of 0x6075).
-  # Results are phase to phase, as motor datasheets give them. State: 0 idle,
+  # Results are phase to phase, as motor datasheets give them, and include the
+  # cable and the bridge. Resistance reads high at low test currents, where the
+  # bridge's dead-time voltage still grows with current: on the bench 520 mOhm
+  # at 150 per mille, 385 at 300, 268 at 600, 252 at 800, 246 at 1000. State: 0 idle,
   # 1 running, 2 done, 3 failed. Error: 0 none, 1 not ready (encoder not
   # calibrated, motor turning, no supply or 0x6075 unset), 2 current not
   # reached (open phase), 3 overcurrent, 4 fit failed, 5 aborted, 6 unknown
@@ -516,7 +519,7 @@ objects:
     type: record
     subs:
       - {sub: 1, name: "Routine",            type: u8,  access: rw, var: "IdentRoutine", value: 1}
-      - {sub: 2, name: "Test Current",       type: u16, access: rw, var: "IdentTestCurrent", value: 300, store: true}
+      - {sub: 2, name: "Test Current",       type: u16, access: rw, var: "IdentTestCurrent", value: 800, store: true}
       - {sub: 3, name: "State",              type: u8,  access: ro, var: "IdentState"}
       - {sub: 4, name: "Error",              type: u8,  access: ro, var: "IdentError"}
       - {sub: 5, name: "Resistance mOhm",    type: u32, access: ro, var: "IdentResistance"}
