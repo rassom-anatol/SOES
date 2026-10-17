@@ -62,12 +62,14 @@ typedef struct
    uint32_t   GearShaftRevolutions;
    int16_t    HaltOptionCode;
    uint16_t   IdentBandwidth;
+   uint32_t   IdentBridgeResistance;
    uint16_t   IdentCurrentIAdvanced;
    uint16_t   IdentCurrentIClassic;
    uint16_t   IdentCurrentP;
    uint8_t    IdentError;
    uint16_t   IdentFitQuality;
    uint32_t   IdentInductance;
+   uint32_t   IdentMotorResistance;
    uint32_t   IdentResistance;
    uint8_t    IdentRoutine;
    uint8_t    IdentState;

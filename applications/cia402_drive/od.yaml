@@ -539,6 +539,13 @@ objects:
       - {sub: 14, name: "Step Rise Time us",  type: u32, access: ro, var: "IdentStepRise"}
       - {sub: 15, name: "Step Overshoot",     type: u16, access: ro, var: "IdentStepOvershoot"}
       - {sub: 16, name: "Step Settling Time us", type: u32, access: ro, var: "IdentStepSettling"}
+      # Sub 5 is everything the drive sees, which the current loop works
+      # against. Sub 17 takes off the bridge (sub 18, from bsp.yaml's MOSFET
+      # on-resistance and r_sense, at the MOSFET temperature); with the
+      # on-resistance unknown, sub 18 is 0 and sub 17 equals sub 5. The cable
+      # stays included in both.
+      - {sub: 17, name: "Motor Resistance mOhm",  type: u32, access: ro, var: "IdentMotorResistance"}
+      - {sub: 18, name: "Bridge Resistance mOhm", type: u32, access: ro, var: "IdentBridgeResistance"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
