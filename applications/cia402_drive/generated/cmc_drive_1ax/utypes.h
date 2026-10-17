@@ -61,6 +61,15 @@ typedef struct
    uint32_t   GearMotorRevolutions;
    uint32_t   GearShaftRevolutions;
    int16_t    HaltOptionCode;
+   uint8_t    IdentError;
+   uint16_t   IdentFitQuality;
+   uint32_t   IdentInductance;
+   uint32_t   IdentResistance;
+   uint8_t    IdentRoutine;
+   uint8_t    IdentState;
+   uint32_t   IdentSupply;
+   uint16_t   IdentTestCurrent;
+   uint32_t   IdentTimeConstant;
    uint8_t    LoopStructure;
    uint32_t   MaxMotorSpeed;
    uint16_t   MaxTorque;

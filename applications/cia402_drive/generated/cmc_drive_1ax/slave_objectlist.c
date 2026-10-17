@@ -391,6 +391,16 @@ static const char acName2020_12[] = "Channel 7";
 static const char acName2020_13[] = "Channel 8";
 static const char acName2021[] = "Recorder Data";
 static const char acName2021_00[] = "Recorder Data";
+static const char acName2030[] = "Identification";
+static const char acName2030_01[] = "Routine";
+static const char acName2030_02[] = "Test Current";
+static const char acName2030_03[] = "State";
+static const char acName2030_04[] = "Error";
+static const char acName2030_05[] = "Resistance mOhm";
+static const char acName2030_06[] = "Inductance uH";
+static const char acName2030_07[] = "Time Constant us";
+static const char acName2030_08[] = "Supply Voltage mV";
+static const char acName2030_09[] = "Fit Quality";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1025,6 +1035,21 @@ const _objd SDO2021[] =
    {0x00, DTYPE_DOMAIN, 1048576, ATYPE_RO, acName2021_00, 0, &Obj.RecorderData},
 };
 
+/* 0x2030 Identification */
+const _objd SDO2030[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030, 9, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2030_01, 1, &Obj.axis[0].IdentRoutine},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2030_02, 300, &Obj.axis[0].IdentTestCurrent},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_03, 0, &Obj.axis[0].IdentState},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_04, 0, &Obj.axis[0].IdentError},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_05, 0, &Obj.axis[0].IdentResistance},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_06, 0, &Obj.axis[0].IdentInductance},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_07, 0, &Obj.axis[0].IdentTimeConstant},
+   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_08, 0, &Obj.axis[0].IdentSupply},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_09, 0, &Obj.axis[0].IdentFitQuality},
+};
+
 /* 0x603F Error Code */
 const _objd SDO603F[] =
 {
@@ -1192,7 +1217,7 @@ const _objd SDO60FF[] =
 /* 0x6502 Supported Drive Modes */
 const _objd SDO6502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 896, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66432, NULL},
 };
 
 /* Object list. Ascending index order is required by
@@ -1229,6 +1254,7 @@ const _objectlist SDOobjects[] =
    {0x2016, OTYPE_RECORD, 2, 0, acName2016, SDO2016},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
+   {0x2030, OTYPE_RECORD, 9, 0, acName2030, SDO2030},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

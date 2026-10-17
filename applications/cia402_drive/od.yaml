@@ -253,7 +253,8 @@ objects:
   - {index: 0x6085, axis: true, name: "Quick Stop Deceleration", type: u32, access: rw, var: "QuickStopDeceleration", value: 10000, store: true}
   - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
-  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00000380}
+  # Bits 7, 8, 9: csp, csv, cst. Bit 16: manufacturer mode -1, identification.
+  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00010380}
 
   # Scaling. SDO-only, but a master cannot convert increments to user units
   # without them -- TwinCAT NC in particular.
@@ -499,6 +500,30 @@ objects:
   # channels in order as little-endian int32. Readable once State is 3;
   # otherwise the read is refused with 0x08000024, no data available.
   - {index: 0x2021, name: "Recorder Data", type: domain, size: 131072, access: ro, var: "RecorderData", length_var: "RecorderDataLength"}
+
+  # Identification, run in mode of operation -1: controlword bit 4 starts the
+  # routine; statusword bit 10 finished, 12 succeeded, 13 failed. Routine 1
+  # measures the motor's resistance and inductance at standstill with a d-axis
+  # current, which makes no torque, of up to Test Current (per mille of 0x6075).
+  # Results are phase to phase, as motor datasheets give them. State: 0 idle,
+  # 1 running, 2 done, 3 failed. Error: 0 none, 1 not ready (encoder not
+  # calibrated, motor turning, no supply or 0x6075 unset), 2 current not
+  # reached (open phase), 3 overcurrent, 4 fit failed, 5 aborted, 6 unknown
+  # routine, 7 rotor moved. Fit Quality: the step response fit's R squared.
+  - index: 0x2030
+    axis: true
+    name: "Identification"
+    type: record
+    subs:
+      - {sub: 1, name: "Routine",            type: u8,  access: rw, var: "IdentRoutine", value: 1}
+      - {sub: 2, name: "Test Current",       type: u16, access: rw, var: "IdentTestCurrent", value: 300, store: true}
+      - {sub: 3, name: "State",              type: u8,  access: ro, var: "IdentState"}
+      - {sub: 4, name: "Error",              type: u8,  access: ro, var: "IdentError"}
+      - {sub: 5, name: "Resistance mOhm",    type: u32, access: ro, var: "IdentResistance"}
+      - {sub: 6, name: "Inductance uH",      type: u32, access: ro, var: "IdentInductance"}
+      - {sub: 7, name: "Time Constant us",   type: u32, access: ro, var: "IdentTimeConstant"}
+      - {sub: 8, name: "Supply Voltage mV",  type: u32, access: ro, var: "IdentSupply"}
+      - {sub: 9, name: "Fit Quality",        type: u16, access: ro, var: "IdentFitQuality"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than

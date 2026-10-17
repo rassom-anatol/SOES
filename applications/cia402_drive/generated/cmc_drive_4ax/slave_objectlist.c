@@ -391,6 +391,16 @@ static const char acName2020_12[] = "Channel 7";
 static const char acName2020_13[] = "Channel 8";
 static const char acName2021[] = "Recorder Data";
 static const char acName2021_00[] = "Recorder Data";
+static const char acName2030[] = "Identification";
+static const char acName2030_01[] = "Routine";
+static const char acName2030_02[] = "Test Current";
+static const char acName2030_03[] = "State";
+static const char acName2030_04[] = "Error";
+static const char acName2030_05[] = "Resistance mOhm";
+static const char acName2030_06[] = "Inductance uH";
+static const char acName2030_07[] = "Time Constant us";
+static const char acName2030_08[] = "Supply Voltage mV";
+static const char acName2030_09[] = "Fit Quality";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -714,6 +724,16 @@ static const char acName2815_80[] = "Point 127";
 static const char acName2816[] = "Loop Signals";
 static const char acName2816_01[] = "Velocity Feed-Forward";
 static const char acName2816_02[] = "Cogging Torque mA";
+static const char acName2830[] = "Identification";
+static const char acName2830_01[] = "Routine";
+static const char acName2830_02[] = "Test Current";
+static const char acName2830_03[] = "State";
+static const char acName2830_04[] = "Error";
+static const char acName2830_05[] = "Resistance mOhm";
+static const char acName2830_06[] = "Inductance uH";
+static const char acName2830_07[] = "Time Constant us";
+static const char acName2830_08[] = "Supply Voltage mV";
+static const char acName2830_09[] = "Fit Quality";
 static const char acName3000[] = "Drive Faults and Status";
 static const char acName3000_01[] = "Gate Driver Faults";
 static const char acName3000_02[] = "Drive Status Flags";
@@ -1037,6 +1057,16 @@ static const char acName3015_80[] = "Point 127";
 static const char acName3016[] = "Loop Signals";
 static const char acName3016_01[] = "Velocity Feed-Forward";
 static const char acName3016_02[] = "Cogging Torque mA";
+static const char acName3030[] = "Identification";
+static const char acName3030_01[] = "Routine";
+static const char acName3030_02[] = "Test Current";
+static const char acName3030_03[] = "State";
+static const char acName3030_04[] = "Error";
+static const char acName3030_05[] = "Resistance mOhm";
+static const char acName3030_06[] = "Inductance uH";
+static const char acName3030_07[] = "Time Constant us";
+static const char acName3030_08[] = "Supply Voltage mV";
+static const char acName3030_09[] = "Fit Quality";
 static const char acName3800[] = "Drive Faults and Status";
 static const char acName3800_01[] = "Gate Driver Faults";
 static const char acName3800_02[] = "Drive Status Flags";
@@ -1360,6 +1390,16 @@ static const char acName3815_80[] = "Point 127";
 static const char acName3816[] = "Loop Signals";
 static const char acName3816_01[] = "Velocity Feed-Forward";
 static const char acName3816_02[] = "Cogging Torque mA";
+static const char acName3830[] = "Identification";
+static const char acName3830_01[] = "Routine";
+static const char acName3830_02[] = "Test Current";
+static const char acName3830_03[] = "State";
+static const char acName3830_04[] = "Error";
+static const char acName3830_05[] = "Resistance mOhm";
+static const char acName3830_06[] = "Inductance uH";
+static const char acName3830_07[] = "Time Constant us";
+static const char acName3830_08[] = "Supply Voltage mV";
+static const char acName3830_09[] = "Fit Quality";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -2324,6 +2364,21 @@ const _objd SDO2021[] =
    {0x00, DTYPE_DOMAIN, 1048576, ATYPE_RO, acName2021_00, 0, &Obj.RecorderData},
 };
 
+/* 0x2030 Identification */
+const _objd SDO2030[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030, 9, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2030_01, 1, &Obj.axis[0].IdentRoutine},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2030_02, 300, &Obj.axis[0].IdentTestCurrent},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_03, 0, &Obj.axis[0].IdentState},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2030_04, 0, &Obj.axis[0].IdentError},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_05, 0, &Obj.axis[0].IdentResistance},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_06, 0, &Obj.axis[0].IdentInductance},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_07, 0, &Obj.axis[0].IdentTimeConstant},
+   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2030_08, 0, &Obj.axis[0].IdentSupply},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2030_09, 0, &Obj.axis[0].IdentFitQuality},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -2704,6 +2759,21 @@ const _objd SDO2816[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 2, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_01, 0, &Obj.axis[1].SigVelocityFeedForward},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_02, 0, &Obj.axis[1].SigCoggingTorque},
+};
+
+/* 0x2830 Identification */
+const _objd SDO2830[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2830, 9, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2830_01, 1, &Obj.axis[1].IdentRoutine},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2830_02, 300, &Obj.axis[1].IdentTestCurrent},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2830_03, 0, &Obj.axis[1].IdentState},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2830_04, 0, &Obj.axis[1].IdentError},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2830_05, 0, &Obj.axis[1].IdentResistance},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2830_06, 0, &Obj.axis[1].IdentInductance},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2830_07, 0, &Obj.axis[1].IdentTimeConstant},
+   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2830_08, 0, &Obj.axis[1].IdentSupply},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2830_09, 0, &Obj.axis[1].IdentFitQuality},
 };
 
 /* 0x3000 Drive Faults and Status */
@@ -3088,6 +3158,21 @@ const _objd SDO3016[] =
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName3016_02, 0, &Obj.axis[2].SigCoggingTorque},
 };
 
+/* 0x3030 Identification */
+const _objd SDO3030[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3030, 9, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3030_01, 1, &Obj.axis[2].IdentRoutine},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3030_02, 300, &Obj.axis[2].IdentTestCurrent},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3030_03, 0, &Obj.axis[2].IdentState},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3030_04, 0, &Obj.axis[2].IdentError},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3030_05, 0, &Obj.axis[2].IdentResistance},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3030_06, 0, &Obj.axis[2].IdentInductance},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3030_07, 0, &Obj.axis[2].IdentTimeConstant},
+   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3030_08, 0, &Obj.axis[2].IdentSupply},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3030_09, 0, &Obj.axis[2].IdentFitQuality},
+};
+
 /* 0x3800 Drive Faults and Status */
 const _objd SDO3800[] =
 {
@@ -3470,6 +3555,21 @@ const _objd SDO3816[] =
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName3816_02, 0, &Obj.axis[3].SigCoggingTorque},
 };
 
+/* 0x3830 Identification */
+const _objd SDO3830[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3830, 9, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3830_01, 1, &Obj.axis[3].IdentRoutine},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3830_02, 300, &Obj.axis[3].IdentTestCurrent},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3830_03, 0, &Obj.axis[3].IdentState},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3830_04, 0, &Obj.axis[3].IdentError},
+   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3830_05, 0, &Obj.axis[3].IdentResistance},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3830_06, 0, &Obj.axis[3].IdentInductance},
+   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3830_07, 0, &Obj.axis[3].IdentTimeConstant},
+   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3830_08, 0, &Obj.axis[3].IdentSupply},
+   {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3830_09, 0, &Obj.axis[3].IdentFitQuality},
+};
+
 /* 0x603F Error Code */
 const _objd SDO603F[] =
 {
@@ -3637,7 +3737,7 @@ const _objd SDO60FF[] =
 /* 0x6502 Supported Drive Modes */
 const _objd SDO6502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 896, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66432, NULL},
 };
 
 /* 0x683F Error Code */
@@ -3807,7 +3907,7 @@ const _objd SDO68FF[] =
 /* 0x6D02 Supported Drive Modes */
 const _objd SDO6D02[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6D02_00, 896, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6D02_00, 66432, NULL},
 };
 
 /* 0x703F Error Code */
@@ -3977,7 +4077,7 @@ const _objd SDO70FF[] =
 /* 0x7502 Supported Drive Modes */
 const _objd SDO7502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7502_00, 896, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7502_00, 66432, NULL},
 };
 
 /* 0x783F Error Code */
@@ -4147,7 +4247,7 @@ const _objd SDO78FF[] =
 /* 0x7D02 Supported Drive Modes */
 const _objd SDO7D02[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7D02_00, 896, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7D02_00, 66432, NULL},
 };
 
 /* Object list. Ascending index order is required by
@@ -4190,6 +4290,7 @@ const _objectlist SDOobjects[] =
    {0x2016, OTYPE_RECORD, 2, 0, acName2016, SDO2016},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
+   {0x2030, OTYPE_RECORD, 9, 0, acName2030, SDO2030},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
@@ -4202,6 +4303,7 @@ const _objectlist SDOobjects[] =
    {0x2814, OTYPE_ARRAY, 128, 0, acName2814, SDO2814},
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
    {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
+   {0x2830, OTYPE_RECORD, 9, 0, acName2830, SDO2830},
    {0x3000, OTYPE_RECORD, 2, 0, acName3000, SDO3000},
    {0x3001, OTYPE_RECORD, 4, 0, acName3001, SDO3001},
    {0x3002, OTYPE_RECORD, 3, 0, acName3002, SDO3002},
@@ -4214,6 +4316,7 @@ const _objectlist SDOobjects[] =
    {0x3014, OTYPE_ARRAY, 128, 0, acName3014, SDO3014},
    {0x3015, OTYPE_ARRAY, 128, 0, acName3015, SDO3015},
    {0x3016, OTYPE_RECORD, 2, 0, acName3016, SDO3016},
+   {0x3030, OTYPE_RECORD, 9, 0, acName3030, SDO3030},
    {0x3800, OTYPE_RECORD, 2, 0, acName3800, SDO3800},
    {0x3801, OTYPE_RECORD, 4, 0, acName3801, SDO3801},
    {0x3802, OTYPE_RECORD, 3, 0, acName3802, SDO3802},
@@ -4226,6 +4329,7 @@ const _objectlist SDOobjects[] =
    {0x3814, OTYPE_ARRAY, 128, 0, acName3814, SDO3814},
    {0x3815, OTYPE_ARRAY, 128, 0, acName3815, SDO3815},
    {0x3816, OTYPE_RECORD, 2, 0, acName3816, SDO3816},
+   {0x3830, OTYPE_RECORD, 9, 0, acName3830, SDO3830},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
