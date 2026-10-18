@@ -569,7 +569,9 @@ objects:
   # routine, 7 rotor moved. Fit Quality: the step response fit's R squared.
   # Routine 1 also gives current loop gains for Current Loop Bandwidth, in the
   # chip's units: P for both structures, I per structure. They are not
-  # applied; 0x2010:01-04 and 0x2011:01-04 take them. Routine 2 steps the flux
+  # applied; 0x2010:01-04 and 0x2011:01-04 take them. Changing the bandwidth
+  # afterwards works them out again from the same measurement, without a new
+  # run. Routine 2 steps the flux
   # current in closed loop with the gains in use and reports the averaged
   # response: rise time 10-90 %, overshoot per mille, settling within 5 %.
   - index: 0x2030
@@ -639,6 +641,8 @@ objects:
       # Velocity loop gains for Velocity Loop Bandwidth, from the inertia, in
       # the drive's units: P for both structures, I per structure, and the
       # advanced structure's velocity filter cutoff (0x2011:09). Not applied.
+      # Changing the bandwidth afterwards works them out again from the same
+      # inertia, without a new run.
       - {sub: 14, name: "Velocity Loop Bandwidth Hz", type: u16, access: rw, var: "MechVelocityBandwidth", value: 100, store: true}
       - {sub: 15, name: "Velocity P",          type: u16, access: ro, var: "MechVelocityP"}
       - {sub: 16, name: "Velocity I Classic",  type: u16, access: ro, var: "MechVelocityIClassic"}
