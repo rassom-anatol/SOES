@@ -530,6 +530,20 @@ objects:
       - {sub: 6, name: "Hall Offset",                  type: u16, access: rw, var: "FbHallOffset", store: true, disabled_only: true}
       - {sub: 7, name: "Commutation Offset",           type: i16, access: ro, var: "FbCommutationOffset"}
 
+  # Feed-forward from the load's inertia, in profile position: the current
+  # the profile's acceleration takes, Inertia (current per angular
+  # acceleration at the motor, A per rad/s^2, as routine 3 reports it in
+  # 0x2031:06) times the acceleration, times Acceleration Gain (per mille),
+  # added to the torque loop ahead of the error the velocity loop would
+  # otherwise need. 0 inertia leaves it off. Shown in 0x2016:03.
+  - index: 0x2018
+    axis: true
+    name: "Feed-Forward"
+    type: record
+    subs:
+      - {sub: 1, name: "Inertia A per rad/s2", type: real32, access: rw, var: "FfInertia", store: true}
+      - {sub: 2, name: "Acceleration Gain",    type: u16,    access: rw, var: "FfAccelerationGain", value: 1000, store: true}
+
   # Signals inside the drive's control, as objects so the recorder (0x2020)
   # and any client can see them.
   - index: 0x2016
@@ -539,6 +553,7 @@ objects:
     subs:
       - {sub: 1, name: "Velocity Feed-Forward", type: i32, access: ro, var: "SigVelocityFeedForward"}
       - {sub: 2, name: "Cogging Torque mA",     type: i32, access: ro, var: "SigCoggingTorque"}
+      - {sub: 3, name: "Acceleration Feed-Forward mA", type: i32, access: ro, var: "SigAccelerationFeedForward"}
 
   # The recorder: up to 8 channels, each naming an object in the PDO mapping
   # format (index << 16 | sub << 8, the low byte ignored), sampled by the

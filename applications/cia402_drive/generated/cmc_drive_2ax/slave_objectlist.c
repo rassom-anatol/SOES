@@ -369,6 +369,7 @@ static const char acName2015_80[] = "Point 127";
 static const char acName2016[] = "Loop Signals";
 static const char acName2016_01[] = "Velocity Feed-Forward";
 static const char acName2016_02[] = "Cogging Torque mA";
+static const char acName2016_03[] = "Acceleration Feed-Forward mA";
 static const char acName2017[] = "Feedback Settings";
 static const char acName2017_01[] = "Encoder Direction";
 static const char acName2017_02[] = "Encoder Counts per Revolution";
@@ -377,6 +378,9 @@ static const char acName2017_04[] = "Hall Direction";
 static const char acName2017_05[] = "Hall Polarity";
 static const char acName2017_06[] = "Hall Offset";
 static const char acName2017_07[] = "Commutation Offset";
+static const char acName2018[] = "Feed-Forward";
+static const char acName2018_01[] = "Inertia A per rad/s2";
+static const char acName2018_02[] = "Acceleration Gain";
 static const char acName2020[] = "Recorder";
 static const char acName2020_01[] = "Command";
 static const char acName2020_02[] = "State";
@@ -1261,6 +1265,7 @@ static const char acName2815_80[] = "Point 127";
 static const char acName2816[] = "Loop Signals";
 static const char acName2816_01[] = "Velocity Feed-Forward";
 static const char acName2816_02[] = "Cogging Torque mA";
+static const char acName2816_03[] = "Acceleration Feed-Forward mA";
 static const char acName2817[] = "Feedback Settings";
 static const char acName2817_01[] = "Encoder Direction";
 static const char acName2817_02[] = "Encoder Counts per Revolution";
@@ -1269,6 +1274,9 @@ static const char acName2817_04[] = "Hall Direction";
 static const char acName2817_05[] = "Hall Polarity";
 static const char acName2817_06[] = "Hall Offset";
 static const char acName2817_07[] = "Commutation Offset";
+static const char acName2818[] = "Feed-Forward";
+static const char acName2818_01[] = "Inertia A per rad/s2";
+static const char acName2818_02[] = "Acceleration Gain";
 static const char acName2830[] = "Identification";
 static const char acName2830_01[] = "Routine";
 static const char acName2830_02[] = "Test Current";
@@ -2557,9 +2565,10 @@ const _objd SDO2015[] =
 /* 0x2016 Loop Signals */
 const _objd SDO2016[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2016, 2, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2016, 3, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_01, 0, &Obj.axis[0].SigVelocityFeedForward},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_02, 0, &Obj.axis[0].SigCoggingTorque},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_03, 0, &Obj.axis[0].SigAccelerationFeedForward},
 };
 
 /* 0x2017 Feedback Settings */
@@ -2573,6 +2582,14 @@ const _objd SDO2017[] =
    {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2017_05, 0, &Obj.axis[0].FbHallPolarity},
    {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2017_06, 0, &Obj.axis[0].FbHallOffset},
    {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName2017_07, 0, &Obj.axis[0].FbCommutationOffset},
+};
+
+/* 0x2018 Feed-Forward */
+const _objd SDO2018[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2018, 2, NULL},
+   {0x01, DTYPE_REAL32, 32, ATYPE_RW, acName2018_01, 0, &Obj.axis[0].FfInertia},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2018_02, 1000, &Obj.axis[0].FfAccelerationGain},
 };
 
 /* 0x2020 Recorder */
@@ -3572,9 +3589,10 @@ const _objd SDO2815[] =
 /* 0x2816 Loop Signals */
 const _objd SDO2816[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 2, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 3, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_01, 0, &Obj.axis[1].SigVelocityFeedForward},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_02, 0, &Obj.axis[1].SigCoggingTorque},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_03, 0, &Obj.axis[1].SigAccelerationFeedForward},
 };
 
 /* 0x2817 Feedback Settings */
@@ -3588,6 +3606,14 @@ const _objd SDO2817[] =
    {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2817_05, 0, &Obj.axis[1].FbHallPolarity},
    {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2817_06, 0, &Obj.axis[1].FbHallOffset},
    {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName2817_07, 0, &Obj.axis[1].FbCommutationOffset},
+};
+
+/* 0x2818 Feed-Forward */
+const _objd SDO2818[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2818, 2, NULL},
+   {0x01, DTYPE_REAL32, 32, ATYPE_RW, acName2818_01, 0, &Obj.axis[1].FfInertia},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2818_02, 1000, &Obj.axis[1].FfAccelerationGain},
 };
 
 /* 0x2830 Identification */
@@ -4686,8 +4712,9 @@ const _objectlist SDOobjects[] =
    {0x2013, OTYPE_RECORD, 6, 0, acName2013, SDO2013},
    {0x2014, OTYPE_ARRAY, 128, 0, acName2014, SDO2014},
    {0x2015, OTYPE_ARRAY, 128, 0, acName2015, SDO2015},
-   {0x2016, OTYPE_RECORD, 2, 0, acName2016, SDO2016},
+   {0x2016, OTYPE_RECORD, 3, 0, acName2016, SDO2016},
    {0x2017, OTYPE_RECORD, 7, 0, acName2017, SDO2017},
+   {0x2018, OTYPE_RECORD, 2, 0, acName2018, SDO2018},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
@@ -4711,8 +4738,9 @@ const _objectlist SDOobjects[] =
    {0x2813, OTYPE_RECORD, 6, 0, acName2813, SDO2813},
    {0x2814, OTYPE_ARRAY, 128, 0, acName2814, SDO2814},
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
-   {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
+   {0x2816, OTYPE_RECORD, 3, 0, acName2816, SDO2816},
    {0x2817, OTYPE_RECORD, 7, 0, acName2817, SDO2817},
+   {0x2818, OTYPE_RECORD, 2, 0, acName2818, SDO2818},
    {0x2830, OTYPE_RECORD, 18, 0, acName2830, SDO2830},
    {0x2831, OTYPE_RECORD, 20, 0, acName2831, SDO2831},
    {0x2832, OTYPE_RECORD, 8, 0, acName2832, SDO2832},

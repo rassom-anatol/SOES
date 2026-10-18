@@ -84,6 +84,8 @@ typedef struct
    uint16_t   FbcTurns;
    uint32_t   Feed;
    uint32_t   FeedShaftRevolutions;
+   uint16_t   FfAccelerationGain;
+   float      FfInertia;
    uint16_t   FluxI;
    uint16_t   FluxP;
    int32_t    FollowingErrorActual;
@@ -164,6 +166,7 @@ typedef struct
    uint32_t   SiUnitAcceleration;
    uint32_t   SiUnitPosition;
    uint32_t   SiUnitVelocity;
+   int32_t    SigAccelerationFeedForward;
    int32_t    SigCoggingTorque;
    int32_t    SigVelocityFeedForward;
    uint16_t   Statusword;
