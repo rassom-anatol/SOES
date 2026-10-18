@@ -87,30 +87,32 @@ sync_managers:
 # appended here -- which keeps the axis image byte-identical across variants
 # and independent of whatever else is fitted.
 rxpdo:
+  # Entry names are the standard CiA402 ones (as in ETG.6010 and maxon's and
+  # Beckhoff's ESI files), so a master can recognise them.
   index: 0x1600
   name: "RxPDO Drive"
   entries:
-    - {object: 0x607A, name: TargetPosition}
-    - {object: 0x60FF, name: TargetVelocity}
+    - {object: 0x607A, name: "Target position"}
+    - {object: 0x60FF, name: "Target velocity"}
     - {object: 0x6040, name: Controlword}
-    - {object: 0x6071, name: TargetTorque}
-    - {object: 0x6072, name: MaxTorque}
-    - {object: 0x6060, name: ModesOfOperation}
+    - {object: 0x6071, name: "Target torque"}
+    - {object: 0x6072, name: "Max torque"}
+    - {object: 0x6060, name: "Modes of operation"}
     - {pad: 8}
 
 txpdo:
   index: 0x1A00
   name: "TxPDO Drive"
   entries:
-    - {object: 0x6064, name: PositionActual}
-    - {object: 0x606C, name: VelocityActual}
-    - {object: 0x60F4, name: FollowingErrorActual}
+    - {object: 0x6064, name: "Position actual value"}
+    - {object: 0x606C, name: "Velocity actual value"}
+    - {object: 0x60F4, name: "Following error actual value"}
     - {object: 0x2000, sub: 1, name: GateDriverFaults}
     - {object: 0x2000, sub: 2, name: DriveStatusFlags}
     - {object: 0x6041, name: Statusword}
-    - {object: 0x6077, name: TorqueActual}
-    - {object: 0x603F, name: ErrorCode}
-    - {object: 0x6061, name: ModesOfOperationDisplay}
+    - {object: 0x6077, name: "Torque actual value"}
+    - {object: 0x603F, name: "Error code"}
+    - {object: 0x6061, name: "Modes of operation display"}
     - {pad: 8}
 
 # ---------------------------------------------------------------------------

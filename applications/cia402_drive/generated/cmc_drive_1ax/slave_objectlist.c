@@ -504,12 +504,12 @@ static const char acName6502_00[] = "Supported Drive Modes";
 
 /* RxPDO Drive */
 static const char acNamePDO1600[] = "RxPDO Drive";
-static const char acNamePDO1600_01[] = "TargetPosition";
-static const char acNamePDO1600_02[] = "TargetVelocity";
+static const char acNamePDO1600_01[] = "Target position";
+static const char acNamePDO1600_02[] = "Target velocity";
 static const char acNamePDO1600_03[] = "Controlword";
-static const char acNamePDO1600_04[] = "TargetTorque";
-static const char acNamePDO1600_05[] = "MaxTorque";
-static const char acNamePDO1600_06[] = "ModesOfOperation";
+static const char acNamePDO1600_04[] = "Target torque";
+static const char acNamePDO1600_05[] = "Max torque";
+static const char acNamePDO1600_06[] = "Modes of operation";
 static const char acNamePDO1600_07[] = "padding";
 const _objd SDO1600[] =
 {
@@ -525,15 +525,15 @@ const _objd SDO1600[] =
 
 /* TxPDO Drive */
 static const char acNamePDO1A00[] = "TxPDO Drive";
-static const char acNamePDO1A00_01[] = "PositionActual";
-static const char acNamePDO1A00_02[] = "VelocityActual";
-static const char acNamePDO1A00_03[] = "FollowingErrorActual";
+static const char acNamePDO1A00_01[] = "Position actual value";
+static const char acNamePDO1A00_02[] = "Velocity actual value";
+static const char acNamePDO1A00_03[] = "Following error actual value";
 static const char acNamePDO1A00_04[] = "GateDriverFaults";
 static const char acNamePDO1A00_05[] = "DriveStatusFlags";
 static const char acNamePDO1A00_06[] = "Statusword";
-static const char acNamePDO1A00_07[] = "TorqueActual";
-static const char acNamePDO1A00_08[] = "ErrorCode";
-static const char acNamePDO1A00_09[] = "ModesOfOperationDisplay";
+static const char acNamePDO1A00_07[] = "Torque actual value";
+static const char acNamePDO1A00_08[] = "Error code";
+static const char acNamePDO1A00_09[] = "Modes of operation display";
 static const char acNamePDO1A00_0A[] = "padding";
 const _objd SDO1A00[] =
 {

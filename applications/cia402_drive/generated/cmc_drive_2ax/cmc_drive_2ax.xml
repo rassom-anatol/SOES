@@ -33,14 +33,14 @@
           <Index>#x607A</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>TargetPosition</Name>
+          <Name>Target position</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x60FF</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>TargetVelocity</Name>
+          <Name>Target velocity</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
@@ -54,21 +54,21 @@
           <Index>#x6071</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>TargetTorque</Name>
+          <Name>Target torque</Name>
           <DataType>INT</DataType>
         </Entry>
         <Entry>
           <Index>#x6072</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>MaxTorque</Name>
+          <Name>Max torque</Name>
           <DataType>UINT</DataType>
         </Entry>
         <Entry>
           <Index>#x6060</Index>
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
-          <Name>ModesOfOperation</Name>
+          <Name>Modes of operation</Name>
           <DataType>SINT</DataType>
         </Entry>
         <Entry>
@@ -84,14 +84,14 @@
           <Index>#x687A</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>TargetPosition</Name>
+          <Name>Target position</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x68FF</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>TargetVelocity</Name>
+          <Name>Target velocity</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
@@ -105,21 +105,21 @@
           <Index>#x6871</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>TargetTorque</Name>
+          <Name>Target torque</Name>
           <DataType>INT</DataType>
         </Entry>
         <Entry>
           <Index>#x6872</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>MaxTorque</Name>
+          <Name>Max torque</Name>
           <DataType>UINT</DataType>
         </Entry>
         <Entry>
           <Index>#x6860</Index>
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
-          <Name>ModesOfOperation</Name>
+          <Name>Modes of operation</Name>
           <DataType>SINT</DataType>
         </Entry>
         <Entry>
@@ -135,21 +135,21 @@
           <Index>#x6064</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>PositionActual</Name>
+          <Name>Position actual value</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x606C</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>VelocityActual</Name>
+          <Name>Velocity actual value</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x60F4</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>FollowingErrorActual</Name>
+          <Name>Following error actual value</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
@@ -177,21 +177,21 @@
           <Index>#x6077</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>TorqueActual</Name>
+          <Name>Torque actual value</Name>
           <DataType>INT</DataType>
         </Entry>
         <Entry>
           <Index>#x603F</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>ErrorCode</Name>
+          <Name>Error code</Name>
           <DataType>UINT</DataType>
         </Entry>
         <Entry>
           <Index>#x6061</Index>
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
-          <Name>ModesOfOperationDisplay</Name>
+          <Name>Modes of operation display</Name>
           <DataType>SINT</DataType>
         </Entry>
         <Entry>
@@ -207,21 +207,21 @@
           <Index>#x6864</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>PositionActual</Name>
+          <Name>Position actual value</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x686C</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>VelocityActual</Name>
+          <Name>Velocity actual value</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
           <Index>#x68F4</Index>
           <SubIndex>0</SubIndex>
           <BitLen>32</BitLen>
-          <Name>FollowingErrorActual</Name>
+          <Name>Following error actual value</Name>
           <DataType>DINT</DataType>
         </Entry>
         <Entry>
@@ -249,21 +249,21 @@
           <Index>#x6877</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>TorqueActual</Name>
+          <Name>Torque actual value</Name>
           <DataType>INT</DataType>
         </Entry>
         <Entry>
           <Index>#x683F</Index>
           <SubIndex>0</SubIndex>
           <BitLen>16</BitLen>
-          <Name>ErrorCode</Name>
+          <Name>Error code</Name>
           <DataType>UINT</DataType>
         </Entry>
         <Entry>
           <Index>#x6861</Index>
           <SubIndex>0</SubIndex>
           <BitLen>8</BitLen>
-          <Name>ModesOfOperationDisplay</Name>
+          <Name>Modes of operation display</Name>
           <DataType>SINT</DataType>
         </Entry>
         <Entry>
