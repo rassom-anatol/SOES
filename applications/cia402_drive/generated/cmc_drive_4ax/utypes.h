@@ -90,6 +90,8 @@ typedef struct
    uint16_t   MechMaxSpeed;
    uint16_t   MechMaxTorque;
    uint16_t   MechPeakSpeed;
+   uint16_t   MechPositionPAdvanced;
+   uint16_t   MechPositionPClassic;
    uint16_t   MechQuality;
    uint16_t   MechUncertainty;
    uint16_t   MechVelocityBandwidth;
