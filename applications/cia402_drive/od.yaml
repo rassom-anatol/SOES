@@ -541,7 +541,8 @@ objects:
 
   # The service tool's command, used instead of the master's process data
   # only while the tool holds control (0x2040:02 = 1). Same meanings and units
-  # as 0x6040, 0x6060, 0x607A, 0x60FF and 0x6071.
+  # as 0x6040, 0x6060, 0x607A, 0x60FF, 0x6071 and 0x6072. Max Torque too,
+  # because the master's 0x6072 travels in its process data and may be 0.
   - index: 0x2041
     axis: true
     name: "Service Command"
@@ -552,6 +553,7 @@ objects:
       - {sub: 3, name: "Target Position",    type: i32, access: rw, var: "SvcTargetPosition"}
       - {sub: 4, name: "Target Velocity",    type: i32, access: rw, var: "SvcTargetVelocity"}
       - {sub: 5, name: "Target Torque",      type: i16, access: rw, var: "SvcTargetTorque"}
+      - {sub: 6, name: "Max Torque",         type: u16, access: rw, var: "SvcMaxTorque", value: 1000}
 
   # Identification, run in mode of operation -1: controlword bit 4 starts the
   # routine; statusword bit 10 finished, 12 succeeded, 13 failed. Routine 1

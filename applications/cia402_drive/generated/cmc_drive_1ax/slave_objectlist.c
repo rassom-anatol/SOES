@@ -444,6 +444,7 @@ static const char acName2041_02[] = "Modes of Operation";
 static const char acName2041_03[] = "Target Position";
 static const char acName2041_04[] = "Target Velocity";
 static const char acName2041_05[] = "Target Torque";
+static const char acName2041_06[] = "Max Torque";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1155,12 +1156,13 @@ const _objd SDO2040[] =
 /* 0x2041 Service Command */
 const _objd SDO2041[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2041, 5, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2041, 6, NULL},
    {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2041_01, 0, &Obj.axis[0].SvcControlword},
    {0x02, DTYPE_INTEGER8, 8, ATYPE_RW, acName2041_02, 0, &Obj.axis[0].SvcMode},
    {0x03, DTYPE_INTEGER32, 32, ATYPE_RW, acName2041_03, 0, &Obj.axis[0].SvcTargetPosition},
    {0x04, DTYPE_INTEGER32, 32, ATYPE_RW, acName2041_04, 0, &Obj.axis[0].SvcTargetVelocity},
    {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName2041_05, 0, &Obj.axis[0].SvcTargetTorque},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2041_06, 1000, &Obj.axis[0].SvcMaxTorque},
 };
 
 /* 0x603F Error Code */
@@ -1406,7 +1408,7 @@ const _objectlist SDOobjects[] =
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
    {0x2031, OTYPE_RECORD, 20, 0, acName2031, SDO2031},
    {0x2040, OTYPE_RECORD, 6, 0, acName2040, SDO2040},
-   {0x2041, OTYPE_RECORD, 5, 0, acName2041, SDO2041},
+   {0x2041, OTYPE_RECORD, 6, 0, acName2041, SDO2041},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

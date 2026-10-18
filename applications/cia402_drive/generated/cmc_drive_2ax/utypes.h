@@ -133,6 +133,7 @@ typedef struct
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;
    uint16_t   SvcControlword;
+   uint16_t   SvcMaxTorque;
    int8_t     SvcMode;
    int32_t    SvcTargetPosition;
    int16_t    SvcTargetTorque;
