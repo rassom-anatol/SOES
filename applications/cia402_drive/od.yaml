@@ -496,6 +496,29 @@ objects:
     object_code: array
     elements: {count: 128, type: i16, access: rw, var: "CoggingTableNeg", name: "Point"}
 
+  # How the drive reads its motor's position: the settings wiring decides.
+  # Seeded from bsp.yaml (encoder1, motor.pole_pairs, hall) and saved by
+  # 0x1010. Writable only while no axis is in Operation Enabled; a change
+  # makes the next enable calibrate the commutation again, and may move the
+  # position (a new direction or resolution). Encoder Direction 1 counts the
+  # other way, which also corrects two swapped motor phases. Counts per
+  # Revolution: 4 x the lines of an A/B encoder. Hall Direction 1 reverses the
+  # Hall sequence, Hall Polarity 1 inverts the signals, Hall Offset is added
+  # to the Hall angle (electrical, 65536 a turn). Commutation Offset is what
+  # the last encoder calibration found. Routine 6 (0x2037) checks them.
+  - index: 0x2017
+    axis: true
+    name: "Feedback Settings"
+    type: record
+    subs:
+      - {sub: 1, name: "Encoder Direction",            type: u8,  access: rw, var: "FbEncoderDirection", store: true, disabled_only: true}
+      - {sub: 2, name: "Encoder Counts per Revolution", type: u32, access: rw, var: "FbEncoderCounts", store: true, disabled_only: true}
+      - {sub: 3, name: "Pole Pairs",                   type: u16, access: rw, var: "FbPolePairs", store: true, disabled_only: true}
+      - {sub: 4, name: "Hall Direction",               type: u8,  access: rw, var: "FbHallDirection", store: true, disabled_only: true}
+      - {sub: 5, name: "Hall Polarity",                type: u8,  access: rw, var: "FbHallPolarity", store: true, disabled_only: true}
+      - {sub: 6, name: "Hall Offset",                  type: u16, access: rw, var: "FbHallOffset", store: true, disabled_only: true}
+      - {sub: 7, name: "Commutation Offset",           type: i16, access: ro, var: "FbCommutationOffset"}
+
   # Signals inside the drive's control, as objects so the recorder (0x2020)
   # and any client can see them.
   - index: 0x2016
@@ -543,6 +566,41 @@ objects:
   # otherwise the read is refused with 0x08000024, no data available.
   - {index: 0x2021, name: "Recorder Data", type: domain, size: 131072, access: ro, var: "RecorderData", length_var: "RecorderDataLength"}
 
+  # Who commands motion: the fieldbus master (the default) or a service tool
+  # such as the web page. The tool may take control only while the master is
+  # not in OP or has set Allow, and only from a disabled axis; it keeps it by
+  # Request and a Heartbeat that changes within Heartbeat Timeout. Losing it
+  # while the axis runs Quick Stops the axis before the master's command
+  # applies again. Owner: 0 master, 1 tool, 2 releasing (stopping first).
+  # Contention counts cycles in which the master changed its Controlword while
+  # the tool held control.
+  - index: 0x2040
+    name: "Service Control"
+    type: record
+    subs:
+      - {sub: 1, name: "Allow",             type: u8,  access: rw, var: "SvcAllow"}
+      - {sub: 2, name: "Owner",             type: u8,  access: ro, var: "SvcOwner"}
+      - {sub: 3, name: "Heartbeat Timeout", type: u16, access: rw, var: "SvcTimeoutMs", value: 500, store: true}
+      - {sub: 4, name: "Contention",        type: u32, access: ro, var: "SvcContention"}
+      - {sub: 5, name: "Tool Request",      type: u8,  access: rw, var: "SvcRequest"}
+      - {sub: 6, name: "Tool Heartbeat",    type: u32, access: rw, var: "SvcHeartbeat"}
+
+  # The service tool's command, used instead of the master's process data
+  # only while the tool holds control (0x2040:02 = 1). Same meanings and units
+  # as 0x6040, 0x6060, 0x607A, 0x60FF, 0x6071 and 0x6072. Max Torque too,
+  # because the master's 0x6072 travels in its process data and may be 0.
+  - index: 0x2041
+    axis: true
+    name: "Service Command"
+    type: record
+    subs:
+      - {sub: 1, name: "Controlword",        type: u16, access: rw, var: "SvcControlword"}
+      - {sub: 2, name: "Modes of Operation", type: i8,  access: rw, var: "SvcMode"}
+      - {sub: 3, name: "Target Position",    type: i32, access: rw, var: "SvcTargetPosition"}
+      - {sub: 4, name: "Target Velocity",    type: i32, access: rw, var: "SvcTargetVelocity"}
+      - {sub: 5, name: "Target Torque",      type: i16, access: rw, var: "SvcTargetTorque"}
+      - {sub: 6, name: "Max Torque",         type: u16, access: rw, var: "SvcMaxTorque", value: 1000}
+
   # Identification, run in mode of operation -1: controlword bit 4 starts the
   # routine; statusword bit 10 finished, 12 succeeded, 13 failed. Routine 1
   # measures the motor's resistance and inductance at standstill with a d-axis
@@ -557,7 +615,9 @@ objects:
   # routine, 7 rotor moved. Fit Quality: the step response fit's R squared.
   # Routine 1 also gives current loop gains for Current Loop Bandwidth, in the
   # chip's units: P for both structures, I per structure. They are not
-  # applied; 0x2010:01-04 and 0x2011:01-04 take them. Routine 2 steps the flux
+  # applied; 0x2010:01-04 and 0x2011:01-04 take them. Changing the bandwidth
+  # afterwards works them out again from the same measurement, without a new
+  # run. Routine 2 steps the flux
   # current in closed loop with the gains in use and reports the averaged
   # response: rise time 10-90 %, overshoot per mille, settling within 5 %.
   - index: 0x2030
@@ -627,6 +687,8 @@ objects:
       # Velocity loop gains for Velocity Loop Bandwidth, from the inertia, in
       # the drive's units: P for both structures, I per structure, and the
       # advanced structure's velocity filter cutoff (0x2011:09). Not applied.
+      # Changing the bandwidth afterwards works them out again from the same
+      # inertia, without a new run.
       - {sub: 14, name: "Velocity Loop Bandwidth Hz", type: u16, access: rw, var: "MechVelocityBandwidth", value: 100, store: true}
       - {sub: 15, name: "Velocity P",          type: u16, access: ro, var: "MechVelocityP"}
       - {sub: 16, name: "Velocity I Classic",  type: u16, access: ro, var: "MechVelocityIClassic"}
@@ -636,6 +698,104 @@ objects:
       # Bandwidth: 0x2010:07 (classic) and 0x2011:07 (advanced). Not applied.
       - {sub: 19, name: "Position P Classic",  type: u16, access: ro, var: "MechPositionPClassic"}
       - {sub: 20, name: "Position P Advanced", type: u16, access: ro, var: "MechPositionPAdvanced"}
+
+  # Routine 4 of mode -1 (0x2030:01 = 4): the anti-cogging tables. The axis
+  # turns at Speed in velocity mode, back and forth inside 0x2031's travel
+  # window (at least 1.5 turns), and the current the velocity loop needs is
+  # averaged at each shaft angle, per direction, until each direction has
+  # covered Revolutions and every point has samples. Each direction's table,
+  # less its mean, goes to 0x2033 (positive) and 0x2034 (negative) in the
+  # format of 0x2014 and 0x2015. They are not applied: writing 1 to Apply
+  # copies them into 0x2014 and 0x2015, which 0x1010 then saves. The
+  # summary is in per mille of 0x6075: Cogging the two directions' average
+  # peak to peak, Friction half the difference of their means, Direction
+  # Dependence how much the rest of their difference varies around the turn.
+  # Errors in 0x2030:04 as for routine 3, and 13: no index pulse seen.
+  - index: 0x2032
+    axis: true
+    name: "Cogging Identification"
+    type: record
+    subs:
+      - {sub: 1, name: "Speed rpm",              type: u16, access: rw, var: "CogSpeed", value: 20, store: true}
+      - {sub: 2, name: "Revolutions",            type: u16, access: rw, var: "CogRevolutions", value: 4, store: true}
+      - {sub: 3, name: "Cogging Peak to Peak",   type: u16, access: ro, var: "CogP2p"}
+      - {sub: 4, name: "Cogging RMS",            type: u16, access: ro, var: "CogRms"}
+      - {sub: 5, name: "Friction",               type: i16, access: ro, var: "CogFriction"}
+      - {sub: 6, name: "Direction Dependence",   type: u16, access: ro, var: "CogDirectionP2p"}
+      # Tenths of a turn, per direction (the smaller of the two).
+      - {sub: 7, name: "Revolutions Measured",   type: u16, access: ro, var: "CogRevolutionsMeasured"}
+      - {sub: 8, name: "Apply",                  type: u8,  access: rw, var: "CogApply"}
+  - index: 0x2033
+    axis: true
+    name: "Cogging Result"
+    object_code: array
+    elements: {count: 128, type: i16, access: ro, var: "CogResult", name: "Point"}
+  - index: 0x2034
+    axis: true
+    name: "Cogging Result Negative"
+    object_code: array
+    elements: {count: 128, type: i16, access: ro, var: "CogResultNeg", name: "Point"}
+
+  # Routine 5 of mode -1 (0x2030:01 = 5): a position step check of the loops
+  # in use. The position target steps by Step Size and back, Steps times in
+  # all, inside 0x2031's travel window, with no feed-forward, 400 ms per
+  # step. The normalised responses are averaged: Time to 63 % and to 90 % of
+  # the step (us), Overshoot (per mille of the step), Settling Time (from
+  # when it stays within 5 %, us), Final Error (position units, the mean of
+  # the last 50 ms). 0x2036 holds the averaged response, per mille of the
+  # step, a point every 2 ms. A small step keeps the loops out of their
+  # speed and torque limits, so the check shows their response rather than
+  # the motor's limits. Errors in 0x2030:04: 8 no room for the step in the
+  # window, 9 left the window, 11 never reached 63 %.
+  - index: 0x2035
+    axis: true
+    name: "Step Check"
+    type: record
+    subs:
+      - {sub: 1, name: "Step Size",          type: i32, access: rw, var: "CheckStep", value: 2048, store: true}
+      - {sub: 2, name: "Steps",              type: u8,  access: rw, var: "CheckSteps", value: 8, store: true}
+      - {sub: 3, name: "Time to 63 % us",    type: u32, access: ro, var: "CheckT63"}
+      - {sub: 4, name: "Time to 90 % us",    type: u32, access: ro, var: "CheckT90"}
+      - {sub: 5, name: "Overshoot",          type: u16, access: ro, var: "CheckOvershoot"}
+      - {sub: 6, name: "Settling Time us",   type: u32, access: ro, var: "CheckSettling"}
+      - {sub: 7, name: "Final Error",        type: i32, access: ro, var: "CheckFinalError"}
+  - index: 0x2036
+    axis: true
+    name: "Step Check Response"
+    object_code: array
+    elements: {count: 200, type: i16, access: ro, var: "CheckCurve", name: "Point"}
+
+  # Routine 6 of mode -1 (0x2030:01 = 6): do the encoder and the Hall sensors
+  # agree with the motor's field (0x2017)? With routine 6 selected, mode -1
+  # holds zero current rather than zero speed while it waits, since a
+  # velocity loop on a miswired encoder can run away: enable straight into
+  # mode -1. The field turns in open loop with the calibration's lock
+  # voltage, one electrical turn a second, Electrical Turns forward and the
+  # same back (0: enough for 1.5 revolutions with the pole pairs set, for two
+  # index pulses); the rotor must be free to turn that far. Findings, bits:
+  # 0 encoder reversed (or two motor phases swapped: set 0x2017:01 the other
+  # way), 1 counts per revolution differ from 0x2017:02, 2 pole pairs differ
+  # from 0x2017:03, 3 Hall sensors reversed (or two of their wires swapped:
+  # set 0x2017:04 the other way), 4 the Hall angle does not follow in order
+  # (a sensor dead or miswired), 5 no Hall signals, 6 fewer than two index
+  # pulses (resolution not measured; pole pairs from 0x2017:02), 7 the rotor
+  # slipped. The measured values follow; Hall Offset is the 0x2017:06 that
+  # lines the Hall angle up (with Hall Direction 1), Encoder Residual the
+  # encoder's angle less the field's. Error 10 in 0x2030:04: the rotor did not
+  # follow the field (phase open, rotor blocked).
+  - index: 0x2037
+    axis: true
+    name: "Feedback Check"
+    type: record
+    subs:
+      - {sub: 1, name: "Electrical Turns",            type: u16,    access: rw, var: "FbcTurns", value: 0, store: true}
+      - {sub: 2, name: "Findings",                    type: u16,    access: ro, var: "FbcFindings"}
+      - {sub: 3, name: "Counts per Electrical Turn",  type: real32, access: ro, var: "FbcCountsPerTurn"}
+      - {sub: 4, name: "Counts per Revolution",       type: u32,    access: ro, var: "FbcCountsPerRev"}
+      - {sub: 5, name: "Pole Pairs",                  type: u16,    access: ro, var: "FbcPolePairs"}
+      - {sub: 6, name: "Hall Direction",              type: i8,     access: ro, var: "FbcHallDirection"}
+      - {sub: 7, name: "Hall Offset",                 type: u16,    access: ro, var: "FbcHallOffset"}
+      - {sub: 8, name: "Encoder Residual",            type: i16,    access: ro, var: "FbcEncoderResidual"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
@@ -661,7 +821,10 @@ bitfields:
 
   DriveStatusFlags:
     # Board digital inputs (cmc include/bsp/BSP.hpp) plus the TMC4671 status
-    # bits that matter within a cycle rather than as diagnostics.
+    # bits that matter within a cycle rather than as diagnostics. Bits 4-10
+    # are set while their event happened within the last second (the drive
+    # clears the chip's latching flags as it reads them). Bits 0-2 and 11 are
+    # not filled yet and read 0.
     0:  drv_fault_pin     # BSP DRV_FAULT, BCM 27
     1:  ctrl_sta_pin      # BSP CTRL_STA,  BCM 26
     2:  is_ctrl_en_pin    # BSP IS_CTRL_EN, BCM 24
