@@ -698,6 +698,215 @@ static const char acName2034_7D[] = "Point 124";
 static const char acName2034_7E[] = "Point 125";
 static const char acName2034_7F[] = "Point 126";
 static const char acName2034_80[] = "Point 127";
+static const char acName2035[] = "Step Check";
+static const char acName2035_01[] = "Step Size";
+static const char acName2035_02[] = "Steps";
+static const char acName2035_03[] = "Time to 63 % us";
+static const char acName2035_04[] = "Time to 90 % us";
+static const char acName2035_05[] = "Overshoot";
+static const char acName2035_06[] = "Settling Time us";
+static const char acName2035_07[] = "Final Error";
+static const char acName2036[] = "Step Check Response";
+static const char acName2036_01[] = "Point 0";
+static const char acName2036_02[] = "Point 1";
+static const char acName2036_03[] = "Point 2";
+static const char acName2036_04[] = "Point 3";
+static const char acName2036_05[] = "Point 4";
+static const char acName2036_06[] = "Point 5";
+static const char acName2036_07[] = "Point 6";
+static const char acName2036_08[] = "Point 7";
+static const char acName2036_09[] = "Point 8";
+static const char acName2036_0A[] = "Point 9";
+static const char acName2036_0B[] = "Point 10";
+static const char acName2036_0C[] = "Point 11";
+static const char acName2036_0D[] = "Point 12";
+static const char acName2036_0E[] = "Point 13";
+static const char acName2036_0F[] = "Point 14";
+static const char acName2036_10[] = "Point 15";
+static const char acName2036_11[] = "Point 16";
+static const char acName2036_12[] = "Point 17";
+static const char acName2036_13[] = "Point 18";
+static const char acName2036_14[] = "Point 19";
+static const char acName2036_15[] = "Point 20";
+static const char acName2036_16[] = "Point 21";
+static const char acName2036_17[] = "Point 22";
+static const char acName2036_18[] = "Point 23";
+static const char acName2036_19[] = "Point 24";
+static const char acName2036_1A[] = "Point 25";
+static const char acName2036_1B[] = "Point 26";
+static const char acName2036_1C[] = "Point 27";
+static const char acName2036_1D[] = "Point 28";
+static const char acName2036_1E[] = "Point 29";
+static const char acName2036_1F[] = "Point 30";
+static const char acName2036_20[] = "Point 31";
+static const char acName2036_21[] = "Point 32";
+static const char acName2036_22[] = "Point 33";
+static const char acName2036_23[] = "Point 34";
+static const char acName2036_24[] = "Point 35";
+static const char acName2036_25[] = "Point 36";
+static const char acName2036_26[] = "Point 37";
+static const char acName2036_27[] = "Point 38";
+static const char acName2036_28[] = "Point 39";
+static const char acName2036_29[] = "Point 40";
+static const char acName2036_2A[] = "Point 41";
+static const char acName2036_2B[] = "Point 42";
+static const char acName2036_2C[] = "Point 43";
+static const char acName2036_2D[] = "Point 44";
+static const char acName2036_2E[] = "Point 45";
+static const char acName2036_2F[] = "Point 46";
+static const char acName2036_30[] = "Point 47";
+static const char acName2036_31[] = "Point 48";
+static const char acName2036_32[] = "Point 49";
+static const char acName2036_33[] = "Point 50";
+static const char acName2036_34[] = "Point 51";
+static const char acName2036_35[] = "Point 52";
+static const char acName2036_36[] = "Point 53";
+static const char acName2036_37[] = "Point 54";
+static const char acName2036_38[] = "Point 55";
+static const char acName2036_39[] = "Point 56";
+static const char acName2036_3A[] = "Point 57";
+static const char acName2036_3B[] = "Point 58";
+static const char acName2036_3C[] = "Point 59";
+static const char acName2036_3D[] = "Point 60";
+static const char acName2036_3E[] = "Point 61";
+static const char acName2036_3F[] = "Point 62";
+static const char acName2036_40[] = "Point 63";
+static const char acName2036_41[] = "Point 64";
+static const char acName2036_42[] = "Point 65";
+static const char acName2036_43[] = "Point 66";
+static const char acName2036_44[] = "Point 67";
+static const char acName2036_45[] = "Point 68";
+static const char acName2036_46[] = "Point 69";
+static const char acName2036_47[] = "Point 70";
+static const char acName2036_48[] = "Point 71";
+static const char acName2036_49[] = "Point 72";
+static const char acName2036_4A[] = "Point 73";
+static const char acName2036_4B[] = "Point 74";
+static const char acName2036_4C[] = "Point 75";
+static const char acName2036_4D[] = "Point 76";
+static const char acName2036_4E[] = "Point 77";
+static const char acName2036_4F[] = "Point 78";
+static const char acName2036_50[] = "Point 79";
+static const char acName2036_51[] = "Point 80";
+static const char acName2036_52[] = "Point 81";
+static const char acName2036_53[] = "Point 82";
+static const char acName2036_54[] = "Point 83";
+static const char acName2036_55[] = "Point 84";
+static const char acName2036_56[] = "Point 85";
+static const char acName2036_57[] = "Point 86";
+static const char acName2036_58[] = "Point 87";
+static const char acName2036_59[] = "Point 88";
+static const char acName2036_5A[] = "Point 89";
+static const char acName2036_5B[] = "Point 90";
+static const char acName2036_5C[] = "Point 91";
+static const char acName2036_5D[] = "Point 92";
+static const char acName2036_5E[] = "Point 93";
+static const char acName2036_5F[] = "Point 94";
+static const char acName2036_60[] = "Point 95";
+static const char acName2036_61[] = "Point 96";
+static const char acName2036_62[] = "Point 97";
+static const char acName2036_63[] = "Point 98";
+static const char acName2036_64[] = "Point 99";
+static const char acName2036_65[] = "Point 100";
+static const char acName2036_66[] = "Point 101";
+static const char acName2036_67[] = "Point 102";
+static const char acName2036_68[] = "Point 103";
+static const char acName2036_69[] = "Point 104";
+static const char acName2036_6A[] = "Point 105";
+static const char acName2036_6B[] = "Point 106";
+static const char acName2036_6C[] = "Point 107";
+static const char acName2036_6D[] = "Point 108";
+static const char acName2036_6E[] = "Point 109";
+static const char acName2036_6F[] = "Point 110";
+static const char acName2036_70[] = "Point 111";
+static const char acName2036_71[] = "Point 112";
+static const char acName2036_72[] = "Point 113";
+static const char acName2036_73[] = "Point 114";
+static const char acName2036_74[] = "Point 115";
+static const char acName2036_75[] = "Point 116";
+static const char acName2036_76[] = "Point 117";
+static const char acName2036_77[] = "Point 118";
+static const char acName2036_78[] = "Point 119";
+static const char acName2036_79[] = "Point 120";
+static const char acName2036_7A[] = "Point 121";
+static const char acName2036_7B[] = "Point 122";
+static const char acName2036_7C[] = "Point 123";
+static const char acName2036_7D[] = "Point 124";
+static const char acName2036_7E[] = "Point 125";
+static const char acName2036_7F[] = "Point 126";
+static const char acName2036_80[] = "Point 127";
+static const char acName2036_81[] = "Point 128";
+static const char acName2036_82[] = "Point 129";
+static const char acName2036_83[] = "Point 130";
+static const char acName2036_84[] = "Point 131";
+static const char acName2036_85[] = "Point 132";
+static const char acName2036_86[] = "Point 133";
+static const char acName2036_87[] = "Point 134";
+static const char acName2036_88[] = "Point 135";
+static const char acName2036_89[] = "Point 136";
+static const char acName2036_8A[] = "Point 137";
+static const char acName2036_8B[] = "Point 138";
+static const char acName2036_8C[] = "Point 139";
+static const char acName2036_8D[] = "Point 140";
+static const char acName2036_8E[] = "Point 141";
+static const char acName2036_8F[] = "Point 142";
+static const char acName2036_90[] = "Point 143";
+static const char acName2036_91[] = "Point 144";
+static const char acName2036_92[] = "Point 145";
+static const char acName2036_93[] = "Point 146";
+static const char acName2036_94[] = "Point 147";
+static const char acName2036_95[] = "Point 148";
+static const char acName2036_96[] = "Point 149";
+static const char acName2036_97[] = "Point 150";
+static const char acName2036_98[] = "Point 151";
+static const char acName2036_99[] = "Point 152";
+static const char acName2036_9A[] = "Point 153";
+static const char acName2036_9B[] = "Point 154";
+static const char acName2036_9C[] = "Point 155";
+static const char acName2036_9D[] = "Point 156";
+static const char acName2036_9E[] = "Point 157";
+static const char acName2036_9F[] = "Point 158";
+static const char acName2036_A0[] = "Point 159";
+static const char acName2036_A1[] = "Point 160";
+static const char acName2036_A2[] = "Point 161";
+static const char acName2036_A3[] = "Point 162";
+static const char acName2036_A4[] = "Point 163";
+static const char acName2036_A5[] = "Point 164";
+static const char acName2036_A6[] = "Point 165";
+static const char acName2036_A7[] = "Point 166";
+static const char acName2036_A8[] = "Point 167";
+static const char acName2036_A9[] = "Point 168";
+static const char acName2036_AA[] = "Point 169";
+static const char acName2036_AB[] = "Point 170";
+static const char acName2036_AC[] = "Point 171";
+static const char acName2036_AD[] = "Point 172";
+static const char acName2036_AE[] = "Point 173";
+static const char acName2036_AF[] = "Point 174";
+static const char acName2036_B0[] = "Point 175";
+static const char acName2036_B1[] = "Point 176";
+static const char acName2036_B2[] = "Point 177";
+static const char acName2036_B3[] = "Point 178";
+static const char acName2036_B4[] = "Point 179";
+static const char acName2036_B5[] = "Point 180";
+static const char acName2036_B6[] = "Point 181";
+static const char acName2036_B7[] = "Point 182";
+static const char acName2036_B8[] = "Point 183";
+static const char acName2036_B9[] = "Point 184";
+static const char acName2036_BA[] = "Point 185";
+static const char acName2036_BB[] = "Point 186";
+static const char acName2036_BC[] = "Point 187";
+static const char acName2036_BD[] = "Point 188";
+static const char acName2036_BE[] = "Point 189";
+static const char acName2036_BF[] = "Point 190";
+static const char acName2036_C0[] = "Point 191";
+static const char acName2036_C1[] = "Point 192";
+static const char acName2036_C2[] = "Point 193";
+static const char acName2036_C3[] = "Point 194";
+static const char acName2036_C4[] = "Point 195";
+static const char acName2036_C5[] = "Point 196";
+static const char acName2036_C6[] = "Point 197";
+static const char acName2036_C7[] = "Point 198";
+static const char acName2036_C8[] = "Point 199";
 static const char acName2040[] = "Service Control";
 static const char acName2040_01[] = "Allow";
 static const char acName2040_02[] = "Owner";
@@ -1342,6 +1551,215 @@ static const char acName2834_7D[] = "Point 124";
 static const char acName2834_7E[] = "Point 125";
 static const char acName2834_7F[] = "Point 126";
 static const char acName2834_80[] = "Point 127";
+static const char acName2835[] = "Step Check";
+static const char acName2835_01[] = "Step Size";
+static const char acName2835_02[] = "Steps";
+static const char acName2835_03[] = "Time to 63 % us";
+static const char acName2835_04[] = "Time to 90 % us";
+static const char acName2835_05[] = "Overshoot";
+static const char acName2835_06[] = "Settling Time us";
+static const char acName2835_07[] = "Final Error";
+static const char acName2836[] = "Step Check Response";
+static const char acName2836_01[] = "Point 0";
+static const char acName2836_02[] = "Point 1";
+static const char acName2836_03[] = "Point 2";
+static const char acName2836_04[] = "Point 3";
+static const char acName2836_05[] = "Point 4";
+static const char acName2836_06[] = "Point 5";
+static const char acName2836_07[] = "Point 6";
+static const char acName2836_08[] = "Point 7";
+static const char acName2836_09[] = "Point 8";
+static const char acName2836_0A[] = "Point 9";
+static const char acName2836_0B[] = "Point 10";
+static const char acName2836_0C[] = "Point 11";
+static const char acName2836_0D[] = "Point 12";
+static const char acName2836_0E[] = "Point 13";
+static const char acName2836_0F[] = "Point 14";
+static const char acName2836_10[] = "Point 15";
+static const char acName2836_11[] = "Point 16";
+static const char acName2836_12[] = "Point 17";
+static const char acName2836_13[] = "Point 18";
+static const char acName2836_14[] = "Point 19";
+static const char acName2836_15[] = "Point 20";
+static const char acName2836_16[] = "Point 21";
+static const char acName2836_17[] = "Point 22";
+static const char acName2836_18[] = "Point 23";
+static const char acName2836_19[] = "Point 24";
+static const char acName2836_1A[] = "Point 25";
+static const char acName2836_1B[] = "Point 26";
+static const char acName2836_1C[] = "Point 27";
+static const char acName2836_1D[] = "Point 28";
+static const char acName2836_1E[] = "Point 29";
+static const char acName2836_1F[] = "Point 30";
+static const char acName2836_20[] = "Point 31";
+static const char acName2836_21[] = "Point 32";
+static const char acName2836_22[] = "Point 33";
+static const char acName2836_23[] = "Point 34";
+static const char acName2836_24[] = "Point 35";
+static const char acName2836_25[] = "Point 36";
+static const char acName2836_26[] = "Point 37";
+static const char acName2836_27[] = "Point 38";
+static const char acName2836_28[] = "Point 39";
+static const char acName2836_29[] = "Point 40";
+static const char acName2836_2A[] = "Point 41";
+static const char acName2836_2B[] = "Point 42";
+static const char acName2836_2C[] = "Point 43";
+static const char acName2836_2D[] = "Point 44";
+static const char acName2836_2E[] = "Point 45";
+static const char acName2836_2F[] = "Point 46";
+static const char acName2836_30[] = "Point 47";
+static const char acName2836_31[] = "Point 48";
+static const char acName2836_32[] = "Point 49";
+static const char acName2836_33[] = "Point 50";
+static const char acName2836_34[] = "Point 51";
+static const char acName2836_35[] = "Point 52";
+static const char acName2836_36[] = "Point 53";
+static const char acName2836_37[] = "Point 54";
+static const char acName2836_38[] = "Point 55";
+static const char acName2836_39[] = "Point 56";
+static const char acName2836_3A[] = "Point 57";
+static const char acName2836_3B[] = "Point 58";
+static const char acName2836_3C[] = "Point 59";
+static const char acName2836_3D[] = "Point 60";
+static const char acName2836_3E[] = "Point 61";
+static const char acName2836_3F[] = "Point 62";
+static const char acName2836_40[] = "Point 63";
+static const char acName2836_41[] = "Point 64";
+static const char acName2836_42[] = "Point 65";
+static const char acName2836_43[] = "Point 66";
+static const char acName2836_44[] = "Point 67";
+static const char acName2836_45[] = "Point 68";
+static const char acName2836_46[] = "Point 69";
+static const char acName2836_47[] = "Point 70";
+static const char acName2836_48[] = "Point 71";
+static const char acName2836_49[] = "Point 72";
+static const char acName2836_4A[] = "Point 73";
+static const char acName2836_4B[] = "Point 74";
+static const char acName2836_4C[] = "Point 75";
+static const char acName2836_4D[] = "Point 76";
+static const char acName2836_4E[] = "Point 77";
+static const char acName2836_4F[] = "Point 78";
+static const char acName2836_50[] = "Point 79";
+static const char acName2836_51[] = "Point 80";
+static const char acName2836_52[] = "Point 81";
+static const char acName2836_53[] = "Point 82";
+static const char acName2836_54[] = "Point 83";
+static const char acName2836_55[] = "Point 84";
+static const char acName2836_56[] = "Point 85";
+static const char acName2836_57[] = "Point 86";
+static const char acName2836_58[] = "Point 87";
+static const char acName2836_59[] = "Point 88";
+static const char acName2836_5A[] = "Point 89";
+static const char acName2836_5B[] = "Point 90";
+static const char acName2836_5C[] = "Point 91";
+static const char acName2836_5D[] = "Point 92";
+static const char acName2836_5E[] = "Point 93";
+static const char acName2836_5F[] = "Point 94";
+static const char acName2836_60[] = "Point 95";
+static const char acName2836_61[] = "Point 96";
+static const char acName2836_62[] = "Point 97";
+static const char acName2836_63[] = "Point 98";
+static const char acName2836_64[] = "Point 99";
+static const char acName2836_65[] = "Point 100";
+static const char acName2836_66[] = "Point 101";
+static const char acName2836_67[] = "Point 102";
+static const char acName2836_68[] = "Point 103";
+static const char acName2836_69[] = "Point 104";
+static const char acName2836_6A[] = "Point 105";
+static const char acName2836_6B[] = "Point 106";
+static const char acName2836_6C[] = "Point 107";
+static const char acName2836_6D[] = "Point 108";
+static const char acName2836_6E[] = "Point 109";
+static const char acName2836_6F[] = "Point 110";
+static const char acName2836_70[] = "Point 111";
+static const char acName2836_71[] = "Point 112";
+static const char acName2836_72[] = "Point 113";
+static const char acName2836_73[] = "Point 114";
+static const char acName2836_74[] = "Point 115";
+static const char acName2836_75[] = "Point 116";
+static const char acName2836_76[] = "Point 117";
+static const char acName2836_77[] = "Point 118";
+static const char acName2836_78[] = "Point 119";
+static const char acName2836_79[] = "Point 120";
+static const char acName2836_7A[] = "Point 121";
+static const char acName2836_7B[] = "Point 122";
+static const char acName2836_7C[] = "Point 123";
+static const char acName2836_7D[] = "Point 124";
+static const char acName2836_7E[] = "Point 125";
+static const char acName2836_7F[] = "Point 126";
+static const char acName2836_80[] = "Point 127";
+static const char acName2836_81[] = "Point 128";
+static const char acName2836_82[] = "Point 129";
+static const char acName2836_83[] = "Point 130";
+static const char acName2836_84[] = "Point 131";
+static const char acName2836_85[] = "Point 132";
+static const char acName2836_86[] = "Point 133";
+static const char acName2836_87[] = "Point 134";
+static const char acName2836_88[] = "Point 135";
+static const char acName2836_89[] = "Point 136";
+static const char acName2836_8A[] = "Point 137";
+static const char acName2836_8B[] = "Point 138";
+static const char acName2836_8C[] = "Point 139";
+static const char acName2836_8D[] = "Point 140";
+static const char acName2836_8E[] = "Point 141";
+static const char acName2836_8F[] = "Point 142";
+static const char acName2836_90[] = "Point 143";
+static const char acName2836_91[] = "Point 144";
+static const char acName2836_92[] = "Point 145";
+static const char acName2836_93[] = "Point 146";
+static const char acName2836_94[] = "Point 147";
+static const char acName2836_95[] = "Point 148";
+static const char acName2836_96[] = "Point 149";
+static const char acName2836_97[] = "Point 150";
+static const char acName2836_98[] = "Point 151";
+static const char acName2836_99[] = "Point 152";
+static const char acName2836_9A[] = "Point 153";
+static const char acName2836_9B[] = "Point 154";
+static const char acName2836_9C[] = "Point 155";
+static const char acName2836_9D[] = "Point 156";
+static const char acName2836_9E[] = "Point 157";
+static const char acName2836_9F[] = "Point 158";
+static const char acName2836_A0[] = "Point 159";
+static const char acName2836_A1[] = "Point 160";
+static const char acName2836_A2[] = "Point 161";
+static const char acName2836_A3[] = "Point 162";
+static const char acName2836_A4[] = "Point 163";
+static const char acName2836_A5[] = "Point 164";
+static const char acName2836_A6[] = "Point 165";
+static const char acName2836_A7[] = "Point 166";
+static const char acName2836_A8[] = "Point 167";
+static const char acName2836_A9[] = "Point 168";
+static const char acName2836_AA[] = "Point 169";
+static const char acName2836_AB[] = "Point 170";
+static const char acName2836_AC[] = "Point 171";
+static const char acName2836_AD[] = "Point 172";
+static const char acName2836_AE[] = "Point 173";
+static const char acName2836_AF[] = "Point 174";
+static const char acName2836_B0[] = "Point 175";
+static const char acName2836_B1[] = "Point 176";
+static const char acName2836_B2[] = "Point 177";
+static const char acName2836_B3[] = "Point 178";
+static const char acName2836_B4[] = "Point 179";
+static const char acName2836_B5[] = "Point 180";
+static const char acName2836_B6[] = "Point 181";
+static const char acName2836_B7[] = "Point 182";
+static const char acName2836_B8[] = "Point 183";
+static const char acName2836_B9[] = "Point 184";
+static const char acName2836_BA[] = "Point 185";
+static const char acName2836_BB[] = "Point 186";
+static const char acName2836_BC[] = "Point 187";
+static const char acName2836_BD[] = "Point 188";
+static const char acName2836_BE[] = "Point 189";
+static const char acName2836_BF[] = "Point 190";
+static const char acName2836_C0[] = "Point 191";
+static const char acName2836_C1[] = "Point 192";
+static const char acName2836_C2[] = "Point 193";
+static const char acName2836_C3[] = "Point 194";
+static const char acName2836_C4[] = "Point 195";
+static const char acName2836_C5[] = "Point 196";
+static const char acName2836_C6[] = "Point 197";
+static const char acName2836_C7[] = "Point 198";
+static const char acName2836_C8[] = "Point 199";
 static const char acName2841[] = "Service Command";
 static const char acName2841_01[] = "Controlword";
 static const char acName2841_02[] = "Modes of Operation";
@@ -1979,6 +2397,215 @@ static const char acName3034_7D[] = "Point 124";
 static const char acName3034_7E[] = "Point 125";
 static const char acName3034_7F[] = "Point 126";
 static const char acName3034_80[] = "Point 127";
+static const char acName3035[] = "Step Check";
+static const char acName3035_01[] = "Step Size";
+static const char acName3035_02[] = "Steps";
+static const char acName3035_03[] = "Time to 63 % us";
+static const char acName3035_04[] = "Time to 90 % us";
+static const char acName3035_05[] = "Overshoot";
+static const char acName3035_06[] = "Settling Time us";
+static const char acName3035_07[] = "Final Error";
+static const char acName3036[] = "Step Check Response";
+static const char acName3036_01[] = "Point 0";
+static const char acName3036_02[] = "Point 1";
+static const char acName3036_03[] = "Point 2";
+static const char acName3036_04[] = "Point 3";
+static const char acName3036_05[] = "Point 4";
+static const char acName3036_06[] = "Point 5";
+static const char acName3036_07[] = "Point 6";
+static const char acName3036_08[] = "Point 7";
+static const char acName3036_09[] = "Point 8";
+static const char acName3036_0A[] = "Point 9";
+static const char acName3036_0B[] = "Point 10";
+static const char acName3036_0C[] = "Point 11";
+static const char acName3036_0D[] = "Point 12";
+static const char acName3036_0E[] = "Point 13";
+static const char acName3036_0F[] = "Point 14";
+static const char acName3036_10[] = "Point 15";
+static const char acName3036_11[] = "Point 16";
+static const char acName3036_12[] = "Point 17";
+static const char acName3036_13[] = "Point 18";
+static const char acName3036_14[] = "Point 19";
+static const char acName3036_15[] = "Point 20";
+static const char acName3036_16[] = "Point 21";
+static const char acName3036_17[] = "Point 22";
+static const char acName3036_18[] = "Point 23";
+static const char acName3036_19[] = "Point 24";
+static const char acName3036_1A[] = "Point 25";
+static const char acName3036_1B[] = "Point 26";
+static const char acName3036_1C[] = "Point 27";
+static const char acName3036_1D[] = "Point 28";
+static const char acName3036_1E[] = "Point 29";
+static const char acName3036_1F[] = "Point 30";
+static const char acName3036_20[] = "Point 31";
+static const char acName3036_21[] = "Point 32";
+static const char acName3036_22[] = "Point 33";
+static const char acName3036_23[] = "Point 34";
+static const char acName3036_24[] = "Point 35";
+static const char acName3036_25[] = "Point 36";
+static const char acName3036_26[] = "Point 37";
+static const char acName3036_27[] = "Point 38";
+static const char acName3036_28[] = "Point 39";
+static const char acName3036_29[] = "Point 40";
+static const char acName3036_2A[] = "Point 41";
+static const char acName3036_2B[] = "Point 42";
+static const char acName3036_2C[] = "Point 43";
+static const char acName3036_2D[] = "Point 44";
+static const char acName3036_2E[] = "Point 45";
+static const char acName3036_2F[] = "Point 46";
+static const char acName3036_30[] = "Point 47";
+static const char acName3036_31[] = "Point 48";
+static const char acName3036_32[] = "Point 49";
+static const char acName3036_33[] = "Point 50";
+static const char acName3036_34[] = "Point 51";
+static const char acName3036_35[] = "Point 52";
+static const char acName3036_36[] = "Point 53";
+static const char acName3036_37[] = "Point 54";
+static const char acName3036_38[] = "Point 55";
+static const char acName3036_39[] = "Point 56";
+static const char acName3036_3A[] = "Point 57";
+static const char acName3036_3B[] = "Point 58";
+static const char acName3036_3C[] = "Point 59";
+static const char acName3036_3D[] = "Point 60";
+static const char acName3036_3E[] = "Point 61";
+static const char acName3036_3F[] = "Point 62";
+static const char acName3036_40[] = "Point 63";
+static const char acName3036_41[] = "Point 64";
+static const char acName3036_42[] = "Point 65";
+static const char acName3036_43[] = "Point 66";
+static const char acName3036_44[] = "Point 67";
+static const char acName3036_45[] = "Point 68";
+static const char acName3036_46[] = "Point 69";
+static const char acName3036_47[] = "Point 70";
+static const char acName3036_48[] = "Point 71";
+static const char acName3036_49[] = "Point 72";
+static const char acName3036_4A[] = "Point 73";
+static const char acName3036_4B[] = "Point 74";
+static const char acName3036_4C[] = "Point 75";
+static const char acName3036_4D[] = "Point 76";
+static const char acName3036_4E[] = "Point 77";
+static const char acName3036_4F[] = "Point 78";
+static const char acName3036_50[] = "Point 79";
+static const char acName3036_51[] = "Point 80";
+static const char acName3036_52[] = "Point 81";
+static const char acName3036_53[] = "Point 82";
+static const char acName3036_54[] = "Point 83";
+static const char acName3036_55[] = "Point 84";
+static const char acName3036_56[] = "Point 85";
+static const char acName3036_57[] = "Point 86";
+static const char acName3036_58[] = "Point 87";
+static const char acName3036_59[] = "Point 88";
+static const char acName3036_5A[] = "Point 89";
+static const char acName3036_5B[] = "Point 90";
+static const char acName3036_5C[] = "Point 91";
+static const char acName3036_5D[] = "Point 92";
+static const char acName3036_5E[] = "Point 93";
+static const char acName3036_5F[] = "Point 94";
+static const char acName3036_60[] = "Point 95";
+static const char acName3036_61[] = "Point 96";
+static const char acName3036_62[] = "Point 97";
+static const char acName3036_63[] = "Point 98";
+static const char acName3036_64[] = "Point 99";
+static const char acName3036_65[] = "Point 100";
+static const char acName3036_66[] = "Point 101";
+static const char acName3036_67[] = "Point 102";
+static const char acName3036_68[] = "Point 103";
+static const char acName3036_69[] = "Point 104";
+static const char acName3036_6A[] = "Point 105";
+static const char acName3036_6B[] = "Point 106";
+static const char acName3036_6C[] = "Point 107";
+static const char acName3036_6D[] = "Point 108";
+static const char acName3036_6E[] = "Point 109";
+static const char acName3036_6F[] = "Point 110";
+static const char acName3036_70[] = "Point 111";
+static const char acName3036_71[] = "Point 112";
+static const char acName3036_72[] = "Point 113";
+static const char acName3036_73[] = "Point 114";
+static const char acName3036_74[] = "Point 115";
+static const char acName3036_75[] = "Point 116";
+static const char acName3036_76[] = "Point 117";
+static const char acName3036_77[] = "Point 118";
+static const char acName3036_78[] = "Point 119";
+static const char acName3036_79[] = "Point 120";
+static const char acName3036_7A[] = "Point 121";
+static const char acName3036_7B[] = "Point 122";
+static const char acName3036_7C[] = "Point 123";
+static const char acName3036_7D[] = "Point 124";
+static const char acName3036_7E[] = "Point 125";
+static const char acName3036_7F[] = "Point 126";
+static const char acName3036_80[] = "Point 127";
+static const char acName3036_81[] = "Point 128";
+static const char acName3036_82[] = "Point 129";
+static const char acName3036_83[] = "Point 130";
+static const char acName3036_84[] = "Point 131";
+static const char acName3036_85[] = "Point 132";
+static const char acName3036_86[] = "Point 133";
+static const char acName3036_87[] = "Point 134";
+static const char acName3036_88[] = "Point 135";
+static const char acName3036_89[] = "Point 136";
+static const char acName3036_8A[] = "Point 137";
+static const char acName3036_8B[] = "Point 138";
+static const char acName3036_8C[] = "Point 139";
+static const char acName3036_8D[] = "Point 140";
+static const char acName3036_8E[] = "Point 141";
+static const char acName3036_8F[] = "Point 142";
+static const char acName3036_90[] = "Point 143";
+static const char acName3036_91[] = "Point 144";
+static const char acName3036_92[] = "Point 145";
+static const char acName3036_93[] = "Point 146";
+static const char acName3036_94[] = "Point 147";
+static const char acName3036_95[] = "Point 148";
+static const char acName3036_96[] = "Point 149";
+static const char acName3036_97[] = "Point 150";
+static const char acName3036_98[] = "Point 151";
+static const char acName3036_99[] = "Point 152";
+static const char acName3036_9A[] = "Point 153";
+static const char acName3036_9B[] = "Point 154";
+static const char acName3036_9C[] = "Point 155";
+static const char acName3036_9D[] = "Point 156";
+static const char acName3036_9E[] = "Point 157";
+static const char acName3036_9F[] = "Point 158";
+static const char acName3036_A0[] = "Point 159";
+static const char acName3036_A1[] = "Point 160";
+static const char acName3036_A2[] = "Point 161";
+static const char acName3036_A3[] = "Point 162";
+static const char acName3036_A4[] = "Point 163";
+static const char acName3036_A5[] = "Point 164";
+static const char acName3036_A6[] = "Point 165";
+static const char acName3036_A7[] = "Point 166";
+static const char acName3036_A8[] = "Point 167";
+static const char acName3036_A9[] = "Point 168";
+static const char acName3036_AA[] = "Point 169";
+static const char acName3036_AB[] = "Point 170";
+static const char acName3036_AC[] = "Point 171";
+static const char acName3036_AD[] = "Point 172";
+static const char acName3036_AE[] = "Point 173";
+static const char acName3036_AF[] = "Point 174";
+static const char acName3036_B0[] = "Point 175";
+static const char acName3036_B1[] = "Point 176";
+static const char acName3036_B2[] = "Point 177";
+static const char acName3036_B3[] = "Point 178";
+static const char acName3036_B4[] = "Point 179";
+static const char acName3036_B5[] = "Point 180";
+static const char acName3036_B6[] = "Point 181";
+static const char acName3036_B7[] = "Point 182";
+static const char acName3036_B8[] = "Point 183";
+static const char acName3036_B9[] = "Point 184";
+static const char acName3036_BA[] = "Point 185";
+static const char acName3036_BB[] = "Point 186";
+static const char acName3036_BC[] = "Point 187";
+static const char acName3036_BD[] = "Point 188";
+static const char acName3036_BE[] = "Point 189";
+static const char acName3036_BF[] = "Point 190";
+static const char acName3036_C0[] = "Point 191";
+static const char acName3036_C1[] = "Point 192";
+static const char acName3036_C2[] = "Point 193";
+static const char acName3036_C3[] = "Point 194";
+static const char acName3036_C4[] = "Point 195";
+static const char acName3036_C5[] = "Point 196";
+static const char acName3036_C6[] = "Point 197";
+static const char acName3036_C7[] = "Point 198";
+static const char acName3036_C8[] = "Point 199";
 static const char acName3041[] = "Service Command";
 static const char acName3041_01[] = "Controlword";
 static const char acName3041_02[] = "Modes of Operation";
@@ -2616,6 +3243,215 @@ static const char acName3834_7D[] = "Point 124";
 static const char acName3834_7E[] = "Point 125";
 static const char acName3834_7F[] = "Point 126";
 static const char acName3834_80[] = "Point 127";
+static const char acName3835[] = "Step Check";
+static const char acName3835_01[] = "Step Size";
+static const char acName3835_02[] = "Steps";
+static const char acName3835_03[] = "Time to 63 % us";
+static const char acName3835_04[] = "Time to 90 % us";
+static const char acName3835_05[] = "Overshoot";
+static const char acName3835_06[] = "Settling Time us";
+static const char acName3835_07[] = "Final Error";
+static const char acName3836[] = "Step Check Response";
+static const char acName3836_01[] = "Point 0";
+static const char acName3836_02[] = "Point 1";
+static const char acName3836_03[] = "Point 2";
+static const char acName3836_04[] = "Point 3";
+static const char acName3836_05[] = "Point 4";
+static const char acName3836_06[] = "Point 5";
+static const char acName3836_07[] = "Point 6";
+static const char acName3836_08[] = "Point 7";
+static const char acName3836_09[] = "Point 8";
+static const char acName3836_0A[] = "Point 9";
+static const char acName3836_0B[] = "Point 10";
+static const char acName3836_0C[] = "Point 11";
+static const char acName3836_0D[] = "Point 12";
+static const char acName3836_0E[] = "Point 13";
+static const char acName3836_0F[] = "Point 14";
+static const char acName3836_10[] = "Point 15";
+static const char acName3836_11[] = "Point 16";
+static const char acName3836_12[] = "Point 17";
+static const char acName3836_13[] = "Point 18";
+static const char acName3836_14[] = "Point 19";
+static const char acName3836_15[] = "Point 20";
+static const char acName3836_16[] = "Point 21";
+static const char acName3836_17[] = "Point 22";
+static const char acName3836_18[] = "Point 23";
+static const char acName3836_19[] = "Point 24";
+static const char acName3836_1A[] = "Point 25";
+static const char acName3836_1B[] = "Point 26";
+static const char acName3836_1C[] = "Point 27";
+static const char acName3836_1D[] = "Point 28";
+static const char acName3836_1E[] = "Point 29";
+static const char acName3836_1F[] = "Point 30";
+static const char acName3836_20[] = "Point 31";
+static const char acName3836_21[] = "Point 32";
+static const char acName3836_22[] = "Point 33";
+static const char acName3836_23[] = "Point 34";
+static const char acName3836_24[] = "Point 35";
+static const char acName3836_25[] = "Point 36";
+static const char acName3836_26[] = "Point 37";
+static const char acName3836_27[] = "Point 38";
+static const char acName3836_28[] = "Point 39";
+static const char acName3836_29[] = "Point 40";
+static const char acName3836_2A[] = "Point 41";
+static const char acName3836_2B[] = "Point 42";
+static const char acName3836_2C[] = "Point 43";
+static const char acName3836_2D[] = "Point 44";
+static const char acName3836_2E[] = "Point 45";
+static const char acName3836_2F[] = "Point 46";
+static const char acName3836_30[] = "Point 47";
+static const char acName3836_31[] = "Point 48";
+static const char acName3836_32[] = "Point 49";
+static const char acName3836_33[] = "Point 50";
+static const char acName3836_34[] = "Point 51";
+static const char acName3836_35[] = "Point 52";
+static const char acName3836_36[] = "Point 53";
+static const char acName3836_37[] = "Point 54";
+static const char acName3836_38[] = "Point 55";
+static const char acName3836_39[] = "Point 56";
+static const char acName3836_3A[] = "Point 57";
+static const char acName3836_3B[] = "Point 58";
+static const char acName3836_3C[] = "Point 59";
+static const char acName3836_3D[] = "Point 60";
+static const char acName3836_3E[] = "Point 61";
+static const char acName3836_3F[] = "Point 62";
+static const char acName3836_40[] = "Point 63";
+static const char acName3836_41[] = "Point 64";
+static const char acName3836_42[] = "Point 65";
+static const char acName3836_43[] = "Point 66";
+static const char acName3836_44[] = "Point 67";
+static const char acName3836_45[] = "Point 68";
+static const char acName3836_46[] = "Point 69";
+static const char acName3836_47[] = "Point 70";
+static const char acName3836_48[] = "Point 71";
+static const char acName3836_49[] = "Point 72";
+static const char acName3836_4A[] = "Point 73";
+static const char acName3836_4B[] = "Point 74";
+static const char acName3836_4C[] = "Point 75";
+static const char acName3836_4D[] = "Point 76";
+static const char acName3836_4E[] = "Point 77";
+static const char acName3836_4F[] = "Point 78";
+static const char acName3836_50[] = "Point 79";
+static const char acName3836_51[] = "Point 80";
+static const char acName3836_52[] = "Point 81";
+static const char acName3836_53[] = "Point 82";
+static const char acName3836_54[] = "Point 83";
+static const char acName3836_55[] = "Point 84";
+static const char acName3836_56[] = "Point 85";
+static const char acName3836_57[] = "Point 86";
+static const char acName3836_58[] = "Point 87";
+static const char acName3836_59[] = "Point 88";
+static const char acName3836_5A[] = "Point 89";
+static const char acName3836_5B[] = "Point 90";
+static const char acName3836_5C[] = "Point 91";
+static const char acName3836_5D[] = "Point 92";
+static const char acName3836_5E[] = "Point 93";
+static const char acName3836_5F[] = "Point 94";
+static const char acName3836_60[] = "Point 95";
+static const char acName3836_61[] = "Point 96";
+static const char acName3836_62[] = "Point 97";
+static const char acName3836_63[] = "Point 98";
+static const char acName3836_64[] = "Point 99";
+static const char acName3836_65[] = "Point 100";
+static const char acName3836_66[] = "Point 101";
+static const char acName3836_67[] = "Point 102";
+static const char acName3836_68[] = "Point 103";
+static const char acName3836_69[] = "Point 104";
+static const char acName3836_6A[] = "Point 105";
+static const char acName3836_6B[] = "Point 106";
+static const char acName3836_6C[] = "Point 107";
+static const char acName3836_6D[] = "Point 108";
+static const char acName3836_6E[] = "Point 109";
+static const char acName3836_6F[] = "Point 110";
+static const char acName3836_70[] = "Point 111";
+static const char acName3836_71[] = "Point 112";
+static const char acName3836_72[] = "Point 113";
+static const char acName3836_73[] = "Point 114";
+static const char acName3836_74[] = "Point 115";
+static const char acName3836_75[] = "Point 116";
+static const char acName3836_76[] = "Point 117";
+static const char acName3836_77[] = "Point 118";
+static const char acName3836_78[] = "Point 119";
+static const char acName3836_79[] = "Point 120";
+static const char acName3836_7A[] = "Point 121";
+static const char acName3836_7B[] = "Point 122";
+static const char acName3836_7C[] = "Point 123";
+static const char acName3836_7D[] = "Point 124";
+static const char acName3836_7E[] = "Point 125";
+static const char acName3836_7F[] = "Point 126";
+static const char acName3836_80[] = "Point 127";
+static const char acName3836_81[] = "Point 128";
+static const char acName3836_82[] = "Point 129";
+static const char acName3836_83[] = "Point 130";
+static const char acName3836_84[] = "Point 131";
+static const char acName3836_85[] = "Point 132";
+static const char acName3836_86[] = "Point 133";
+static const char acName3836_87[] = "Point 134";
+static const char acName3836_88[] = "Point 135";
+static const char acName3836_89[] = "Point 136";
+static const char acName3836_8A[] = "Point 137";
+static const char acName3836_8B[] = "Point 138";
+static const char acName3836_8C[] = "Point 139";
+static const char acName3836_8D[] = "Point 140";
+static const char acName3836_8E[] = "Point 141";
+static const char acName3836_8F[] = "Point 142";
+static const char acName3836_90[] = "Point 143";
+static const char acName3836_91[] = "Point 144";
+static const char acName3836_92[] = "Point 145";
+static const char acName3836_93[] = "Point 146";
+static const char acName3836_94[] = "Point 147";
+static const char acName3836_95[] = "Point 148";
+static const char acName3836_96[] = "Point 149";
+static const char acName3836_97[] = "Point 150";
+static const char acName3836_98[] = "Point 151";
+static const char acName3836_99[] = "Point 152";
+static const char acName3836_9A[] = "Point 153";
+static const char acName3836_9B[] = "Point 154";
+static const char acName3836_9C[] = "Point 155";
+static const char acName3836_9D[] = "Point 156";
+static const char acName3836_9E[] = "Point 157";
+static const char acName3836_9F[] = "Point 158";
+static const char acName3836_A0[] = "Point 159";
+static const char acName3836_A1[] = "Point 160";
+static const char acName3836_A2[] = "Point 161";
+static const char acName3836_A3[] = "Point 162";
+static const char acName3836_A4[] = "Point 163";
+static const char acName3836_A5[] = "Point 164";
+static const char acName3836_A6[] = "Point 165";
+static const char acName3836_A7[] = "Point 166";
+static const char acName3836_A8[] = "Point 167";
+static const char acName3836_A9[] = "Point 168";
+static const char acName3836_AA[] = "Point 169";
+static const char acName3836_AB[] = "Point 170";
+static const char acName3836_AC[] = "Point 171";
+static const char acName3836_AD[] = "Point 172";
+static const char acName3836_AE[] = "Point 173";
+static const char acName3836_AF[] = "Point 174";
+static const char acName3836_B0[] = "Point 175";
+static const char acName3836_B1[] = "Point 176";
+static const char acName3836_B2[] = "Point 177";
+static const char acName3836_B3[] = "Point 178";
+static const char acName3836_B4[] = "Point 179";
+static const char acName3836_B5[] = "Point 180";
+static const char acName3836_B6[] = "Point 181";
+static const char acName3836_B7[] = "Point 182";
+static const char acName3836_B8[] = "Point 183";
+static const char acName3836_B9[] = "Point 184";
+static const char acName3836_BA[] = "Point 185";
+static const char acName3836_BB[] = "Point 186";
+static const char acName3836_BC[] = "Point 187";
+static const char acName3836_BD[] = "Point 188";
+static const char acName3836_BE[] = "Point 189";
+static const char acName3836_BF[] = "Point 190";
+static const char acName3836_C0[] = "Point 191";
+static const char acName3836_C1[] = "Point 192";
+static const char acName3836_C2[] = "Point 193";
+static const char acName3836_C3[] = "Point 194";
+static const char acName3836_C4[] = "Point 195";
+static const char acName3836_C5[] = "Point 196";
+static const char acName3836_C6[] = "Point 197";
+static const char acName3836_C7[] = "Point 198";
+static const char acName3836_C8[] = "Point 199";
 static const char acName3841[] = "Service Command";
 static const char acName3841_01[] = "Controlword";
 static const char acName3841_02[] = "Modes of Operation";
@@ -3967,6 +4803,225 @@ const _objd SDO2034[] =
    {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName2034_80, 0, &Obj.axis[0].CogResultNeg[127]},
 };
 
+/* 0x2035 Step Check */
+const _objd SDO2035[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2035, 7, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2035_01, 2048, &Obj.axis[0].CheckStep},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2035_02, 8, &Obj.axis[0].CheckSteps},
+   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2035_03, 0, &Obj.axis[0].CheckT63},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2035_04, 0, &Obj.axis[0].CheckT90},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2035_05, 0, &Obj.axis[0].CheckOvershoot},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2035_06, 0, &Obj.axis[0].CheckSettling},
+   {0x07, DTYPE_INTEGER32, 32, ATYPE_RO, acName2035_07, 0, &Obj.axis[0].CheckFinalError},
+};
+
+/* 0x2036 Step Check Response */
+const _objd SDO2036[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2036, 200, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_01, 0, &Obj.axis[0].CheckCurve[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_02, 0, &Obj.axis[0].CheckCurve[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_03, 0, &Obj.axis[0].CheckCurve[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_04, 0, &Obj.axis[0].CheckCurve[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_05, 0, &Obj.axis[0].CheckCurve[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_06, 0, &Obj.axis[0].CheckCurve[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_07, 0, &Obj.axis[0].CheckCurve[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_08, 0, &Obj.axis[0].CheckCurve[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_09, 0, &Obj.axis[0].CheckCurve[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_0A, 0, &Obj.axis[0].CheckCurve[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_0B, 0, &Obj.axis[0].CheckCurve[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_0C, 0, &Obj.axis[0].CheckCurve[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_0D, 0, &Obj.axis[0].CheckCurve[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_0E, 0, &Obj.axis[0].CheckCurve[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_0F, 0, &Obj.axis[0].CheckCurve[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_10, 0, &Obj.axis[0].CheckCurve[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_11, 0, &Obj.axis[0].CheckCurve[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_12, 0, &Obj.axis[0].CheckCurve[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_13, 0, &Obj.axis[0].CheckCurve[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_14, 0, &Obj.axis[0].CheckCurve[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_15, 0, &Obj.axis[0].CheckCurve[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_16, 0, &Obj.axis[0].CheckCurve[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_17, 0, &Obj.axis[0].CheckCurve[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_18, 0, &Obj.axis[0].CheckCurve[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_19, 0, &Obj.axis[0].CheckCurve[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_1A, 0, &Obj.axis[0].CheckCurve[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_1B, 0, &Obj.axis[0].CheckCurve[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_1C, 0, &Obj.axis[0].CheckCurve[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_1D, 0, &Obj.axis[0].CheckCurve[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_1E, 0, &Obj.axis[0].CheckCurve[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_1F, 0, &Obj.axis[0].CheckCurve[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_20, 0, &Obj.axis[0].CheckCurve[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_21, 0, &Obj.axis[0].CheckCurve[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_22, 0, &Obj.axis[0].CheckCurve[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_23, 0, &Obj.axis[0].CheckCurve[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_24, 0, &Obj.axis[0].CheckCurve[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_25, 0, &Obj.axis[0].CheckCurve[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_26, 0, &Obj.axis[0].CheckCurve[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_27, 0, &Obj.axis[0].CheckCurve[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_28, 0, &Obj.axis[0].CheckCurve[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_29, 0, &Obj.axis[0].CheckCurve[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_2A, 0, &Obj.axis[0].CheckCurve[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_2B, 0, &Obj.axis[0].CheckCurve[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_2C, 0, &Obj.axis[0].CheckCurve[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_2D, 0, &Obj.axis[0].CheckCurve[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_2E, 0, &Obj.axis[0].CheckCurve[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_2F, 0, &Obj.axis[0].CheckCurve[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_30, 0, &Obj.axis[0].CheckCurve[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_31, 0, &Obj.axis[0].CheckCurve[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_32, 0, &Obj.axis[0].CheckCurve[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_33, 0, &Obj.axis[0].CheckCurve[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_34, 0, &Obj.axis[0].CheckCurve[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_35, 0, &Obj.axis[0].CheckCurve[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_36, 0, &Obj.axis[0].CheckCurve[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_37, 0, &Obj.axis[0].CheckCurve[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_38, 0, &Obj.axis[0].CheckCurve[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_39, 0, &Obj.axis[0].CheckCurve[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_3A, 0, &Obj.axis[0].CheckCurve[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_3B, 0, &Obj.axis[0].CheckCurve[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_3C, 0, &Obj.axis[0].CheckCurve[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_3D, 0, &Obj.axis[0].CheckCurve[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_3E, 0, &Obj.axis[0].CheckCurve[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_3F, 0, &Obj.axis[0].CheckCurve[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_40, 0, &Obj.axis[0].CheckCurve[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_41, 0, &Obj.axis[0].CheckCurve[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_42, 0, &Obj.axis[0].CheckCurve[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_43, 0, &Obj.axis[0].CheckCurve[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_44, 0, &Obj.axis[0].CheckCurve[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_45, 0, &Obj.axis[0].CheckCurve[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_46, 0, &Obj.axis[0].CheckCurve[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_47, 0, &Obj.axis[0].CheckCurve[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_48, 0, &Obj.axis[0].CheckCurve[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_49, 0, &Obj.axis[0].CheckCurve[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_4A, 0, &Obj.axis[0].CheckCurve[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_4B, 0, &Obj.axis[0].CheckCurve[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_4C, 0, &Obj.axis[0].CheckCurve[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_4D, 0, &Obj.axis[0].CheckCurve[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_4E, 0, &Obj.axis[0].CheckCurve[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_4F, 0, &Obj.axis[0].CheckCurve[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_50, 0, &Obj.axis[0].CheckCurve[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_51, 0, &Obj.axis[0].CheckCurve[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_52, 0, &Obj.axis[0].CheckCurve[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_53, 0, &Obj.axis[0].CheckCurve[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_54, 0, &Obj.axis[0].CheckCurve[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_55, 0, &Obj.axis[0].CheckCurve[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_56, 0, &Obj.axis[0].CheckCurve[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_57, 0, &Obj.axis[0].CheckCurve[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_58, 0, &Obj.axis[0].CheckCurve[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_59, 0, &Obj.axis[0].CheckCurve[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_5A, 0, &Obj.axis[0].CheckCurve[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_5B, 0, &Obj.axis[0].CheckCurve[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_5C, 0, &Obj.axis[0].CheckCurve[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_5D, 0, &Obj.axis[0].CheckCurve[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_5E, 0, &Obj.axis[0].CheckCurve[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_5F, 0, &Obj.axis[0].CheckCurve[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_60, 0, &Obj.axis[0].CheckCurve[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_61, 0, &Obj.axis[0].CheckCurve[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_62, 0, &Obj.axis[0].CheckCurve[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_63, 0, &Obj.axis[0].CheckCurve[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_64, 0, &Obj.axis[0].CheckCurve[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_65, 0, &Obj.axis[0].CheckCurve[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_66, 0, &Obj.axis[0].CheckCurve[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_67, 0, &Obj.axis[0].CheckCurve[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_68, 0, &Obj.axis[0].CheckCurve[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_69, 0, &Obj.axis[0].CheckCurve[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_6A, 0, &Obj.axis[0].CheckCurve[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_6B, 0, &Obj.axis[0].CheckCurve[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_6C, 0, &Obj.axis[0].CheckCurve[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_6D, 0, &Obj.axis[0].CheckCurve[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_6E, 0, &Obj.axis[0].CheckCurve[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_6F, 0, &Obj.axis[0].CheckCurve[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_70, 0, &Obj.axis[0].CheckCurve[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_71, 0, &Obj.axis[0].CheckCurve[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_72, 0, &Obj.axis[0].CheckCurve[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_73, 0, &Obj.axis[0].CheckCurve[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_74, 0, &Obj.axis[0].CheckCurve[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_75, 0, &Obj.axis[0].CheckCurve[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_76, 0, &Obj.axis[0].CheckCurve[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_77, 0, &Obj.axis[0].CheckCurve[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_78, 0, &Obj.axis[0].CheckCurve[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_79, 0, &Obj.axis[0].CheckCurve[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_7A, 0, &Obj.axis[0].CheckCurve[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_7B, 0, &Obj.axis[0].CheckCurve[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_7C, 0, &Obj.axis[0].CheckCurve[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_7D, 0, &Obj.axis[0].CheckCurve[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_7E, 0, &Obj.axis[0].CheckCurve[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_7F, 0, &Obj.axis[0].CheckCurve[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_80, 0, &Obj.axis[0].CheckCurve[127]},
+   {0x81, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_81, 0, &Obj.axis[0].CheckCurve[128]},
+   {0x82, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_82, 0, &Obj.axis[0].CheckCurve[129]},
+   {0x83, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_83, 0, &Obj.axis[0].CheckCurve[130]},
+   {0x84, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_84, 0, &Obj.axis[0].CheckCurve[131]},
+   {0x85, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_85, 0, &Obj.axis[0].CheckCurve[132]},
+   {0x86, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_86, 0, &Obj.axis[0].CheckCurve[133]},
+   {0x87, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_87, 0, &Obj.axis[0].CheckCurve[134]},
+   {0x88, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_88, 0, &Obj.axis[0].CheckCurve[135]},
+   {0x89, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_89, 0, &Obj.axis[0].CheckCurve[136]},
+   {0x8A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_8A, 0, &Obj.axis[0].CheckCurve[137]},
+   {0x8B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_8B, 0, &Obj.axis[0].CheckCurve[138]},
+   {0x8C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_8C, 0, &Obj.axis[0].CheckCurve[139]},
+   {0x8D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_8D, 0, &Obj.axis[0].CheckCurve[140]},
+   {0x8E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_8E, 0, &Obj.axis[0].CheckCurve[141]},
+   {0x8F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_8F, 0, &Obj.axis[0].CheckCurve[142]},
+   {0x90, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_90, 0, &Obj.axis[0].CheckCurve[143]},
+   {0x91, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_91, 0, &Obj.axis[0].CheckCurve[144]},
+   {0x92, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_92, 0, &Obj.axis[0].CheckCurve[145]},
+   {0x93, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_93, 0, &Obj.axis[0].CheckCurve[146]},
+   {0x94, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_94, 0, &Obj.axis[0].CheckCurve[147]},
+   {0x95, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_95, 0, &Obj.axis[0].CheckCurve[148]},
+   {0x96, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_96, 0, &Obj.axis[0].CheckCurve[149]},
+   {0x97, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_97, 0, &Obj.axis[0].CheckCurve[150]},
+   {0x98, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_98, 0, &Obj.axis[0].CheckCurve[151]},
+   {0x99, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_99, 0, &Obj.axis[0].CheckCurve[152]},
+   {0x9A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_9A, 0, &Obj.axis[0].CheckCurve[153]},
+   {0x9B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_9B, 0, &Obj.axis[0].CheckCurve[154]},
+   {0x9C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_9C, 0, &Obj.axis[0].CheckCurve[155]},
+   {0x9D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_9D, 0, &Obj.axis[0].CheckCurve[156]},
+   {0x9E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_9E, 0, &Obj.axis[0].CheckCurve[157]},
+   {0x9F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_9F, 0, &Obj.axis[0].CheckCurve[158]},
+   {0xA0, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A0, 0, &Obj.axis[0].CheckCurve[159]},
+   {0xA1, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A1, 0, &Obj.axis[0].CheckCurve[160]},
+   {0xA2, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A2, 0, &Obj.axis[0].CheckCurve[161]},
+   {0xA3, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A3, 0, &Obj.axis[0].CheckCurve[162]},
+   {0xA4, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A4, 0, &Obj.axis[0].CheckCurve[163]},
+   {0xA5, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A5, 0, &Obj.axis[0].CheckCurve[164]},
+   {0xA6, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A6, 0, &Obj.axis[0].CheckCurve[165]},
+   {0xA7, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A7, 0, &Obj.axis[0].CheckCurve[166]},
+   {0xA8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A8, 0, &Obj.axis[0].CheckCurve[167]},
+   {0xA9, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_A9, 0, &Obj.axis[0].CheckCurve[168]},
+   {0xAA, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_AA, 0, &Obj.axis[0].CheckCurve[169]},
+   {0xAB, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_AB, 0, &Obj.axis[0].CheckCurve[170]},
+   {0xAC, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_AC, 0, &Obj.axis[0].CheckCurve[171]},
+   {0xAD, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_AD, 0, &Obj.axis[0].CheckCurve[172]},
+   {0xAE, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_AE, 0, &Obj.axis[0].CheckCurve[173]},
+   {0xAF, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_AF, 0, &Obj.axis[0].CheckCurve[174]},
+   {0xB0, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B0, 0, &Obj.axis[0].CheckCurve[175]},
+   {0xB1, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B1, 0, &Obj.axis[0].CheckCurve[176]},
+   {0xB2, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B2, 0, &Obj.axis[0].CheckCurve[177]},
+   {0xB3, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B3, 0, &Obj.axis[0].CheckCurve[178]},
+   {0xB4, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B4, 0, &Obj.axis[0].CheckCurve[179]},
+   {0xB5, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B5, 0, &Obj.axis[0].CheckCurve[180]},
+   {0xB6, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B6, 0, &Obj.axis[0].CheckCurve[181]},
+   {0xB7, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B7, 0, &Obj.axis[0].CheckCurve[182]},
+   {0xB8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B8, 0, &Obj.axis[0].CheckCurve[183]},
+   {0xB9, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_B9, 0, &Obj.axis[0].CheckCurve[184]},
+   {0xBA, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_BA, 0, &Obj.axis[0].CheckCurve[185]},
+   {0xBB, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_BB, 0, &Obj.axis[0].CheckCurve[186]},
+   {0xBC, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_BC, 0, &Obj.axis[0].CheckCurve[187]},
+   {0xBD, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_BD, 0, &Obj.axis[0].CheckCurve[188]},
+   {0xBE, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_BE, 0, &Obj.axis[0].CheckCurve[189]},
+   {0xBF, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_BF, 0, &Obj.axis[0].CheckCurve[190]},
+   {0xC0, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C0, 0, &Obj.axis[0].CheckCurve[191]},
+   {0xC1, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C1, 0, &Obj.axis[0].CheckCurve[192]},
+   {0xC2, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C2, 0, &Obj.axis[0].CheckCurve[193]},
+   {0xC3, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C3, 0, &Obj.axis[0].CheckCurve[194]},
+   {0xC4, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C4, 0, &Obj.axis[0].CheckCurve[195]},
+   {0xC5, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C5, 0, &Obj.axis[0].CheckCurve[196]},
+   {0xC6, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C6, 0, &Obj.axis[0].CheckCurve[197]},
+   {0xC7, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C7, 0, &Obj.axis[0].CheckCurve[198]},
+   {0xC8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C8, 0, &Obj.axis[0].CheckCurve[199]},
+};
+
 /* 0x2040 Service Control */
 const _objd SDO2040[] =
 {
@@ -4705,6 +5760,225 @@ const _objd SDO2834[] =
    {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName2834_80, 0, &Obj.axis[1].CogResultNeg[127]},
 };
 
+/* 0x2835 Step Check */
+const _objd SDO2835[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2835, 7, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2835_01, 2048, &Obj.axis[1].CheckStep},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2835_02, 8, &Obj.axis[1].CheckSteps},
+   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2835_03, 0, &Obj.axis[1].CheckT63},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2835_04, 0, &Obj.axis[1].CheckT90},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2835_05, 0, &Obj.axis[1].CheckOvershoot},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2835_06, 0, &Obj.axis[1].CheckSettling},
+   {0x07, DTYPE_INTEGER32, 32, ATYPE_RO, acName2835_07, 0, &Obj.axis[1].CheckFinalError},
+};
+
+/* 0x2836 Step Check Response */
+const _objd SDO2836[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2836, 200, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_01, 0, &Obj.axis[1].CheckCurve[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_02, 0, &Obj.axis[1].CheckCurve[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_03, 0, &Obj.axis[1].CheckCurve[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_04, 0, &Obj.axis[1].CheckCurve[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_05, 0, &Obj.axis[1].CheckCurve[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_06, 0, &Obj.axis[1].CheckCurve[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_07, 0, &Obj.axis[1].CheckCurve[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_08, 0, &Obj.axis[1].CheckCurve[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_09, 0, &Obj.axis[1].CheckCurve[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_0A, 0, &Obj.axis[1].CheckCurve[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_0B, 0, &Obj.axis[1].CheckCurve[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_0C, 0, &Obj.axis[1].CheckCurve[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_0D, 0, &Obj.axis[1].CheckCurve[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_0E, 0, &Obj.axis[1].CheckCurve[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_0F, 0, &Obj.axis[1].CheckCurve[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_10, 0, &Obj.axis[1].CheckCurve[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_11, 0, &Obj.axis[1].CheckCurve[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_12, 0, &Obj.axis[1].CheckCurve[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_13, 0, &Obj.axis[1].CheckCurve[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_14, 0, &Obj.axis[1].CheckCurve[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_15, 0, &Obj.axis[1].CheckCurve[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_16, 0, &Obj.axis[1].CheckCurve[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_17, 0, &Obj.axis[1].CheckCurve[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_18, 0, &Obj.axis[1].CheckCurve[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_19, 0, &Obj.axis[1].CheckCurve[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_1A, 0, &Obj.axis[1].CheckCurve[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_1B, 0, &Obj.axis[1].CheckCurve[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_1C, 0, &Obj.axis[1].CheckCurve[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_1D, 0, &Obj.axis[1].CheckCurve[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_1E, 0, &Obj.axis[1].CheckCurve[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_1F, 0, &Obj.axis[1].CheckCurve[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_20, 0, &Obj.axis[1].CheckCurve[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_21, 0, &Obj.axis[1].CheckCurve[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_22, 0, &Obj.axis[1].CheckCurve[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_23, 0, &Obj.axis[1].CheckCurve[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_24, 0, &Obj.axis[1].CheckCurve[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_25, 0, &Obj.axis[1].CheckCurve[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_26, 0, &Obj.axis[1].CheckCurve[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_27, 0, &Obj.axis[1].CheckCurve[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_28, 0, &Obj.axis[1].CheckCurve[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_29, 0, &Obj.axis[1].CheckCurve[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_2A, 0, &Obj.axis[1].CheckCurve[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_2B, 0, &Obj.axis[1].CheckCurve[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_2C, 0, &Obj.axis[1].CheckCurve[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_2D, 0, &Obj.axis[1].CheckCurve[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_2E, 0, &Obj.axis[1].CheckCurve[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_2F, 0, &Obj.axis[1].CheckCurve[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_30, 0, &Obj.axis[1].CheckCurve[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_31, 0, &Obj.axis[1].CheckCurve[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_32, 0, &Obj.axis[1].CheckCurve[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_33, 0, &Obj.axis[1].CheckCurve[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_34, 0, &Obj.axis[1].CheckCurve[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_35, 0, &Obj.axis[1].CheckCurve[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_36, 0, &Obj.axis[1].CheckCurve[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_37, 0, &Obj.axis[1].CheckCurve[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_38, 0, &Obj.axis[1].CheckCurve[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_39, 0, &Obj.axis[1].CheckCurve[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_3A, 0, &Obj.axis[1].CheckCurve[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_3B, 0, &Obj.axis[1].CheckCurve[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_3C, 0, &Obj.axis[1].CheckCurve[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_3D, 0, &Obj.axis[1].CheckCurve[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_3E, 0, &Obj.axis[1].CheckCurve[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_3F, 0, &Obj.axis[1].CheckCurve[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_40, 0, &Obj.axis[1].CheckCurve[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_41, 0, &Obj.axis[1].CheckCurve[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_42, 0, &Obj.axis[1].CheckCurve[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_43, 0, &Obj.axis[1].CheckCurve[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_44, 0, &Obj.axis[1].CheckCurve[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_45, 0, &Obj.axis[1].CheckCurve[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_46, 0, &Obj.axis[1].CheckCurve[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_47, 0, &Obj.axis[1].CheckCurve[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_48, 0, &Obj.axis[1].CheckCurve[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_49, 0, &Obj.axis[1].CheckCurve[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_4A, 0, &Obj.axis[1].CheckCurve[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_4B, 0, &Obj.axis[1].CheckCurve[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_4C, 0, &Obj.axis[1].CheckCurve[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_4D, 0, &Obj.axis[1].CheckCurve[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_4E, 0, &Obj.axis[1].CheckCurve[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_4F, 0, &Obj.axis[1].CheckCurve[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_50, 0, &Obj.axis[1].CheckCurve[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_51, 0, &Obj.axis[1].CheckCurve[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_52, 0, &Obj.axis[1].CheckCurve[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_53, 0, &Obj.axis[1].CheckCurve[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_54, 0, &Obj.axis[1].CheckCurve[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_55, 0, &Obj.axis[1].CheckCurve[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_56, 0, &Obj.axis[1].CheckCurve[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_57, 0, &Obj.axis[1].CheckCurve[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_58, 0, &Obj.axis[1].CheckCurve[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_59, 0, &Obj.axis[1].CheckCurve[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_5A, 0, &Obj.axis[1].CheckCurve[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_5B, 0, &Obj.axis[1].CheckCurve[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_5C, 0, &Obj.axis[1].CheckCurve[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_5D, 0, &Obj.axis[1].CheckCurve[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_5E, 0, &Obj.axis[1].CheckCurve[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_5F, 0, &Obj.axis[1].CheckCurve[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_60, 0, &Obj.axis[1].CheckCurve[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_61, 0, &Obj.axis[1].CheckCurve[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_62, 0, &Obj.axis[1].CheckCurve[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_63, 0, &Obj.axis[1].CheckCurve[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_64, 0, &Obj.axis[1].CheckCurve[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_65, 0, &Obj.axis[1].CheckCurve[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_66, 0, &Obj.axis[1].CheckCurve[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_67, 0, &Obj.axis[1].CheckCurve[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_68, 0, &Obj.axis[1].CheckCurve[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_69, 0, &Obj.axis[1].CheckCurve[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_6A, 0, &Obj.axis[1].CheckCurve[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_6B, 0, &Obj.axis[1].CheckCurve[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_6C, 0, &Obj.axis[1].CheckCurve[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_6D, 0, &Obj.axis[1].CheckCurve[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_6E, 0, &Obj.axis[1].CheckCurve[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_6F, 0, &Obj.axis[1].CheckCurve[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_70, 0, &Obj.axis[1].CheckCurve[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_71, 0, &Obj.axis[1].CheckCurve[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_72, 0, &Obj.axis[1].CheckCurve[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_73, 0, &Obj.axis[1].CheckCurve[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_74, 0, &Obj.axis[1].CheckCurve[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_75, 0, &Obj.axis[1].CheckCurve[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_76, 0, &Obj.axis[1].CheckCurve[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_77, 0, &Obj.axis[1].CheckCurve[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_78, 0, &Obj.axis[1].CheckCurve[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_79, 0, &Obj.axis[1].CheckCurve[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_7A, 0, &Obj.axis[1].CheckCurve[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_7B, 0, &Obj.axis[1].CheckCurve[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_7C, 0, &Obj.axis[1].CheckCurve[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_7D, 0, &Obj.axis[1].CheckCurve[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_7E, 0, &Obj.axis[1].CheckCurve[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_7F, 0, &Obj.axis[1].CheckCurve[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_80, 0, &Obj.axis[1].CheckCurve[127]},
+   {0x81, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_81, 0, &Obj.axis[1].CheckCurve[128]},
+   {0x82, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_82, 0, &Obj.axis[1].CheckCurve[129]},
+   {0x83, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_83, 0, &Obj.axis[1].CheckCurve[130]},
+   {0x84, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_84, 0, &Obj.axis[1].CheckCurve[131]},
+   {0x85, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_85, 0, &Obj.axis[1].CheckCurve[132]},
+   {0x86, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_86, 0, &Obj.axis[1].CheckCurve[133]},
+   {0x87, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_87, 0, &Obj.axis[1].CheckCurve[134]},
+   {0x88, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_88, 0, &Obj.axis[1].CheckCurve[135]},
+   {0x89, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_89, 0, &Obj.axis[1].CheckCurve[136]},
+   {0x8A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_8A, 0, &Obj.axis[1].CheckCurve[137]},
+   {0x8B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_8B, 0, &Obj.axis[1].CheckCurve[138]},
+   {0x8C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_8C, 0, &Obj.axis[1].CheckCurve[139]},
+   {0x8D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_8D, 0, &Obj.axis[1].CheckCurve[140]},
+   {0x8E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_8E, 0, &Obj.axis[1].CheckCurve[141]},
+   {0x8F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_8F, 0, &Obj.axis[1].CheckCurve[142]},
+   {0x90, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_90, 0, &Obj.axis[1].CheckCurve[143]},
+   {0x91, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_91, 0, &Obj.axis[1].CheckCurve[144]},
+   {0x92, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_92, 0, &Obj.axis[1].CheckCurve[145]},
+   {0x93, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_93, 0, &Obj.axis[1].CheckCurve[146]},
+   {0x94, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_94, 0, &Obj.axis[1].CheckCurve[147]},
+   {0x95, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_95, 0, &Obj.axis[1].CheckCurve[148]},
+   {0x96, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_96, 0, &Obj.axis[1].CheckCurve[149]},
+   {0x97, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_97, 0, &Obj.axis[1].CheckCurve[150]},
+   {0x98, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_98, 0, &Obj.axis[1].CheckCurve[151]},
+   {0x99, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_99, 0, &Obj.axis[1].CheckCurve[152]},
+   {0x9A, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_9A, 0, &Obj.axis[1].CheckCurve[153]},
+   {0x9B, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_9B, 0, &Obj.axis[1].CheckCurve[154]},
+   {0x9C, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_9C, 0, &Obj.axis[1].CheckCurve[155]},
+   {0x9D, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_9D, 0, &Obj.axis[1].CheckCurve[156]},
+   {0x9E, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_9E, 0, &Obj.axis[1].CheckCurve[157]},
+   {0x9F, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_9F, 0, &Obj.axis[1].CheckCurve[158]},
+   {0xA0, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A0, 0, &Obj.axis[1].CheckCurve[159]},
+   {0xA1, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A1, 0, &Obj.axis[1].CheckCurve[160]},
+   {0xA2, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A2, 0, &Obj.axis[1].CheckCurve[161]},
+   {0xA3, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A3, 0, &Obj.axis[1].CheckCurve[162]},
+   {0xA4, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A4, 0, &Obj.axis[1].CheckCurve[163]},
+   {0xA5, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A5, 0, &Obj.axis[1].CheckCurve[164]},
+   {0xA6, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A6, 0, &Obj.axis[1].CheckCurve[165]},
+   {0xA7, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A7, 0, &Obj.axis[1].CheckCurve[166]},
+   {0xA8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A8, 0, &Obj.axis[1].CheckCurve[167]},
+   {0xA9, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_A9, 0, &Obj.axis[1].CheckCurve[168]},
+   {0xAA, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_AA, 0, &Obj.axis[1].CheckCurve[169]},
+   {0xAB, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_AB, 0, &Obj.axis[1].CheckCurve[170]},
+   {0xAC, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_AC, 0, &Obj.axis[1].CheckCurve[171]},
+   {0xAD, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_AD, 0, &Obj.axis[1].CheckCurve[172]},
+   {0xAE, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_AE, 0, &Obj.axis[1].CheckCurve[173]},
+   {0xAF, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_AF, 0, &Obj.axis[1].CheckCurve[174]},
+   {0xB0, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B0, 0, &Obj.axis[1].CheckCurve[175]},
+   {0xB1, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B1, 0, &Obj.axis[1].CheckCurve[176]},
+   {0xB2, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B2, 0, &Obj.axis[1].CheckCurve[177]},
+   {0xB3, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B3, 0, &Obj.axis[1].CheckCurve[178]},
+   {0xB4, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B4, 0, &Obj.axis[1].CheckCurve[179]},
+   {0xB5, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B5, 0, &Obj.axis[1].CheckCurve[180]},
+   {0xB6, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B6, 0, &Obj.axis[1].CheckCurve[181]},
+   {0xB7, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B7, 0, &Obj.axis[1].CheckCurve[182]},
+   {0xB8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B8, 0, &Obj.axis[1].CheckCurve[183]},
+   {0xB9, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_B9, 0, &Obj.axis[1].CheckCurve[184]},
+   {0xBA, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_BA, 0, &Obj.axis[1].CheckCurve[185]},
+   {0xBB, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_BB, 0, &Obj.axis[1].CheckCurve[186]},
+   {0xBC, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_BC, 0, &Obj.axis[1].CheckCurve[187]},
+   {0xBD, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_BD, 0, &Obj.axis[1].CheckCurve[188]},
+   {0xBE, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_BE, 0, &Obj.axis[1].CheckCurve[189]},
+   {0xBF, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_BF, 0, &Obj.axis[1].CheckCurve[190]},
+   {0xC0, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C0, 0, &Obj.axis[1].CheckCurve[191]},
+   {0xC1, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C1, 0, &Obj.axis[1].CheckCurve[192]},
+   {0xC2, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C2, 0, &Obj.axis[1].CheckCurve[193]},
+   {0xC3, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C3, 0, &Obj.axis[1].CheckCurve[194]},
+   {0xC4, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C4, 0, &Obj.axis[1].CheckCurve[195]},
+   {0xC5, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C5, 0, &Obj.axis[1].CheckCurve[196]},
+   {0xC6, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C6, 0, &Obj.axis[1].CheckCurve[197]},
+   {0xC7, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C7, 0, &Obj.axis[1].CheckCurve[198]},
+   {0xC8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C8, 0, &Obj.axis[1].CheckCurve[199]},
+};
+
 /* 0x2841 Service Command */
 const _objd SDO2841[] =
 {
@@ -5431,6 +6705,225 @@ const _objd SDO3034[] =
    {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName3034_80, 0, &Obj.axis[2].CogResultNeg[127]},
 };
 
+/* 0x3035 Step Check */
+const _objd SDO3035[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3035, 7, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName3035_01, 2048, &Obj.axis[2].CheckStep},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3035_02, 8, &Obj.axis[2].CheckSteps},
+   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3035_03, 0, &Obj.axis[2].CheckT63},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3035_04, 0, &Obj.axis[2].CheckT90},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3035_05, 0, &Obj.axis[2].CheckOvershoot},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3035_06, 0, &Obj.axis[2].CheckSettling},
+   {0x07, DTYPE_INTEGER32, 32, ATYPE_RO, acName3035_07, 0, &Obj.axis[2].CheckFinalError},
+};
+
+/* 0x3036 Step Check Response */
+const _objd SDO3036[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3036, 200, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_01, 0, &Obj.axis[2].CheckCurve[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_02, 0, &Obj.axis[2].CheckCurve[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_03, 0, &Obj.axis[2].CheckCurve[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_04, 0, &Obj.axis[2].CheckCurve[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_05, 0, &Obj.axis[2].CheckCurve[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_06, 0, &Obj.axis[2].CheckCurve[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_07, 0, &Obj.axis[2].CheckCurve[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_08, 0, &Obj.axis[2].CheckCurve[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_09, 0, &Obj.axis[2].CheckCurve[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_0A, 0, &Obj.axis[2].CheckCurve[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_0B, 0, &Obj.axis[2].CheckCurve[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_0C, 0, &Obj.axis[2].CheckCurve[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_0D, 0, &Obj.axis[2].CheckCurve[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_0E, 0, &Obj.axis[2].CheckCurve[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_0F, 0, &Obj.axis[2].CheckCurve[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_10, 0, &Obj.axis[2].CheckCurve[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_11, 0, &Obj.axis[2].CheckCurve[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_12, 0, &Obj.axis[2].CheckCurve[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_13, 0, &Obj.axis[2].CheckCurve[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_14, 0, &Obj.axis[2].CheckCurve[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_15, 0, &Obj.axis[2].CheckCurve[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_16, 0, &Obj.axis[2].CheckCurve[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_17, 0, &Obj.axis[2].CheckCurve[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_18, 0, &Obj.axis[2].CheckCurve[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_19, 0, &Obj.axis[2].CheckCurve[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_1A, 0, &Obj.axis[2].CheckCurve[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_1B, 0, &Obj.axis[2].CheckCurve[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_1C, 0, &Obj.axis[2].CheckCurve[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_1D, 0, &Obj.axis[2].CheckCurve[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_1E, 0, &Obj.axis[2].CheckCurve[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_1F, 0, &Obj.axis[2].CheckCurve[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_20, 0, &Obj.axis[2].CheckCurve[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_21, 0, &Obj.axis[2].CheckCurve[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_22, 0, &Obj.axis[2].CheckCurve[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_23, 0, &Obj.axis[2].CheckCurve[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_24, 0, &Obj.axis[2].CheckCurve[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_25, 0, &Obj.axis[2].CheckCurve[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_26, 0, &Obj.axis[2].CheckCurve[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_27, 0, &Obj.axis[2].CheckCurve[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_28, 0, &Obj.axis[2].CheckCurve[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_29, 0, &Obj.axis[2].CheckCurve[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_2A, 0, &Obj.axis[2].CheckCurve[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_2B, 0, &Obj.axis[2].CheckCurve[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_2C, 0, &Obj.axis[2].CheckCurve[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_2D, 0, &Obj.axis[2].CheckCurve[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_2E, 0, &Obj.axis[2].CheckCurve[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_2F, 0, &Obj.axis[2].CheckCurve[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_30, 0, &Obj.axis[2].CheckCurve[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_31, 0, &Obj.axis[2].CheckCurve[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_32, 0, &Obj.axis[2].CheckCurve[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_33, 0, &Obj.axis[2].CheckCurve[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_34, 0, &Obj.axis[2].CheckCurve[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_35, 0, &Obj.axis[2].CheckCurve[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_36, 0, &Obj.axis[2].CheckCurve[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_37, 0, &Obj.axis[2].CheckCurve[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_38, 0, &Obj.axis[2].CheckCurve[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_39, 0, &Obj.axis[2].CheckCurve[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_3A, 0, &Obj.axis[2].CheckCurve[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_3B, 0, &Obj.axis[2].CheckCurve[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_3C, 0, &Obj.axis[2].CheckCurve[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_3D, 0, &Obj.axis[2].CheckCurve[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_3E, 0, &Obj.axis[2].CheckCurve[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_3F, 0, &Obj.axis[2].CheckCurve[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_40, 0, &Obj.axis[2].CheckCurve[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_41, 0, &Obj.axis[2].CheckCurve[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_42, 0, &Obj.axis[2].CheckCurve[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_43, 0, &Obj.axis[2].CheckCurve[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_44, 0, &Obj.axis[2].CheckCurve[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_45, 0, &Obj.axis[2].CheckCurve[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_46, 0, &Obj.axis[2].CheckCurve[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_47, 0, &Obj.axis[2].CheckCurve[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_48, 0, &Obj.axis[2].CheckCurve[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_49, 0, &Obj.axis[2].CheckCurve[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_4A, 0, &Obj.axis[2].CheckCurve[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_4B, 0, &Obj.axis[2].CheckCurve[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_4C, 0, &Obj.axis[2].CheckCurve[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_4D, 0, &Obj.axis[2].CheckCurve[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_4E, 0, &Obj.axis[2].CheckCurve[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_4F, 0, &Obj.axis[2].CheckCurve[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_50, 0, &Obj.axis[2].CheckCurve[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_51, 0, &Obj.axis[2].CheckCurve[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_52, 0, &Obj.axis[2].CheckCurve[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_53, 0, &Obj.axis[2].CheckCurve[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_54, 0, &Obj.axis[2].CheckCurve[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_55, 0, &Obj.axis[2].CheckCurve[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_56, 0, &Obj.axis[2].CheckCurve[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_57, 0, &Obj.axis[2].CheckCurve[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_58, 0, &Obj.axis[2].CheckCurve[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_59, 0, &Obj.axis[2].CheckCurve[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_5A, 0, &Obj.axis[2].CheckCurve[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_5B, 0, &Obj.axis[2].CheckCurve[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_5C, 0, &Obj.axis[2].CheckCurve[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_5D, 0, &Obj.axis[2].CheckCurve[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_5E, 0, &Obj.axis[2].CheckCurve[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_5F, 0, &Obj.axis[2].CheckCurve[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_60, 0, &Obj.axis[2].CheckCurve[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_61, 0, &Obj.axis[2].CheckCurve[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_62, 0, &Obj.axis[2].CheckCurve[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_63, 0, &Obj.axis[2].CheckCurve[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_64, 0, &Obj.axis[2].CheckCurve[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_65, 0, &Obj.axis[2].CheckCurve[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_66, 0, &Obj.axis[2].CheckCurve[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_67, 0, &Obj.axis[2].CheckCurve[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_68, 0, &Obj.axis[2].CheckCurve[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_69, 0, &Obj.axis[2].CheckCurve[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_6A, 0, &Obj.axis[2].CheckCurve[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_6B, 0, &Obj.axis[2].CheckCurve[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_6C, 0, &Obj.axis[2].CheckCurve[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_6D, 0, &Obj.axis[2].CheckCurve[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_6E, 0, &Obj.axis[2].CheckCurve[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_6F, 0, &Obj.axis[2].CheckCurve[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_70, 0, &Obj.axis[2].CheckCurve[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_71, 0, &Obj.axis[2].CheckCurve[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_72, 0, &Obj.axis[2].CheckCurve[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_73, 0, &Obj.axis[2].CheckCurve[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_74, 0, &Obj.axis[2].CheckCurve[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_75, 0, &Obj.axis[2].CheckCurve[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_76, 0, &Obj.axis[2].CheckCurve[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_77, 0, &Obj.axis[2].CheckCurve[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_78, 0, &Obj.axis[2].CheckCurve[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_79, 0, &Obj.axis[2].CheckCurve[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_7A, 0, &Obj.axis[2].CheckCurve[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_7B, 0, &Obj.axis[2].CheckCurve[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_7C, 0, &Obj.axis[2].CheckCurve[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_7D, 0, &Obj.axis[2].CheckCurve[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_7E, 0, &Obj.axis[2].CheckCurve[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_7F, 0, &Obj.axis[2].CheckCurve[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_80, 0, &Obj.axis[2].CheckCurve[127]},
+   {0x81, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_81, 0, &Obj.axis[2].CheckCurve[128]},
+   {0x82, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_82, 0, &Obj.axis[2].CheckCurve[129]},
+   {0x83, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_83, 0, &Obj.axis[2].CheckCurve[130]},
+   {0x84, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_84, 0, &Obj.axis[2].CheckCurve[131]},
+   {0x85, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_85, 0, &Obj.axis[2].CheckCurve[132]},
+   {0x86, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_86, 0, &Obj.axis[2].CheckCurve[133]},
+   {0x87, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_87, 0, &Obj.axis[2].CheckCurve[134]},
+   {0x88, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_88, 0, &Obj.axis[2].CheckCurve[135]},
+   {0x89, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_89, 0, &Obj.axis[2].CheckCurve[136]},
+   {0x8A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_8A, 0, &Obj.axis[2].CheckCurve[137]},
+   {0x8B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_8B, 0, &Obj.axis[2].CheckCurve[138]},
+   {0x8C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_8C, 0, &Obj.axis[2].CheckCurve[139]},
+   {0x8D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_8D, 0, &Obj.axis[2].CheckCurve[140]},
+   {0x8E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_8E, 0, &Obj.axis[2].CheckCurve[141]},
+   {0x8F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_8F, 0, &Obj.axis[2].CheckCurve[142]},
+   {0x90, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_90, 0, &Obj.axis[2].CheckCurve[143]},
+   {0x91, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_91, 0, &Obj.axis[2].CheckCurve[144]},
+   {0x92, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_92, 0, &Obj.axis[2].CheckCurve[145]},
+   {0x93, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_93, 0, &Obj.axis[2].CheckCurve[146]},
+   {0x94, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_94, 0, &Obj.axis[2].CheckCurve[147]},
+   {0x95, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_95, 0, &Obj.axis[2].CheckCurve[148]},
+   {0x96, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_96, 0, &Obj.axis[2].CheckCurve[149]},
+   {0x97, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_97, 0, &Obj.axis[2].CheckCurve[150]},
+   {0x98, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_98, 0, &Obj.axis[2].CheckCurve[151]},
+   {0x99, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_99, 0, &Obj.axis[2].CheckCurve[152]},
+   {0x9A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_9A, 0, &Obj.axis[2].CheckCurve[153]},
+   {0x9B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_9B, 0, &Obj.axis[2].CheckCurve[154]},
+   {0x9C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_9C, 0, &Obj.axis[2].CheckCurve[155]},
+   {0x9D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_9D, 0, &Obj.axis[2].CheckCurve[156]},
+   {0x9E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_9E, 0, &Obj.axis[2].CheckCurve[157]},
+   {0x9F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_9F, 0, &Obj.axis[2].CheckCurve[158]},
+   {0xA0, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A0, 0, &Obj.axis[2].CheckCurve[159]},
+   {0xA1, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A1, 0, &Obj.axis[2].CheckCurve[160]},
+   {0xA2, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A2, 0, &Obj.axis[2].CheckCurve[161]},
+   {0xA3, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A3, 0, &Obj.axis[2].CheckCurve[162]},
+   {0xA4, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A4, 0, &Obj.axis[2].CheckCurve[163]},
+   {0xA5, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A5, 0, &Obj.axis[2].CheckCurve[164]},
+   {0xA6, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A6, 0, &Obj.axis[2].CheckCurve[165]},
+   {0xA7, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A7, 0, &Obj.axis[2].CheckCurve[166]},
+   {0xA8, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A8, 0, &Obj.axis[2].CheckCurve[167]},
+   {0xA9, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_A9, 0, &Obj.axis[2].CheckCurve[168]},
+   {0xAA, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_AA, 0, &Obj.axis[2].CheckCurve[169]},
+   {0xAB, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_AB, 0, &Obj.axis[2].CheckCurve[170]},
+   {0xAC, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_AC, 0, &Obj.axis[2].CheckCurve[171]},
+   {0xAD, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_AD, 0, &Obj.axis[2].CheckCurve[172]},
+   {0xAE, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_AE, 0, &Obj.axis[2].CheckCurve[173]},
+   {0xAF, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_AF, 0, &Obj.axis[2].CheckCurve[174]},
+   {0xB0, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B0, 0, &Obj.axis[2].CheckCurve[175]},
+   {0xB1, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B1, 0, &Obj.axis[2].CheckCurve[176]},
+   {0xB2, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B2, 0, &Obj.axis[2].CheckCurve[177]},
+   {0xB3, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B3, 0, &Obj.axis[2].CheckCurve[178]},
+   {0xB4, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B4, 0, &Obj.axis[2].CheckCurve[179]},
+   {0xB5, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B5, 0, &Obj.axis[2].CheckCurve[180]},
+   {0xB6, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B6, 0, &Obj.axis[2].CheckCurve[181]},
+   {0xB7, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B7, 0, &Obj.axis[2].CheckCurve[182]},
+   {0xB8, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B8, 0, &Obj.axis[2].CheckCurve[183]},
+   {0xB9, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_B9, 0, &Obj.axis[2].CheckCurve[184]},
+   {0xBA, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_BA, 0, &Obj.axis[2].CheckCurve[185]},
+   {0xBB, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_BB, 0, &Obj.axis[2].CheckCurve[186]},
+   {0xBC, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_BC, 0, &Obj.axis[2].CheckCurve[187]},
+   {0xBD, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_BD, 0, &Obj.axis[2].CheckCurve[188]},
+   {0xBE, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_BE, 0, &Obj.axis[2].CheckCurve[189]},
+   {0xBF, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_BF, 0, &Obj.axis[2].CheckCurve[190]},
+   {0xC0, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C0, 0, &Obj.axis[2].CheckCurve[191]},
+   {0xC1, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C1, 0, &Obj.axis[2].CheckCurve[192]},
+   {0xC2, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C2, 0, &Obj.axis[2].CheckCurve[193]},
+   {0xC3, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C3, 0, &Obj.axis[2].CheckCurve[194]},
+   {0xC4, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C4, 0, &Obj.axis[2].CheckCurve[195]},
+   {0xC5, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C5, 0, &Obj.axis[2].CheckCurve[196]},
+   {0xC6, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C6, 0, &Obj.axis[2].CheckCurve[197]},
+   {0xC7, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C7, 0, &Obj.axis[2].CheckCurve[198]},
+   {0xC8, DTYPE_INTEGER16, 16, ATYPE_RO, acName3036_C8, 0, &Obj.axis[2].CheckCurve[199]},
+};
+
 /* 0x3041 Service Command */
 const _objd SDO3041[] =
 {
@@ -6155,6 +7648,225 @@ const _objd SDO3834[] =
    {0x7E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3834_7E, 0, &Obj.axis[3].CogResultNeg[125]},
    {0x7F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3834_7F, 0, &Obj.axis[3].CogResultNeg[126]},
    {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName3834_80, 0, &Obj.axis[3].CogResultNeg[127]},
+};
+
+/* 0x3835 Step Check */
+const _objd SDO3835[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3835, 7, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName3835_01, 2048, &Obj.axis[3].CheckStep},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName3835_02, 8, &Obj.axis[3].CheckSteps},
+   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3835_03, 0, &Obj.axis[3].CheckT63},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3835_04, 0, &Obj.axis[3].CheckT90},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3835_05, 0, &Obj.axis[3].CheckOvershoot},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName3835_06, 0, &Obj.axis[3].CheckSettling},
+   {0x07, DTYPE_INTEGER32, 32, ATYPE_RO, acName3835_07, 0, &Obj.axis[3].CheckFinalError},
+};
+
+/* 0x3836 Step Check Response */
+const _objd SDO3836[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3836, 200, NULL},
+   {0x01, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_01, 0, &Obj.axis[3].CheckCurve[0]},
+   {0x02, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_02, 0, &Obj.axis[3].CheckCurve[1]},
+   {0x03, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_03, 0, &Obj.axis[3].CheckCurve[2]},
+   {0x04, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_04, 0, &Obj.axis[3].CheckCurve[3]},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_05, 0, &Obj.axis[3].CheckCurve[4]},
+   {0x06, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_06, 0, &Obj.axis[3].CheckCurve[5]},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_07, 0, &Obj.axis[3].CheckCurve[6]},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_08, 0, &Obj.axis[3].CheckCurve[7]},
+   {0x09, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_09, 0, &Obj.axis[3].CheckCurve[8]},
+   {0x0A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_0A, 0, &Obj.axis[3].CheckCurve[9]},
+   {0x0B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_0B, 0, &Obj.axis[3].CheckCurve[10]},
+   {0x0C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_0C, 0, &Obj.axis[3].CheckCurve[11]},
+   {0x0D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_0D, 0, &Obj.axis[3].CheckCurve[12]},
+   {0x0E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_0E, 0, &Obj.axis[3].CheckCurve[13]},
+   {0x0F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_0F, 0, &Obj.axis[3].CheckCurve[14]},
+   {0x10, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_10, 0, &Obj.axis[3].CheckCurve[15]},
+   {0x11, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_11, 0, &Obj.axis[3].CheckCurve[16]},
+   {0x12, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_12, 0, &Obj.axis[3].CheckCurve[17]},
+   {0x13, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_13, 0, &Obj.axis[3].CheckCurve[18]},
+   {0x14, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_14, 0, &Obj.axis[3].CheckCurve[19]},
+   {0x15, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_15, 0, &Obj.axis[3].CheckCurve[20]},
+   {0x16, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_16, 0, &Obj.axis[3].CheckCurve[21]},
+   {0x17, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_17, 0, &Obj.axis[3].CheckCurve[22]},
+   {0x18, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_18, 0, &Obj.axis[3].CheckCurve[23]},
+   {0x19, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_19, 0, &Obj.axis[3].CheckCurve[24]},
+   {0x1A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_1A, 0, &Obj.axis[3].CheckCurve[25]},
+   {0x1B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_1B, 0, &Obj.axis[3].CheckCurve[26]},
+   {0x1C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_1C, 0, &Obj.axis[3].CheckCurve[27]},
+   {0x1D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_1D, 0, &Obj.axis[3].CheckCurve[28]},
+   {0x1E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_1E, 0, &Obj.axis[3].CheckCurve[29]},
+   {0x1F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_1F, 0, &Obj.axis[3].CheckCurve[30]},
+   {0x20, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_20, 0, &Obj.axis[3].CheckCurve[31]},
+   {0x21, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_21, 0, &Obj.axis[3].CheckCurve[32]},
+   {0x22, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_22, 0, &Obj.axis[3].CheckCurve[33]},
+   {0x23, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_23, 0, &Obj.axis[3].CheckCurve[34]},
+   {0x24, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_24, 0, &Obj.axis[3].CheckCurve[35]},
+   {0x25, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_25, 0, &Obj.axis[3].CheckCurve[36]},
+   {0x26, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_26, 0, &Obj.axis[3].CheckCurve[37]},
+   {0x27, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_27, 0, &Obj.axis[3].CheckCurve[38]},
+   {0x28, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_28, 0, &Obj.axis[3].CheckCurve[39]},
+   {0x29, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_29, 0, &Obj.axis[3].CheckCurve[40]},
+   {0x2A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_2A, 0, &Obj.axis[3].CheckCurve[41]},
+   {0x2B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_2B, 0, &Obj.axis[3].CheckCurve[42]},
+   {0x2C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_2C, 0, &Obj.axis[3].CheckCurve[43]},
+   {0x2D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_2D, 0, &Obj.axis[3].CheckCurve[44]},
+   {0x2E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_2E, 0, &Obj.axis[3].CheckCurve[45]},
+   {0x2F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_2F, 0, &Obj.axis[3].CheckCurve[46]},
+   {0x30, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_30, 0, &Obj.axis[3].CheckCurve[47]},
+   {0x31, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_31, 0, &Obj.axis[3].CheckCurve[48]},
+   {0x32, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_32, 0, &Obj.axis[3].CheckCurve[49]},
+   {0x33, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_33, 0, &Obj.axis[3].CheckCurve[50]},
+   {0x34, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_34, 0, &Obj.axis[3].CheckCurve[51]},
+   {0x35, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_35, 0, &Obj.axis[3].CheckCurve[52]},
+   {0x36, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_36, 0, &Obj.axis[3].CheckCurve[53]},
+   {0x37, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_37, 0, &Obj.axis[3].CheckCurve[54]},
+   {0x38, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_38, 0, &Obj.axis[3].CheckCurve[55]},
+   {0x39, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_39, 0, &Obj.axis[3].CheckCurve[56]},
+   {0x3A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_3A, 0, &Obj.axis[3].CheckCurve[57]},
+   {0x3B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_3B, 0, &Obj.axis[3].CheckCurve[58]},
+   {0x3C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_3C, 0, &Obj.axis[3].CheckCurve[59]},
+   {0x3D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_3D, 0, &Obj.axis[3].CheckCurve[60]},
+   {0x3E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_3E, 0, &Obj.axis[3].CheckCurve[61]},
+   {0x3F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_3F, 0, &Obj.axis[3].CheckCurve[62]},
+   {0x40, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_40, 0, &Obj.axis[3].CheckCurve[63]},
+   {0x41, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_41, 0, &Obj.axis[3].CheckCurve[64]},
+   {0x42, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_42, 0, &Obj.axis[3].CheckCurve[65]},
+   {0x43, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_43, 0, &Obj.axis[3].CheckCurve[66]},
+   {0x44, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_44, 0, &Obj.axis[3].CheckCurve[67]},
+   {0x45, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_45, 0, &Obj.axis[3].CheckCurve[68]},
+   {0x46, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_46, 0, &Obj.axis[3].CheckCurve[69]},
+   {0x47, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_47, 0, &Obj.axis[3].CheckCurve[70]},
+   {0x48, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_48, 0, &Obj.axis[3].CheckCurve[71]},
+   {0x49, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_49, 0, &Obj.axis[3].CheckCurve[72]},
+   {0x4A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_4A, 0, &Obj.axis[3].CheckCurve[73]},
+   {0x4B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_4B, 0, &Obj.axis[3].CheckCurve[74]},
+   {0x4C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_4C, 0, &Obj.axis[3].CheckCurve[75]},
+   {0x4D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_4D, 0, &Obj.axis[3].CheckCurve[76]},
+   {0x4E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_4E, 0, &Obj.axis[3].CheckCurve[77]},
+   {0x4F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_4F, 0, &Obj.axis[3].CheckCurve[78]},
+   {0x50, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_50, 0, &Obj.axis[3].CheckCurve[79]},
+   {0x51, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_51, 0, &Obj.axis[3].CheckCurve[80]},
+   {0x52, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_52, 0, &Obj.axis[3].CheckCurve[81]},
+   {0x53, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_53, 0, &Obj.axis[3].CheckCurve[82]},
+   {0x54, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_54, 0, &Obj.axis[3].CheckCurve[83]},
+   {0x55, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_55, 0, &Obj.axis[3].CheckCurve[84]},
+   {0x56, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_56, 0, &Obj.axis[3].CheckCurve[85]},
+   {0x57, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_57, 0, &Obj.axis[3].CheckCurve[86]},
+   {0x58, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_58, 0, &Obj.axis[3].CheckCurve[87]},
+   {0x59, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_59, 0, &Obj.axis[3].CheckCurve[88]},
+   {0x5A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_5A, 0, &Obj.axis[3].CheckCurve[89]},
+   {0x5B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_5B, 0, &Obj.axis[3].CheckCurve[90]},
+   {0x5C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_5C, 0, &Obj.axis[3].CheckCurve[91]},
+   {0x5D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_5D, 0, &Obj.axis[3].CheckCurve[92]},
+   {0x5E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_5E, 0, &Obj.axis[3].CheckCurve[93]},
+   {0x5F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_5F, 0, &Obj.axis[3].CheckCurve[94]},
+   {0x60, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_60, 0, &Obj.axis[3].CheckCurve[95]},
+   {0x61, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_61, 0, &Obj.axis[3].CheckCurve[96]},
+   {0x62, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_62, 0, &Obj.axis[3].CheckCurve[97]},
+   {0x63, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_63, 0, &Obj.axis[3].CheckCurve[98]},
+   {0x64, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_64, 0, &Obj.axis[3].CheckCurve[99]},
+   {0x65, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_65, 0, &Obj.axis[3].CheckCurve[100]},
+   {0x66, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_66, 0, &Obj.axis[3].CheckCurve[101]},
+   {0x67, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_67, 0, &Obj.axis[3].CheckCurve[102]},
+   {0x68, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_68, 0, &Obj.axis[3].CheckCurve[103]},
+   {0x69, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_69, 0, &Obj.axis[3].CheckCurve[104]},
+   {0x6A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_6A, 0, &Obj.axis[3].CheckCurve[105]},
+   {0x6B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_6B, 0, &Obj.axis[3].CheckCurve[106]},
+   {0x6C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_6C, 0, &Obj.axis[3].CheckCurve[107]},
+   {0x6D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_6D, 0, &Obj.axis[3].CheckCurve[108]},
+   {0x6E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_6E, 0, &Obj.axis[3].CheckCurve[109]},
+   {0x6F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_6F, 0, &Obj.axis[3].CheckCurve[110]},
+   {0x70, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_70, 0, &Obj.axis[3].CheckCurve[111]},
+   {0x71, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_71, 0, &Obj.axis[3].CheckCurve[112]},
+   {0x72, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_72, 0, &Obj.axis[3].CheckCurve[113]},
+   {0x73, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_73, 0, &Obj.axis[3].CheckCurve[114]},
+   {0x74, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_74, 0, &Obj.axis[3].CheckCurve[115]},
+   {0x75, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_75, 0, &Obj.axis[3].CheckCurve[116]},
+   {0x76, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_76, 0, &Obj.axis[3].CheckCurve[117]},
+   {0x77, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_77, 0, &Obj.axis[3].CheckCurve[118]},
+   {0x78, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_78, 0, &Obj.axis[3].CheckCurve[119]},
+   {0x79, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_79, 0, &Obj.axis[3].CheckCurve[120]},
+   {0x7A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_7A, 0, &Obj.axis[3].CheckCurve[121]},
+   {0x7B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_7B, 0, &Obj.axis[3].CheckCurve[122]},
+   {0x7C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_7C, 0, &Obj.axis[3].CheckCurve[123]},
+   {0x7D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_7D, 0, &Obj.axis[3].CheckCurve[124]},
+   {0x7E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_7E, 0, &Obj.axis[3].CheckCurve[125]},
+   {0x7F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_7F, 0, &Obj.axis[3].CheckCurve[126]},
+   {0x80, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_80, 0, &Obj.axis[3].CheckCurve[127]},
+   {0x81, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_81, 0, &Obj.axis[3].CheckCurve[128]},
+   {0x82, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_82, 0, &Obj.axis[3].CheckCurve[129]},
+   {0x83, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_83, 0, &Obj.axis[3].CheckCurve[130]},
+   {0x84, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_84, 0, &Obj.axis[3].CheckCurve[131]},
+   {0x85, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_85, 0, &Obj.axis[3].CheckCurve[132]},
+   {0x86, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_86, 0, &Obj.axis[3].CheckCurve[133]},
+   {0x87, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_87, 0, &Obj.axis[3].CheckCurve[134]},
+   {0x88, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_88, 0, &Obj.axis[3].CheckCurve[135]},
+   {0x89, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_89, 0, &Obj.axis[3].CheckCurve[136]},
+   {0x8A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_8A, 0, &Obj.axis[3].CheckCurve[137]},
+   {0x8B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_8B, 0, &Obj.axis[3].CheckCurve[138]},
+   {0x8C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_8C, 0, &Obj.axis[3].CheckCurve[139]},
+   {0x8D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_8D, 0, &Obj.axis[3].CheckCurve[140]},
+   {0x8E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_8E, 0, &Obj.axis[3].CheckCurve[141]},
+   {0x8F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_8F, 0, &Obj.axis[3].CheckCurve[142]},
+   {0x90, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_90, 0, &Obj.axis[3].CheckCurve[143]},
+   {0x91, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_91, 0, &Obj.axis[3].CheckCurve[144]},
+   {0x92, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_92, 0, &Obj.axis[3].CheckCurve[145]},
+   {0x93, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_93, 0, &Obj.axis[3].CheckCurve[146]},
+   {0x94, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_94, 0, &Obj.axis[3].CheckCurve[147]},
+   {0x95, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_95, 0, &Obj.axis[3].CheckCurve[148]},
+   {0x96, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_96, 0, &Obj.axis[3].CheckCurve[149]},
+   {0x97, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_97, 0, &Obj.axis[3].CheckCurve[150]},
+   {0x98, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_98, 0, &Obj.axis[3].CheckCurve[151]},
+   {0x99, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_99, 0, &Obj.axis[3].CheckCurve[152]},
+   {0x9A, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_9A, 0, &Obj.axis[3].CheckCurve[153]},
+   {0x9B, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_9B, 0, &Obj.axis[3].CheckCurve[154]},
+   {0x9C, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_9C, 0, &Obj.axis[3].CheckCurve[155]},
+   {0x9D, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_9D, 0, &Obj.axis[3].CheckCurve[156]},
+   {0x9E, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_9E, 0, &Obj.axis[3].CheckCurve[157]},
+   {0x9F, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_9F, 0, &Obj.axis[3].CheckCurve[158]},
+   {0xA0, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A0, 0, &Obj.axis[3].CheckCurve[159]},
+   {0xA1, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A1, 0, &Obj.axis[3].CheckCurve[160]},
+   {0xA2, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A2, 0, &Obj.axis[3].CheckCurve[161]},
+   {0xA3, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A3, 0, &Obj.axis[3].CheckCurve[162]},
+   {0xA4, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A4, 0, &Obj.axis[3].CheckCurve[163]},
+   {0xA5, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A5, 0, &Obj.axis[3].CheckCurve[164]},
+   {0xA6, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A6, 0, &Obj.axis[3].CheckCurve[165]},
+   {0xA7, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A7, 0, &Obj.axis[3].CheckCurve[166]},
+   {0xA8, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A8, 0, &Obj.axis[3].CheckCurve[167]},
+   {0xA9, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_A9, 0, &Obj.axis[3].CheckCurve[168]},
+   {0xAA, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_AA, 0, &Obj.axis[3].CheckCurve[169]},
+   {0xAB, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_AB, 0, &Obj.axis[3].CheckCurve[170]},
+   {0xAC, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_AC, 0, &Obj.axis[3].CheckCurve[171]},
+   {0xAD, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_AD, 0, &Obj.axis[3].CheckCurve[172]},
+   {0xAE, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_AE, 0, &Obj.axis[3].CheckCurve[173]},
+   {0xAF, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_AF, 0, &Obj.axis[3].CheckCurve[174]},
+   {0xB0, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B0, 0, &Obj.axis[3].CheckCurve[175]},
+   {0xB1, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B1, 0, &Obj.axis[3].CheckCurve[176]},
+   {0xB2, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B2, 0, &Obj.axis[3].CheckCurve[177]},
+   {0xB3, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B3, 0, &Obj.axis[3].CheckCurve[178]},
+   {0xB4, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B4, 0, &Obj.axis[3].CheckCurve[179]},
+   {0xB5, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B5, 0, &Obj.axis[3].CheckCurve[180]},
+   {0xB6, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B6, 0, &Obj.axis[3].CheckCurve[181]},
+   {0xB7, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B7, 0, &Obj.axis[3].CheckCurve[182]},
+   {0xB8, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B8, 0, &Obj.axis[3].CheckCurve[183]},
+   {0xB9, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_B9, 0, &Obj.axis[3].CheckCurve[184]},
+   {0xBA, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_BA, 0, &Obj.axis[3].CheckCurve[185]},
+   {0xBB, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_BB, 0, &Obj.axis[3].CheckCurve[186]},
+   {0xBC, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_BC, 0, &Obj.axis[3].CheckCurve[187]},
+   {0xBD, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_BD, 0, &Obj.axis[3].CheckCurve[188]},
+   {0xBE, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_BE, 0, &Obj.axis[3].CheckCurve[189]},
+   {0xBF, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_BF, 0, &Obj.axis[3].CheckCurve[190]},
+   {0xC0, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C0, 0, &Obj.axis[3].CheckCurve[191]},
+   {0xC1, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C1, 0, &Obj.axis[3].CheckCurve[192]},
+   {0xC2, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C2, 0, &Obj.axis[3].CheckCurve[193]},
+   {0xC3, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C3, 0, &Obj.axis[3].CheckCurve[194]},
+   {0xC4, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C4, 0, &Obj.axis[3].CheckCurve[195]},
+   {0xC5, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C5, 0, &Obj.axis[3].CheckCurve[196]},
+   {0xC6, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C6, 0, &Obj.axis[3].CheckCurve[197]},
+   {0xC7, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C7, 0, &Obj.axis[3].CheckCurve[198]},
+   {0xC8, DTYPE_INTEGER16, 16, ATYPE_RO, acName3836_C8, 0, &Obj.axis[3].CheckCurve[199]},
 };
 
 /* 0x3841 Service Command */
@@ -7038,6 +8750,8 @@ const _objectlist SDOobjects[] =
    {0x2032, OTYPE_RECORD, 8, 0, acName2032, SDO2032},
    {0x2033, OTYPE_ARRAY, 128, 0, acName2033, SDO2033},
    {0x2034, OTYPE_ARRAY, 128, 0, acName2034, SDO2034},
+   {0x2035, OTYPE_RECORD, 7, 0, acName2035, SDO2035},
+   {0x2036, OTYPE_ARRAY, 200, 0, acName2036, SDO2036},
    {0x2040, OTYPE_RECORD, 6, 0, acName2040, SDO2040},
    {0x2041, OTYPE_RECORD, 6, 0, acName2041, SDO2041},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
@@ -7057,6 +8771,8 @@ const _objectlist SDOobjects[] =
    {0x2832, OTYPE_RECORD, 8, 0, acName2832, SDO2832},
    {0x2833, OTYPE_ARRAY, 128, 0, acName2833, SDO2833},
    {0x2834, OTYPE_ARRAY, 128, 0, acName2834, SDO2834},
+   {0x2835, OTYPE_RECORD, 7, 0, acName2835, SDO2835},
+   {0x2836, OTYPE_ARRAY, 200, 0, acName2836, SDO2836},
    {0x2841, OTYPE_RECORD, 6, 0, acName2841, SDO2841},
    {0x3000, OTYPE_RECORD, 2, 0, acName3000, SDO3000},
    {0x3001, OTYPE_RECORD, 4, 0, acName3001, SDO3001},
@@ -7075,6 +8791,8 @@ const _objectlist SDOobjects[] =
    {0x3032, OTYPE_RECORD, 8, 0, acName3032, SDO3032},
    {0x3033, OTYPE_ARRAY, 128, 0, acName3033, SDO3033},
    {0x3034, OTYPE_ARRAY, 128, 0, acName3034, SDO3034},
+   {0x3035, OTYPE_RECORD, 7, 0, acName3035, SDO3035},
+   {0x3036, OTYPE_ARRAY, 200, 0, acName3036, SDO3036},
    {0x3041, OTYPE_RECORD, 6, 0, acName3041, SDO3041},
    {0x3800, OTYPE_RECORD, 2, 0, acName3800, SDO3800},
    {0x3801, OTYPE_RECORD, 4, 0, acName3801, SDO3801},
@@ -7093,6 +8811,8 @@ const _objectlist SDOobjects[] =
    {0x3832, OTYPE_RECORD, 8, 0, acName3832, SDO3832},
    {0x3833, OTYPE_ARRAY, 128, 0, acName3833, SDO3833},
    {0x3834, OTYPE_ARRAY, 128, 0, acName3834, SDO3834},
+   {0x3835, OTYPE_RECORD, 7, 0, acName3835, SDO3835},
+   {0x3836, OTYPE_ARRAY, 200, 0, acName3836, SDO3836},
    {0x3841, OTYPE_RECORD, 6, 0, acName3841, SDO3841},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},

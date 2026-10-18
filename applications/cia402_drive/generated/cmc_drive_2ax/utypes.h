@@ -38,6 +38,13 @@ typedef struct
    uint16_t   AdvVelocityI;
    uint16_t   AdvVelocityP;
    uint16_t   BoardTelemetryPeriod;
+   int32_t    CheckFinalError;
+   uint16_t   CheckOvershoot;
+   uint32_t   CheckSettling;
+   int32_t    CheckStep;
+   uint8_t    CheckSteps;
+   uint32_t   CheckT63;
+   uint32_t   CheckT90;
    uint8_t    CogApply;
    uint16_t   CogDirectionP2p;
    int16_t    CogFriction;
@@ -157,6 +164,7 @@ typedef struct
    uint16_t   VelocityI;
    uint32_t   VelocityLimit;
    uint16_t   VelocityP;
+   int16_t    CheckCurve[200];
    int16_t    CogResult[128];
    int16_t    CogResultNeg[128];
    int16_t    CoggingTable[128];

@@ -690,6 +690,35 @@ objects:
     object_code: array
     elements: {count: 128, type: i16, access: ro, var: "CogResultNeg", name: "Point"}
 
+  # Routine 5 of mode -1 (0x2030:01 = 5): a position step check of the loops
+  # in use. The position target steps by Step Size and back, Steps times in
+  # all, inside 0x2031's travel window, with no feed-forward, 400 ms per
+  # step. The normalised responses are averaged: Time to 63 % and to 90 % of
+  # the step (us), Overshoot (per mille of the step), Settling Time (from
+  # when it stays within 5 %, us), Final Error (position units, the mean of
+  # the last 50 ms). 0x2036 holds the averaged response, per mille of the
+  # step, a point every 2 ms. A small step keeps the loops out of their
+  # speed and torque limits, so the check shows their response rather than
+  # the motor's limits. Errors in 0x2030:04: 8 no room for the step in the
+  # window, 9 left the window, 11 never reached 63 %.
+  - index: 0x2035
+    axis: true
+    name: "Step Check"
+    type: record
+    subs:
+      - {sub: 1, name: "Step Size",          type: i32, access: rw, var: "CheckStep", value: 2048, store: true}
+      - {sub: 2, name: "Steps",              type: u8,  access: rw, var: "CheckSteps", value: 8, store: true}
+      - {sub: 3, name: "Time to 63 % us",    type: u32, access: ro, var: "CheckT63"}
+      - {sub: 4, name: "Time to 90 % us",    type: u32, access: ro, var: "CheckT90"}
+      - {sub: 5, name: "Overshoot",          type: u16, access: ro, var: "CheckOvershoot"}
+      - {sub: 6, name: "Settling Time us",   type: u32, access: ro, var: "CheckSettling"}
+      - {sub: 7, name: "Final Error",        type: i32, access: ro, var: "CheckFinalError"}
+  - index: 0x2036
+    axis: true
+    name: "Step Check Response"
+    object_code: array
+    elements: {count: 200, type: i16, access: ro, var: "CheckCurve", name: "Point"}
+
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
 # only in C so the master side and the drive side have one source.
