@@ -590,7 +590,7 @@ objects:
       - {sub: 16, name: "Velocity I Classic",  type: u16, access: ro, var: "MechVelocityIClassic"}
       - {sub: 17, name: "Velocity I Advanced", type: u16, access: ro, var: "MechVelocityIAdvanced"}
       - {sub: 18, name: "Velocity Filter Hz",  type: u16, access: ro, var: "MechVelocityFilter"}
-      # Position P for a position loop at a quarter of Velocity Loop
+      # Position P for a position loop at a tenth of Velocity Loop
       # Bandwidth: 0x2010:07 (classic) and 0x2011:07 (advanced). Not applied.
       - {sub: 19, name: "Position P Classic",  type: u16, access: ro, var: "MechPositionPClassic"}
       - {sub: 20, name: "Position P Advanced", type: u16, access: ro, var: "MechPositionPAdvanced"}
