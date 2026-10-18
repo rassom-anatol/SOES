@@ -369,6 +369,14 @@ static const char acName2015_80[] = "Point 127";
 static const char acName2016[] = "Loop Signals";
 static const char acName2016_01[] = "Velocity Feed-Forward";
 static const char acName2016_02[] = "Cogging Torque mA";
+static const char acName2017[] = "Feedback Settings";
+static const char acName2017_01[] = "Encoder Direction";
+static const char acName2017_02[] = "Encoder Counts per Revolution";
+static const char acName2017_03[] = "Pole Pairs";
+static const char acName2017_04[] = "Hall Direction";
+static const char acName2017_05[] = "Hall Polarity";
+static const char acName2017_06[] = "Hall Offset";
+static const char acName2017_07[] = "Commutation Offset";
 static const char acName2020[] = "Recorder";
 static const char acName2020_01[] = "Command";
 static const char acName2020_02[] = "State";
@@ -907,6 +915,15 @@ static const char acName2036_C5[] = "Point 196";
 static const char acName2036_C6[] = "Point 197";
 static const char acName2036_C7[] = "Point 198";
 static const char acName2036_C8[] = "Point 199";
+static const char acName2037[] = "Feedback Check";
+static const char acName2037_01[] = "Electrical Turns";
+static const char acName2037_02[] = "Findings";
+static const char acName2037_03[] = "Counts per Electrical Turn";
+static const char acName2037_04[] = "Counts per Revolution";
+static const char acName2037_05[] = "Pole Pairs";
+static const char acName2037_06[] = "Hall Direction";
+static const char acName2037_07[] = "Hall Offset";
+static const char acName2037_08[] = "Encoder Residual";
 static const char acName2040[] = "Service Control";
 static const char acName2040_01[] = "Allow";
 static const char acName2040_02[] = "Owner";
@@ -1244,6 +1261,14 @@ static const char acName2815_80[] = "Point 127";
 static const char acName2816[] = "Loop Signals";
 static const char acName2816_01[] = "Velocity Feed-Forward";
 static const char acName2816_02[] = "Cogging Torque mA";
+static const char acName2817[] = "Feedback Settings";
+static const char acName2817_01[] = "Encoder Direction";
+static const char acName2817_02[] = "Encoder Counts per Revolution";
+static const char acName2817_03[] = "Pole Pairs";
+static const char acName2817_04[] = "Hall Direction";
+static const char acName2817_05[] = "Hall Polarity";
+static const char acName2817_06[] = "Hall Offset";
+static const char acName2817_07[] = "Commutation Offset";
 static const char acName2830[] = "Identification";
 static const char acName2830_01[] = "Routine";
 static const char acName2830_02[] = "Test Current";
@@ -1760,6 +1785,15 @@ static const char acName2836_C5[] = "Point 196";
 static const char acName2836_C6[] = "Point 197";
 static const char acName2836_C7[] = "Point 198";
 static const char acName2836_C8[] = "Point 199";
+static const char acName2837[] = "Feedback Check";
+static const char acName2837_01[] = "Electrical Turns";
+static const char acName2837_02[] = "Findings";
+static const char acName2837_03[] = "Counts per Electrical Turn";
+static const char acName2837_04[] = "Counts per Revolution";
+static const char acName2837_05[] = "Pole Pairs";
+static const char acName2837_06[] = "Hall Direction";
+static const char acName2837_07[] = "Hall Offset";
+static const char acName2837_08[] = "Encoder Residual";
 static const char acName2841[] = "Service Command";
 static const char acName2841_01[] = "Controlword";
 static const char acName2841_02[] = "Modes of Operation";
@@ -2504,6 +2538,19 @@ const _objd SDO2016[] =
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_02, 0, &Obj.axis[0].SigCoggingTorque},
 };
 
+/* 0x2017 Feedback Settings */
+const _objd SDO2017[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2017, 7, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2017_01, 0, &Obj.axis[0].FbEncoderDirection},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2017_02, 0, &Obj.axis[0].FbEncoderCounts},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2017_03, 0, &Obj.axis[0].FbPolePairs},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2017_04, 0, &Obj.axis[0].FbHallDirection},
+   {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2017_05, 0, &Obj.axis[0].FbHallPolarity},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2017_06, 0, &Obj.axis[0].FbHallOffset},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName2017_07, 0, &Obj.axis[0].FbCommutationOffset},
+};
+
 /* 0x2020 Recorder */
 const _objd SDO2020[] =
 {
@@ -3086,6 +3133,20 @@ const _objd SDO2036[] =
    {0xC8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2036_C8, 0, &Obj.axis[0].CheckCurve[199]},
 };
 
+/* 0x2037 Feedback Check */
+const _objd SDO2037[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2037, 8, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2037_01, 0, &Obj.axis[0].FbcTurns},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2037_02, 0, &Obj.axis[0].FbcFindings},
+   {0x03, DTYPE_REAL32, 32, ATYPE_RO, acName2037_03, 0, &Obj.axis[0].FbcCountsPerTurn},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2037_04, 0, &Obj.axis[0].FbcCountsPerRev},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2037_05, 0, &Obj.axis[0].FbcPolePairs},
+   {0x06, DTYPE_INTEGER8, 8, ATYPE_RO, acName2037_06, 0, &Obj.axis[0].FbcHallDirection},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2037_07, 0, &Obj.axis[0].FbcHallOffset},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RO, acName2037_08, 0, &Obj.axis[0].FbcEncoderResidual},
+};
+
 /* 0x2040 Service Control */
 const _objd SDO2040[] =
 {
@@ -3490,6 +3551,19 @@ const _objd SDO2816[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 2, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_01, 0, &Obj.axis[1].SigVelocityFeedForward},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_02, 0, &Obj.axis[1].SigCoggingTorque},
+};
+
+/* 0x2817 Feedback Settings */
+const _objd SDO2817[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2817, 7, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2817_01, 0, &Obj.axis[1].FbEncoderDirection},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2817_02, 0, &Obj.axis[1].FbEncoderCounts},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2817_03, 0, &Obj.axis[1].FbPolePairs},
+   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2817_04, 0, &Obj.axis[1].FbHallDirection},
+   {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2817_05, 0, &Obj.axis[1].FbHallPolarity},
+   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2817_06, 0, &Obj.axis[1].FbHallOffset},
+   {0x07, DTYPE_INTEGER16, 16, ATYPE_RO, acName2817_07, 0, &Obj.axis[1].FbCommutationOffset},
 };
 
 /* 0x2830 Identification */
@@ -4043,6 +4117,20 @@ const _objd SDO2836[] =
    {0xC8, DTYPE_INTEGER16, 16, ATYPE_RO, acName2836_C8, 0, &Obj.axis[1].CheckCurve[199]},
 };
 
+/* 0x2837 Feedback Check */
+const _objd SDO2837[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2837, 8, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2837_01, 0, &Obj.axis[1].FbcTurns},
+   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2837_02, 0, &Obj.axis[1].FbcFindings},
+   {0x03, DTYPE_REAL32, 32, ATYPE_RO, acName2837_03, 0, &Obj.axis[1].FbcCountsPerTurn},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2837_04, 0, &Obj.axis[1].FbcCountsPerRev},
+   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2837_05, 0, &Obj.axis[1].FbcPolePairs},
+   {0x06, DTYPE_INTEGER8, 8, ATYPE_RO, acName2837_06, 0, &Obj.axis[1].FbcHallDirection},
+   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2837_07, 0, &Obj.axis[1].FbcHallOffset},
+   {0x08, DTYPE_INTEGER16, 16, ATYPE_RO, acName2837_08, 0, &Obj.axis[1].FbcEncoderResidual},
+};
+
 /* 0x2841 Service Command */
 const _objd SDO2841[] =
 {
@@ -4501,6 +4589,7 @@ const _objectlist SDOobjects[] =
    {0x2014, OTYPE_ARRAY, 128, 0, acName2014, SDO2014},
    {0x2015, OTYPE_ARRAY, 128, 0, acName2015, SDO2015},
    {0x2016, OTYPE_RECORD, 2, 0, acName2016, SDO2016},
+   {0x2017, OTYPE_RECORD, 7, 0, acName2017, SDO2017},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
@@ -4510,6 +4599,7 @@ const _objectlist SDOobjects[] =
    {0x2034, OTYPE_ARRAY, 128, 0, acName2034, SDO2034},
    {0x2035, OTYPE_RECORD, 7, 0, acName2035, SDO2035},
    {0x2036, OTYPE_ARRAY, 200, 0, acName2036, SDO2036},
+   {0x2037, OTYPE_RECORD, 8, 0, acName2037, SDO2037},
    {0x2040, OTYPE_RECORD, 6, 0, acName2040, SDO2040},
    {0x2041, OTYPE_RECORD, 6, 0, acName2041, SDO2041},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
@@ -4524,6 +4614,7 @@ const _objectlist SDOobjects[] =
    {0x2814, OTYPE_ARRAY, 128, 0, acName2814, SDO2814},
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
    {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
+   {0x2817, OTYPE_RECORD, 7, 0, acName2817, SDO2817},
    {0x2830, OTYPE_RECORD, 18, 0, acName2830, SDO2830},
    {0x2831, OTYPE_RECORD, 20, 0, acName2831, SDO2831},
    {0x2832, OTYPE_RECORD, 8, 0, acName2832, SDO2832},
@@ -4531,6 +4622,7 @@ const _objectlist SDOobjects[] =
    {0x2834, OTYPE_ARRAY, 128, 0, acName2834, SDO2834},
    {0x2835, OTYPE_RECORD, 7, 0, acName2835, SDO2835},
    {0x2836, OTYPE_ARRAY, 200, 0, acName2836, SDO2836},
+   {0x2837, OTYPE_RECORD, 8, 0, acName2837, SDO2837},
    {0x2841, OTYPE_RECORD, 6, 0, acName2841, SDO2841},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},

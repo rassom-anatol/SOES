@@ -473,6 +473,29 @@ objects:
     object_code: array
     elements: {count: 128, type: i16, access: rw, var: "CoggingTableNeg", name: "Point"}
 
+  # How the drive reads its motor's position: the settings wiring decides.
+  # Seeded from bsp.yaml (encoder1, motor.pole_pairs, hall) and saved by
+  # 0x1010. Writable only while no axis is in Operation Enabled; a change
+  # makes the next enable calibrate the commutation again, and may move the
+  # position (a new direction or resolution). Encoder Direction 1 counts the
+  # other way, which also corrects two swapped motor phases. Counts per
+  # Revolution: 4 x the lines of an A/B encoder. Hall Direction 1 reverses the
+  # Hall sequence, Hall Polarity 1 inverts the signals, Hall Offset is added
+  # to the Hall angle (electrical, 65536 a turn). Commutation Offset is what
+  # the last encoder calibration found. Routine 6 (0x2037) checks them.
+  - index: 0x2017
+    axis: true
+    name: "Feedback Settings"
+    type: record
+    subs:
+      - {sub: 1, name: "Encoder Direction",            type: u8,  access: rw, var: "FbEncoderDirection", store: true, disabled_only: true}
+      - {sub: 2, name: "Encoder Counts per Revolution", type: u32, access: rw, var: "FbEncoderCounts", store: true, disabled_only: true}
+      - {sub: 3, name: "Pole Pairs",                   type: u16, access: rw, var: "FbPolePairs", store: true, disabled_only: true}
+      - {sub: 4, name: "Hall Direction",               type: u8,  access: rw, var: "FbHallDirection", store: true, disabled_only: true}
+      - {sub: 5, name: "Hall Polarity",                type: u8,  access: rw, var: "FbHallPolarity", store: true, disabled_only: true}
+      - {sub: 6, name: "Hall Offset",                  type: u16, access: rw, var: "FbHallOffset", store: true, disabled_only: true}
+      - {sub: 7, name: "Commutation Offset",           type: i16, access: ro, var: "FbCommutationOffset"}
+
   # Signals inside the drive's control, as objects so the recorder (0x2020)
   # and any client can see them.
   - index: 0x2016
@@ -718,6 +741,38 @@ objects:
     name: "Step Check Response"
     object_code: array
     elements: {count: 200, type: i16, access: ro, var: "CheckCurve", name: "Point"}
+
+  # Routine 6 of mode -1 (0x2030:01 = 6): do the encoder and the Hall sensors
+  # agree with the motor's field (0x2017)? With routine 6 selected, mode -1
+  # holds zero current rather than zero speed while it waits, since a
+  # velocity loop on a miswired encoder can run away: enable straight into
+  # mode -1. The field turns in open loop with the calibration's lock
+  # voltage, one electrical turn a second, Electrical Turns forward and the
+  # same back (0: enough for 1.5 revolutions with the pole pairs set, for two
+  # index pulses); the rotor must be free to turn that far. Findings, bits:
+  # 0 encoder reversed (or two motor phases swapped: set 0x2017:01 the other
+  # way), 1 counts per revolution differ from 0x2017:02, 2 pole pairs differ
+  # from 0x2017:03, 3 Hall sensors reversed (or two of their wires swapped:
+  # set 0x2017:04 the other way), 4 the Hall angle does not follow in order
+  # (a sensor dead or miswired), 5 no Hall signals, 6 fewer than two index
+  # pulses (resolution not measured; pole pairs from 0x2017:02), 7 the rotor
+  # slipped. The measured values follow; Hall Offset is the 0x2017:06 that
+  # lines the Hall angle up (with Hall Direction 1), Encoder Residual the
+  # encoder's angle less the field's. Error 10 in 0x2030:04: the rotor did not
+  # follow the field (phase open, rotor blocked).
+  - index: 0x2037
+    axis: true
+    name: "Feedback Check"
+    type: record
+    subs:
+      - {sub: 1, name: "Electrical Turns",            type: u16,    access: rw, var: "FbcTurns", value: 0, store: true}
+      - {sub: 2, name: "Findings",                    type: u16,    access: ro, var: "FbcFindings"}
+      - {sub: 3, name: "Counts per Electrical Turn",  type: real32, access: ro, var: "FbcCountsPerTurn"}
+      - {sub: 4, name: "Counts per Revolution",       type: u32,    access: ro, var: "FbcCountsPerRev"}
+      - {sub: 5, name: "Pole Pairs",                  type: u16,    access: ro, var: "FbcPolePairs"}
+      - {sub: 6, name: "Hall Direction",              type: i8,     access: ro, var: "FbcHallDirection"}
+      - {sub: 7, name: "Hall Offset",                 type: u16,    access: ro, var: "FbcHallOffset"}
+      - {sub: 8, name: "Encoder Residual",            type: i16,    access: ro, var: "FbcEncoderResidual"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
