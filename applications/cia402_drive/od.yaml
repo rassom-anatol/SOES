@@ -554,6 +554,9 @@ objects:
       - {sub: 1, name: "Velocity Feed-Forward", type: i32, access: ro, var: "SigVelocityFeedForward"}
       - {sub: 2, name: "Cogging Torque mA",     type: i32, access: ro, var: "SigCoggingTorque"}
       - {sub: 3, name: "Acceleration Feed-Forward mA", type: i32, access: ro, var: "SigAccelerationFeedForward"}
+      # Microseconds from the cycle's position read to its position target
+      # write (0 without a position target): timing diagnostics.
+      - {sub: 4, name: "Read to Write us",     type: u16, access: ro, var: "SigReadToWrite"}
 
   # The recorder: up to 8 channels, each naming an object in the PDO mapping
   # format (index << 16 | sub << 8, the low byte ignored), sampled by the

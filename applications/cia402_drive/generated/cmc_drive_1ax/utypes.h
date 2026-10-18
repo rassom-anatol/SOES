@@ -168,6 +168,7 @@ typedef struct
    uint32_t   SiUnitVelocity;
    int32_t    SigAccelerationFeedForward;
    int32_t    SigCoggingTorque;
+   uint16_t   SigReadToWrite;
    int32_t    SigVelocityFeedForward;
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;

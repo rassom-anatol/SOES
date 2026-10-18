@@ -370,6 +370,7 @@ static const char acName2016[] = "Loop Signals";
 static const char acName2016_01[] = "Velocity Feed-Forward";
 static const char acName2016_02[] = "Cogging Torque mA";
 static const char acName2016_03[] = "Acceleration Feed-Forward mA";
+static const char acName2016_04[] = "Read to Write us";
 static const char acName2017[] = "Feedback Settings";
 static const char acName2017_01[] = "Encoder Direction";
 static const char acName2017_02[] = "Encoder Counts per Revolution";
@@ -1266,6 +1267,7 @@ static const char acName2816[] = "Loop Signals";
 static const char acName2816_01[] = "Velocity Feed-Forward";
 static const char acName2816_02[] = "Cogging Torque mA";
 static const char acName2816_03[] = "Acceleration Feed-Forward mA";
+static const char acName2816_04[] = "Read to Write us";
 static const char acName2817[] = "Feedback Settings";
 static const char acName2817_01[] = "Encoder Direction";
 static const char acName2817_02[] = "Encoder Counts per Revolution";
@@ -2565,10 +2567,11 @@ const _objd SDO2015[] =
 /* 0x2016 Loop Signals */
 const _objd SDO2016[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2016, 3, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2016, 4, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_01, 0, &Obj.axis[0].SigVelocityFeedForward},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_02, 0, &Obj.axis[0].SigCoggingTorque},
    {0x03, DTYPE_INTEGER32, 32, ATYPE_RO, acName2016_03, 0, &Obj.axis[0].SigAccelerationFeedForward},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2016_04, 0, &Obj.axis[0].SigReadToWrite},
 };
 
 /* 0x2017 Feedback Settings */
@@ -3589,10 +3592,11 @@ const _objd SDO2815[] =
 /* 0x2816 Loop Signals */
 const _objd SDO2816[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 3, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2816, 4, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_01, 0, &Obj.axis[1].SigVelocityFeedForward},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_02, 0, &Obj.axis[1].SigCoggingTorque},
    {0x03, DTYPE_INTEGER32, 32, ATYPE_RO, acName2816_03, 0, &Obj.axis[1].SigAccelerationFeedForward},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2816_04, 0, &Obj.axis[1].SigReadToWrite},
 };
 
 /* 0x2817 Feedback Settings */
@@ -4712,7 +4716,7 @@ const _objectlist SDOobjects[] =
    {0x2013, OTYPE_RECORD, 6, 0, acName2013, SDO2013},
    {0x2014, OTYPE_ARRAY, 128, 0, acName2014, SDO2014},
    {0x2015, OTYPE_ARRAY, 128, 0, acName2015, SDO2015},
-   {0x2016, OTYPE_RECORD, 3, 0, acName2016, SDO2016},
+   {0x2016, OTYPE_RECORD, 4, 0, acName2016, SDO2016},
    {0x2017, OTYPE_RECORD, 7, 0, acName2017, SDO2017},
    {0x2018, OTYPE_RECORD, 2, 0, acName2018, SDO2018},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
@@ -4738,7 +4742,7 @@ const _objectlist SDOobjects[] =
    {0x2813, OTYPE_RECORD, 6, 0, acName2813, SDO2813},
    {0x2814, OTYPE_ARRAY, 128, 0, acName2814, SDO2814},
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
-   {0x2816, OTYPE_RECORD, 3, 0, acName2816, SDO2816},
+   {0x2816, OTYPE_RECORD, 4, 0, acName2816, SDO2816},
    {0x2817, OTYPE_RECORD, 7, 0, acName2817, SDO2817},
    {0x2818, OTYPE_RECORD, 2, 0, acName2818, SDO2818},
    {0x2830, OTYPE_RECORD, 18, 0, acName2830, SDO2830},
