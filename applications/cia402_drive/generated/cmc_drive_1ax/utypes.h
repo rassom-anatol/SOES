@@ -92,6 +92,11 @@ typedef struct
    uint16_t   MechPeakSpeed;
    uint16_t   MechQuality;
    uint16_t   MechUncertainty;
+   uint16_t   MechVelocityBandwidth;
+   uint16_t   MechVelocityFilter;
+   uint16_t   MechVelocityIAdvanced;
+   uint16_t   MechVelocityIClassic;
+   uint16_t   MechVelocityP;
    float      MechViscous;
    int32_t    MechWindowEnd;
    int32_t    MechWindowStart;

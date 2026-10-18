@@ -581,6 +581,14 @@ objects:
       # that vary around the turn keep it low without making the inertia
       # less certain.
       - {sub: 13, name: "Inertia Uncertainty", type: u16, access: ro, var: "MechUncertainty"}
+      # Velocity loop gains for Velocity Loop Bandwidth, from the inertia, in
+      # the drive's units: P for both structures, I per structure, and the
+      # advanced structure's velocity filter cutoff (0x2011:09). Not applied.
+      - {sub: 14, name: "Velocity Loop Bandwidth Hz", type: u16, access: rw, var: "MechVelocityBandwidth", value: 100, store: true}
+      - {sub: 15, name: "Velocity P",          type: u16, access: ro, var: "MechVelocityP"}
+      - {sub: 16, name: "Velocity I Classic",  type: u16, access: ro, var: "MechVelocityIClassic"}
+      - {sub: 17, name: "Velocity I Advanced", type: u16, access: ro, var: "MechVelocityIAdvanced"}
+      - {sub: 18, name: "Velocity Filter Hz",  type: u16, access: ro, var: "MechVelocityFilter"}
 
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than

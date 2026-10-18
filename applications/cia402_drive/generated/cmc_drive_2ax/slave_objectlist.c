@@ -424,6 +424,11 @@ static const char acName2031_0A[] = "Fit Quality";
 static const char acName2031_0B[] = "Peak Speed rpm";
 static const char acName2031_0C[] = "Breakaway A";
 static const char acName2031_0D[] = "Inertia Uncertainty";
+static const char acName2031_0E[] = "Velocity Loop Bandwidth Hz";
+static const char acName2031_0F[] = "Velocity P";
+static const char acName2031_10[] = "Velocity I Classic";
+static const char acName2031_11[] = "Velocity I Advanced";
+static const char acName2031_12[] = "Velocity Filter Hz";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -780,6 +785,11 @@ static const char acName2831_0A[] = "Fit Quality";
 static const char acName2831_0B[] = "Peak Speed rpm";
 static const char acName2831_0C[] = "Breakaway A";
 static const char acName2831_0D[] = "Inertia Uncertainty";
+static const char acName2831_0E[] = "Velocity Loop Bandwidth Hz";
+static const char acName2831_0F[] = "Velocity P";
+static const char acName2831_10[] = "Velocity I Classic";
+static const char acName2831_11[] = "Velocity I Advanced";
+static const char acName2831_12[] = "Velocity Filter Hz";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -1551,7 +1561,7 @@ const _objd SDO2030[] =
 /* 0x2031 Mechanical Identification */
 const _objd SDO2031[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2031, 13, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2031, 18, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2031_01, 0, &Obj.axis[0].MechWindowStart},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName2031_02, 0, &Obj.axis[0].MechWindowEnd},
    {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2031_03, 300, &Obj.axis[0].MechMaxTorque},
@@ -1565,6 +1575,11 @@ const _objd SDO2031[] =
    {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0B, 0, &Obj.axis[0].MechPeakSpeed},
    {0x0C, DTYPE_REAL32, 32, ATYPE_RO, acName2031_0C, 0, &Obj.axis[0].MechBreakaway},
    {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0D, 0, &Obj.axis[0].MechUncertainty},
+   {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2031_0E, 100, &Obj.axis[0].MechVelocityBandwidth},
+   {0x0F, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_0F, 0, &Obj.axis[0].MechVelocityP},
+   {0x10, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_10, 0, &Obj.axis[0].MechVelocityIClassic},
+   {0x11, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_11, 0, &Obj.axis[0].MechVelocityIAdvanced},
+   {0x12, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_12, 0, &Obj.axis[0].MechVelocityFilter},
 };
 
 /* 0x2800 Drive Faults and Status */
@@ -1976,7 +1991,7 @@ const _objd SDO2830[] =
 /* 0x2831 Mechanical Identification */
 const _objd SDO2831[] =
 {
-   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2831, 13, NULL},
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2831, 18, NULL},
    {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName2831_01, 0, &Obj.axis[1].MechWindowStart},
    {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName2831_02, 0, &Obj.axis[1].MechWindowEnd},
    {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2831_03, 300, &Obj.axis[1].MechMaxTorque},
@@ -1990,6 +2005,11 @@ const _objd SDO2831[] =
    {0x0B, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_0B, 0, &Obj.axis[1].MechPeakSpeed},
    {0x0C, DTYPE_REAL32, 32, ATYPE_RO, acName2831_0C, 0, &Obj.axis[1].MechBreakaway},
    {0x0D, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_0D, 0, &Obj.axis[1].MechUncertainty},
+   {0x0E, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2831_0E, 100, &Obj.axis[1].MechVelocityBandwidth},
+   {0x0F, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_0F, 0, &Obj.axis[1].MechVelocityP},
+   {0x10, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_10, 0, &Obj.axis[1].MechVelocityIClassic},
+   {0x11, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_11, 0, &Obj.axis[1].MechVelocityIAdvanced},
+   {0x12, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_12, 0, &Obj.axis[1].MechVelocityFilter},
 };
 
 /* 0x603F Error Code */
@@ -2369,7 +2389,7 @@ const _objectlist SDOobjects[] =
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
-   {0x2031, OTYPE_RECORD, 13, 0, acName2031, SDO2031},
+   {0x2031, OTYPE_RECORD, 18, 0, acName2031, SDO2031},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
@@ -2383,7 +2403,7 @@ const _objectlist SDOobjects[] =
    {0x2815, OTYPE_ARRAY, 128, 0, acName2815, SDO2815},
    {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
    {0x2830, OTYPE_RECORD, 18, 0, acName2830, SDO2830},
-   {0x2831, OTYPE_RECORD, 13, 0, acName2831, SDO2831},
+   {0x2831, OTYPE_RECORD, 18, 0, acName2831, SDO2831},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
