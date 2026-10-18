@@ -431,6 +431,19 @@ static const char acName2031_11[] = "Velocity I Advanced";
 static const char acName2031_12[] = "Velocity Filter Hz";
 static const char acName2031_13[] = "Position P Classic";
 static const char acName2031_14[] = "Position P Advanced";
+static const char acName2040[] = "Service Control";
+static const char acName2040_01[] = "Allow";
+static const char acName2040_02[] = "Owner";
+static const char acName2040_03[] = "Heartbeat Timeout";
+static const char acName2040_04[] = "Contention";
+static const char acName2040_05[] = "Tool Request";
+static const char acName2040_06[] = "Tool Heartbeat";
+static const char acName2041[] = "Service Command";
+static const char acName2041_01[] = "Controlword";
+static const char acName2041_02[] = "Modes of Operation";
+static const char acName2041_03[] = "Target Position";
+static const char acName2041_04[] = "Target Velocity";
+static const char acName2041_05[] = "Target Torque";
 static const char acName2800[] = "Drive Faults and Status";
 static const char acName2800_01[] = "Gate Driver Faults";
 static const char acName2800_02[] = "Drive Status Flags";
@@ -794,6 +807,12 @@ static const char acName2831_11[] = "Velocity I Advanced";
 static const char acName2831_12[] = "Velocity Filter Hz";
 static const char acName2831_13[] = "Position P Classic";
 static const char acName2831_14[] = "Position P Advanced";
+static const char acName2841[] = "Service Command";
+static const char acName2841_01[] = "Controlword";
+static const char acName2841_02[] = "Modes of Operation";
+static const char acName2841_03[] = "Target Position";
+static const char acName2841_04[] = "Target Velocity";
+static const char acName2841_05[] = "Target Torque";
 static const char acName3000[] = "Drive Faults and Status";
 static const char acName3000_01[] = "Gate Driver Faults";
 static const char acName3000_02[] = "Drive Status Flags";
@@ -1157,6 +1176,12 @@ static const char acName3031_11[] = "Velocity I Advanced";
 static const char acName3031_12[] = "Velocity Filter Hz";
 static const char acName3031_13[] = "Position P Classic";
 static const char acName3031_14[] = "Position P Advanced";
+static const char acName3041[] = "Service Command";
+static const char acName3041_01[] = "Controlword";
+static const char acName3041_02[] = "Modes of Operation";
+static const char acName3041_03[] = "Target Position";
+static const char acName3041_04[] = "Target Velocity";
+static const char acName3041_05[] = "Target Torque";
 static const char acName3800[] = "Drive Faults and Status";
 static const char acName3800_01[] = "Gate Driver Faults";
 static const char acName3800_02[] = "Drive Status Flags";
@@ -1520,6 +1545,12 @@ static const char acName3831_11[] = "Velocity I Advanced";
 static const char acName3831_12[] = "Velocity Filter Hz";
 static const char acName3831_13[] = "Position P Classic";
 static const char acName3831_14[] = "Position P Advanced";
+static const char acName3841[] = "Service Command";
+static const char acName3841_01[] = "Controlword";
+static const char acName3841_02[] = "Modes of Operation";
+static const char acName3841_03[] = "Target Position";
+static const char acName3841_04[] = "Target Velocity";
+static const char acName3841_05[] = "Target Torque";
 static const char acName603F[] = "Error Code";
 static const char acName603F_00[] = "Error Code";
 static const char acName6040[] = "Controlword";
@@ -2582,6 +2613,29 @@ const _objd SDO2031[] =
    {0x14, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2031_14, 0, &Obj.axis[0].MechPositionPAdvanced},
 };
 
+/* 0x2040 Service Control */
+const _objd SDO2040[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2040, 6, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2040_01, 0, &Obj.SvcAllow},
+   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2040_02, 0, &Obj.SvcOwner},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2040_03, 500, &Obj.SvcTimeoutMs},
+   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2040_04, 0, &Obj.SvcContention},
+   {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2040_05, 0, &Obj.SvcRequest},
+   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2040_06, 0, &Obj.SvcHeartbeat},
+};
+
+/* 0x2041 Service Command */
+const _objd SDO2041[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2041, 5, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2041_01, 0, &Obj.axis[0].SvcControlword},
+   {0x02, DTYPE_INTEGER8, 8, ATYPE_RW, acName2041_02, 0, &Obj.axis[0].SvcMode},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RW, acName2041_03, 0, &Obj.axis[0].SvcTargetPosition},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RW, acName2041_04, 0, &Obj.axis[0].SvcTargetVelocity},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName2041_05, 0, &Obj.axis[0].SvcTargetTorque},
+};
+
 /* 0x2800 Drive Faults and Status */
 const _objd SDO2800[] =
 {
@@ -3012,6 +3066,17 @@ const _objd SDO2831[] =
    {0x12, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_12, 0, &Obj.axis[1].MechVelocityFilter},
    {0x13, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_13, 0, &Obj.axis[1].MechPositionPClassic},
    {0x14, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName2831_14, 0, &Obj.axis[1].MechPositionPAdvanced},
+};
+
+/* 0x2841 Service Command */
+const _objd SDO2841[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2841, 5, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2841_01, 0, &Obj.axis[1].SvcControlword},
+   {0x02, DTYPE_INTEGER8, 8, ATYPE_RW, acName2841_02, 0, &Obj.axis[1].SvcMode},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RW, acName2841_03, 0, &Obj.axis[1].SvcTargetPosition},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RW, acName2841_04, 0, &Obj.axis[1].SvcTargetVelocity},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName2841_05, 0, &Obj.axis[1].SvcTargetTorque},
 };
 
 /* 0x3000 Drive Faults and Status */
@@ -3446,6 +3511,17 @@ const _objd SDO3031[] =
    {0x14, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3031_14, 0, &Obj.axis[2].MechPositionPAdvanced},
 };
 
+/* 0x3041 Service Command */
+const _objd SDO3041[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3041, 5, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3041_01, 0, &Obj.axis[2].SvcControlword},
+   {0x02, DTYPE_INTEGER8, 8, ATYPE_RW, acName3041_02, 0, &Obj.axis[2].SvcMode},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RW, acName3041_03, 0, &Obj.axis[2].SvcTargetPosition},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RW, acName3041_04, 0, &Obj.axis[2].SvcTargetVelocity},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName3041_05, 0, &Obj.axis[2].SvcTargetTorque},
+};
+
 /* 0x3800 Drive Faults and Status */
 const _objd SDO3800[] =
 {
@@ -3876,6 +3952,17 @@ const _objd SDO3831[] =
    {0x12, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3831_12, 0, &Obj.axis[3].MechVelocityFilter},
    {0x13, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3831_13, 0, &Obj.axis[3].MechPositionPClassic},
    {0x14, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName3831_14, 0, &Obj.axis[3].MechPositionPAdvanced},
+};
+
+/* 0x3841 Service Command */
+const _objd SDO3841[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName3841, 5, NULL},
+   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName3841_01, 0, &Obj.axis[3].SvcControlword},
+   {0x02, DTYPE_INTEGER8, 8, ATYPE_RW, acName3841_02, 0, &Obj.axis[3].SvcMode},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RW, acName3841_03, 0, &Obj.axis[3].SvcTargetPosition},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RW, acName3841_04, 0, &Obj.axis[3].SvcTargetVelocity},
+   {0x05, DTYPE_INTEGER16, 16, ATYPE_RW, acName3841_05, 0, &Obj.axis[3].SvcTargetTorque},
 };
 
 /* 0x603F Error Code */
@@ -4744,6 +4831,8 @@ const _objectlist SDOobjects[] =
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
    {0x2031, OTYPE_RECORD, 20, 0, acName2031, SDO2031},
+   {0x2040, OTYPE_RECORD, 6, 0, acName2040, SDO2040},
+   {0x2041, OTYPE_RECORD, 5, 0, acName2041, SDO2041},
    {0x2800, OTYPE_RECORD, 2, 0, acName2800, SDO2800},
    {0x2801, OTYPE_RECORD, 4, 0, acName2801, SDO2801},
    {0x2802, OTYPE_RECORD, 3, 0, acName2802, SDO2802},
@@ -4758,6 +4847,7 @@ const _objectlist SDOobjects[] =
    {0x2816, OTYPE_RECORD, 2, 0, acName2816, SDO2816},
    {0x2830, OTYPE_RECORD, 18, 0, acName2830, SDO2830},
    {0x2831, OTYPE_RECORD, 20, 0, acName2831, SDO2831},
+   {0x2841, OTYPE_RECORD, 5, 0, acName2841, SDO2841},
    {0x3000, OTYPE_RECORD, 2, 0, acName3000, SDO3000},
    {0x3001, OTYPE_RECORD, 4, 0, acName3001, SDO3001},
    {0x3002, OTYPE_RECORD, 3, 0, acName3002, SDO3002},
@@ -4772,6 +4862,7 @@ const _objectlist SDOobjects[] =
    {0x3016, OTYPE_RECORD, 2, 0, acName3016, SDO3016},
    {0x3030, OTYPE_RECORD, 18, 0, acName3030, SDO3030},
    {0x3031, OTYPE_RECORD, 20, 0, acName3031, SDO3031},
+   {0x3041, OTYPE_RECORD, 5, 0, acName3041, SDO3041},
    {0x3800, OTYPE_RECORD, 2, 0, acName3800, SDO3800},
    {0x3801, OTYPE_RECORD, 4, 0, acName3801, SDO3801},
    {0x3802, OTYPE_RECORD, 3, 0, acName3802, SDO3802},
@@ -4786,6 +4877,7 @@ const _objectlist SDOobjects[] =
    {0x3816, OTYPE_RECORD, 2, 0, acName3816, SDO3816},
    {0x3830, OTYPE_RECORD, 18, 0, acName3830, SDO3830},
    {0x3831, OTYPE_RECORD, 20, 0, acName3831, SDO3831},
+   {0x3841, OTYPE_RECORD, 5, 0, acName3841, SDO3841},
    {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},

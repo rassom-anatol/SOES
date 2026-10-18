@@ -132,6 +132,11 @@ typedef struct
    int32_t    SigVelocityFeedForward;
    uint16_t   Statusword;
    uint32_t   SupplyVoltage_mV;
+   uint16_t   SvcControlword;
+   int8_t     SvcMode;
+   int32_t    SvcTargetPosition;
+   int16_t    SvcTargetTorque;
+   int32_t    SvcTargetVelocity;
    int32_t    TargetPosition;
    int16_t    TargetTorque;
    int32_t    TargetVelocity;
@@ -172,6 +177,12 @@ typedef struct
    uint32_t   RecorderDataLength;
    uint32_t   RestoreParameters;
    uint32_t   StoreParameters;
+   uint8_t    SvcAllow;
+   uint32_t   SvcContention;
+   uint32_t   SvcHeartbeat;
+   uint8_t    SvcOwner;
+   uint8_t    SvcRequest;
+   uint16_t   SvcTimeoutMs;
    uint32_t   serial;
    struct
    {

@@ -520,6 +520,39 @@ objects:
   # otherwise the read is refused with 0x08000024, no data available.
   - {index: 0x2021, name: "Recorder Data", type: domain, size: 131072, access: ro, var: "RecorderData", length_var: "RecorderDataLength"}
 
+  # Who commands motion: the fieldbus master (the default) or a service tool
+  # such as the web page. The tool may take control only while the master is
+  # not in OP or has set Allow, and only from a disabled axis; it keeps it by
+  # Request and a Heartbeat that changes within Heartbeat Timeout. Losing it
+  # while the axis runs Quick Stops the axis before the master's command
+  # applies again. Owner: 0 master, 1 tool, 2 releasing (stopping first).
+  # Contention counts cycles in which the master changed its Controlword while
+  # the tool held control.
+  - index: 0x2040
+    name: "Service Control"
+    type: record
+    subs:
+      - {sub: 1, name: "Allow",             type: u8,  access: rw, var: "SvcAllow"}
+      - {sub: 2, name: "Owner",             type: u8,  access: ro, var: "SvcOwner"}
+      - {sub: 3, name: "Heartbeat Timeout", type: u16, access: rw, var: "SvcTimeoutMs", value: 500, store: true}
+      - {sub: 4, name: "Contention",        type: u32, access: ro, var: "SvcContention"}
+      - {sub: 5, name: "Tool Request",      type: u8,  access: rw, var: "SvcRequest"}
+      - {sub: 6, name: "Tool Heartbeat",    type: u32, access: rw, var: "SvcHeartbeat"}
+
+  # The service tool's command, used instead of the master's process data
+  # only while the tool holds control (0x2040:02 = 1). Same meanings and units
+  # as 0x6040, 0x6060, 0x607A, 0x60FF and 0x6071.
+  - index: 0x2041
+    axis: true
+    name: "Service Command"
+    type: record
+    subs:
+      - {sub: 1, name: "Controlword",        type: u16, access: rw, var: "SvcControlword"}
+      - {sub: 2, name: "Modes of Operation", type: i8,  access: rw, var: "SvcMode"}
+      - {sub: 3, name: "Target Position",    type: i32, access: rw, var: "SvcTargetPosition"}
+      - {sub: 4, name: "Target Velocity",    type: i32, access: rw, var: "SvcTargetVelocity"}
+      - {sub: 5, name: "Target Torque",      type: i16, access: rw, var: "SvcTargetTorque"}
+
   # Identification, run in mode of operation -1: controlword bit 4 starts the
   # routine; statusword bit 10 finished, 12 succeeded, 13 failed. Routine 1
   # measures the motor's resistance and inductance at standstill with a d-axis
