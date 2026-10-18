@@ -38,6 +38,14 @@ typedef struct
    uint16_t   AdvVelocityI;
    uint16_t   AdvVelocityP;
    uint16_t   BoardTelemetryPeriod;
+   uint8_t    CogApply;
+   uint16_t   CogDirectionP2p;
+   int16_t    CogFriction;
+   uint16_t   CogP2p;
+   uint16_t   CogRevolutions;
+   uint16_t   CogRevolutionsMeasured;
+   uint16_t   CogRms;
+   uint16_t   CogSpeed;
    uint16_t   CoggingBlendRpm;
    uint8_t    CoggingEnable;
    uint16_t   CoggingFadeRpm;
@@ -149,6 +157,8 @@ typedef struct
    uint16_t   VelocityI;
    uint32_t   VelocityLimit;
    uint16_t   VelocityP;
+   int16_t    CogResult[128];
+   int16_t    CogResultNeg[128];
    int16_t    CoggingTable[128];
    int16_t    CoggingTableNeg[128];
 } _Axis;

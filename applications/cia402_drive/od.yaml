@@ -653,6 +653,43 @@ objects:
       - {sub: 19, name: "Position P Classic",  type: u16, access: ro, var: "MechPositionPClassic"}
       - {sub: 20, name: "Position P Advanced", type: u16, access: ro, var: "MechPositionPAdvanced"}
 
+  # Routine 4 of mode -1 (0x2030:01 = 4): the anti-cogging tables. The axis
+  # turns at Speed in velocity mode, back and forth inside 0x2031's travel
+  # window (at least 1.5 turns), and the current the velocity loop needs is
+  # averaged at each shaft angle, per direction, until each direction has
+  # covered Revolutions and every point has samples. Each direction's table,
+  # less its mean, goes to 0x2033 (positive) and 0x2034 (negative) in the
+  # format of 0x2014 and 0x2015. They are not applied: writing 1 to Apply
+  # copies them into 0x2014 and 0x2015, which 0x1010 then saves. The
+  # summary is in per mille of 0x6075: Cogging the two directions' average
+  # peak to peak, Friction half the difference of their means, Direction
+  # Dependence how much the rest of their difference varies around the turn.
+  # Errors in 0x2030:04 as for routine 3, and 13: no index pulse seen.
+  - index: 0x2032
+    axis: true
+    name: "Cogging Identification"
+    type: record
+    subs:
+      - {sub: 1, name: "Speed rpm",              type: u16, access: rw, var: "CogSpeed", value: 20, store: true}
+      - {sub: 2, name: "Revolutions",            type: u16, access: rw, var: "CogRevolutions", value: 4, store: true}
+      - {sub: 3, name: "Cogging Peak to Peak",   type: u16, access: ro, var: "CogP2p"}
+      - {sub: 4, name: "Cogging RMS",            type: u16, access: ro, var: "CogRms"}
+      - {sub: 5, name: "Friction",               type: i16, access: ro, var: "CogFriction"}
+      - {sub: 6, name: "Direction Dependence",   type: u16, access: ro, var: "CogDirectionP2p"}
+      # Tenths of a turn, per direction (the smaller of the two).
+      - {sub: 7, name: "Revolutions Measured",   type: u16, access: ro, var: "CogRevolutionsMeasured"}
+      - {sub: 8, name: "Apply",                  type: u8,  access: rw, var: "CogApply"}
+  - index: 0x2033
+    axis: true
+    name: "Cogging Result"
+    object_code: array
+    elements: {count: 128, type: i16, access: ro, var: "CogResult", name: "Point"}
+  - index: 0x2034
+    axis: true
+    name: "Cogging Result Negative"
+    object_code: array
+    elements: {count: 128, type: i16, access: ro, var: "CogResultNeg", name: "Point"}
+
 # ---------------------------------------------------------------------------
 # Bit assignments for the two cyclic vendor words. Documented here rather than
 # only in C so the master side and the drive side have one source.
