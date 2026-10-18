@@ -47,9 +47,11 @@ typedef struct
    int16_t    CurrentU;
    int16_t    CurrentV;
    int16_t    CurrentW;
+   int16_t    DisableOperationOptionCode;
    uint16_t   DriveStatusFlags;
    uint32_t   EncoderIncrements;
    uint16_t   ErrorCode;
+   int16_t    FaultReactionOptionCode;
    uint32_t   Feed;
    uint32_t   FeedShaftRevolutions;
    uint16_t   FluxI;
@@ -122,6 +124,10 @@ typedef struct
    uint32_t   QuickStopDeceleration;
    int16_t    QuickStopOptionCode;
    uint16_t   ShaftAngle;
+   int16_t    ShutdownOptionCode;
+   uint32_t   SiUnitAcceleration;
+   uint32_t   SiUnitPosition;
+   uint32_t   SiUnitVelocity;
    int32_t    SigCoggingTorque;
    int32_t    SigVelocityFeedForward;
    uint16_t   Statusword;

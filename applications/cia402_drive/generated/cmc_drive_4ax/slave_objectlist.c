@@ -1528,8 +1528,14 @@ static const char acName6041[] = "Statusword";
 static const char acName6041_00[] = "Statusword";
 static const char acName605A[] = "Quick Stop Option Code";
 static const char acName605A_00[] = "Quick Stop Option Code";
+static const char acName605B[] = "Shutdown Option Code";
+static const char acName605B_00[] = "Shutdown Option Code";
+static const char acName605C[] = "Disable Operation Option Code";
+static const char acName605C_00[] = "Disable Operation Option Code";
 static const char acName605D[] = "Halt Option Code";
 static const char acName605D_00[] = "Halt Option Code";
+static const char acName605E[] = "Fault Reaction Option Code";
+static const char acName605E_00[] = "Fault Reaction Option Code";
 static const char acName6060[] = "Modes of Operation";
 static const char acName6060_00[] = "Modes of Operation";
 static const char acName6061[] = "Modes of Operation Display";
@@ -1572,6 +1578,12 @@ static const char acName6091_02[] = "Shaft Revolutions";
 static const char acName6092[] = "Feed Constant";
 static const char acName6092_01[] = "Feed";
 static const char acName6092_02[] = "Shaft Revolutions";
+static const char acName60A8[] = "SI Unit Position";
+static const char acName60A8_00[] = "SI Unit Position";
+static const char acName60A9[] = "SI Unit Velocity";
+static const char acName60A9_00[] = "SI Unit Velocity";
+static const char acName60AA[] = "SI Unit Acceleration";
+static const char acName60AA_00[] = "SI Unit Acceleration";
 static const char acName60F4[] = "Following Error Actual";
 static const char acName60F4_00[] = "Following Error Actual";
 static const char acName60FF[] = "Target Velocity";
@@ -1586,8 +1598,14 @@ static const char acName6841[] = "Statusword";
 static const char acName6841_00[] = "Statusword";
 static const char acName685A[] = "Quick Stop Option Code";
 static const char acName685A_00[] = "Quick Stop Option Code";
+static const char acName685B[] = "Shutdown Option Code";
+static const char acName685B_00[] = "Shutdown Option Code";
+static const char acName685C[] = "Disable Operation Option Code";
+static const char acName685C_00[] = "Disable Operation Option Code";
 static const char acName685D[] = "Halt Option Code";
 static const char acName685D_00[] = "Halt Option Code";
+static const char acName685E[] = "Fault Reaction Option Code";
+static const char acName685E_00[] = "Fault Reaction Option Code";
 static const char acName6860[] = "Modes of Operation";
 static const char acName6860_00[] = "Modes of Operation";
 static const char acName6861[] = "Modes of Operation Display";
@@ -1630,6 +1648,12 @@ static const char acName6891_02[] = "Shaft Revolutions";
 static const char acName6892[] = "Feed Constant";
 static const char acName6892_01[] = "Feed";
 static const char acName6892_02[] = "Shaft Revolutions";
+static const char acName68A8[] = "SI Unit Position";
+static const char acName68A8_00[] = "SI Unit Position";
+static const char acName68A9[] = "SI Unit Velocity";
+static const char acName68A9_00[] = "SI Unit Velocity";
+static const char acName68AA[] = "SI Unit Acceleration";
+static const char acName68AA_00[] = "SI Unit Acceleration";
 static const char acName68F4[] = "Following Error Actual";
 static const char acName68F4_00[] = "Following Error Actual";
 static const char acName68FF[] = "Target Velocity";
@@ -1644,8 +1668,14 @@ static const char acName7041[] = "Statusword";
 static const char acName7041_00[] = "Statusword";
 static const char acName705A[] = "Quick Stop Option Code";
 static const char acName705A_00[] = "Quick Stop Option Code";
+static const char acName705B[] = "Shutdown Option Code";
+static const char acName705B_00[] = "Shutdown Option Code";
+static const char acName705C[] = "Disable Operation Option Code";
+static const char acName705C_00[] = "Disable Operation Option Code";
 static const char acName705D[] = "Halt Option Code";
 static const char acName705D_00[] = "Halt Option Code";
+static const char acName705E[] = "Fault Reaction Option Code";
+static const char acName705E_00[] = "Fault Reaction Option Code";
 static const char acName7060[] = "Modes of Operation";
 static const char acName7060_00[] = "Modes of Operation";
 static const char acName7061[] = "Modes of Operation Display";
@@ -1688,6 +1718,12 @@ static const char acName7091_02[] = "Shaft Revolutions";
 static const char acName7092[] = "Feed Constant";
 static const char acName7092_01[] = "Feed";
 static const char acName7092_02[] = "Shaft Revolutions";
+static const char acName70A8[] = "SI Unit Position";
+static const char acName70A8_00[] = "SI Unit Position";
+static const char acName70A9[] = "SI Unit Velocity";
+static const char acName70A9_00[] = "SI Unit Velocity";
+static const char acName70AA[] = "SI Unit Acceleration";
+static const char acName70AA_00[] = "SI Unit Acceleration";
 static const char acName70F4[] = "Following Error Actual";
 static const char acName70F4_00[] = "Following Error Actual";
 static const char acName70FF[] = "Target Velocity";
@@ -1702,8 +1738,14 @@ static const char acName7841[] = "Statusword";
 static const char acName7841_00[] = "Statusword";
 static const char acName785A[] = "Quick Stop Option Code";
 static const char acName785A_00[] = "Quick Stop Option Code";
+static const char acName785B[] = "Shutdown Option Code";
+static const char acName785B_00[] = "Shutdown Option Code";
+static const char acName785C[] = "Disable Operation Option Code";
+static const char acName785C_00[] = "Disable Operation Option Code";
 static const char acName785D[] = "Halt Option Code";
 static const char acName785D_00[] = "Halt Option Code";
+static const char acName785E[] = "Fault Reaction Option Code";
+static const char acName785E_00[] = "Fault Reaction Option Code";
 static const char acName7860[] = "Modes of Operation";
 static const char acName7860_00[] = "Modes of Operation";
 static const char acName7861[] = "Modes of Operation Display";
@@ -1746,6 +1788,12 @@ static const char acName7891_02[] = "Shaft Revolutions";
 static const char acName7892[] = "Feed Constant";
 static const char acName7892_01[] = "Feed";
 static const char acName7892_02[] = "Shaft Revolutions";
+static const char acName78A8[] = "SI Unit Position";
+static const char acName78A8_00[] = "SI Unit Position";
+static const char acName78A9[] = "SI Unit Velocity";
+static const char acName78A9_00[] = "SI Unit Velocity";
+static const char acName78AA[] = "SI Unit Acceleration";
+static const char acName78AA_00[] = "SI Unit Acceleration";
 static const char acName78F4[] = "Following Error Actual";
 static const char acName78F4_00[] = "Following Error Actual";
 static const char acName78FF[] = "Target Velocity";
@@ -3854,10 +3902,28 @@ const _objd SDO605A[] =
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605A_00, 2, &Obj.axis[0].QuickStopOptionCode},
 };
 
+/* 0x605B Shutdown Option Code */
+const _objd SDO605B[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605B_00, 0, &Obj.axis[0].ShutdownOptionCode},
+};
+
+/* 0x605C Disable Operation Option Code */
+const _objd SDO605C[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605C_00, 0, &Obj.axis[0].DisableOperationOptionCode},
+};
+
 /* 0x605D Halt Option Code */
 const _objd SDO605D[] =
 {
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605D_00, 1, &Obj.axis[0].HaltOptionCode},
+};
+
+/* 0x605E Fault Reaction Option Code */
+const _objd SDO605E[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605E_00, 0, &Obj.axis[0].FaultReactionOptionCode},
 };
 
 /* 0x6060 Modes of Operation */
@@ -3982,6 +4048,24 @@ const _objd SDO6092[] =
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6092_02, 1, &Obj.axis[0].FeedShaftRevolutions},
 };
 
+/* 0x60A8 SI Unit Position */
+const _objd SDO60A8[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60A8_00, 11862016, &Obj.axis[0].SiUnitPosition},
+};
+
+/* 0x60A9 SI Unit Velocity */
+const _objd SDO60A9[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60A9_00, 11814656, &Obj.axis[0].SiUnitVelocity},
+};
+
+/* 0x60AA SI Unit Acceleration */
+const _objd SDO60AA[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60AA_00, 12583680, &Obj.axis[0].SiUnitAcceleration},
+};
+
 /* 0x60F4 Following Error Actual */
 const _objd SDO60F4[] =
 {
@@ -4024,10 +4108,28 @@ const _objd SDO685A[] =
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685A_00, 2, &Obj.axis[1].QuickStopOptionCode},
 };
 
+/* 0x685B Shutdown Option Code */
+const _objd SDO685B[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685B_00, 0, &Obj.axis[1].ShutdownOptionCode},
+};
+
+/* 0x685C Disable Operation Option Code */
+const _objd SDO685C[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685C_00, 0, &Obj.axis[1].DisableOperationOptionCode},
+};
+
 /* 0x685D Halt Option Code */
 const _objd SDO685D[] =
 {
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685D_00, 1, &Obj.axis[1].HaltOptionCode},
+};
+
+/* 0x685E Fault Reaction Option Code */
+const _objd SDO685E[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName685E_00, 0, &Obj.axis[1].FaultReactionOptionCode},
 };
 
 /* 0x6860 Modes of Operation */
@@ -4152,6 +4254,24 @@ const _objd SDO6892[] =
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6892_02, 1, &Obj.axis[1].FeedShaftRevolutions},
 };
 
+/* 0x68A8 SI Unit Position */
+const _objd SDO68A8[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName68A8_00, 11862016, &Obj.axis[1].SiUnitPosition},
+};
+
+/* 0x68A9 SI Unit Velocity */
+const _objd SDO68A9[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName68A9_00, 11814656, &Obj.axis[1].SiUnitVelocity},
+};
+
+/* 0x68AA SI Unit Acceleration */
+const _objd SDO68AA[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName68AA_00, 12583680, &Obj.axis[1].SiUnitAcceleration},
+};
+
 /* 0x68F4 Following Error Actual */
 const _objd SDO68F4[] =
 {
@@ -4194,10 +4314,28 @@ const _objd SDO705A[] =
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705A_00, 2, &Obj.axis[2].QuickStopOptionCode},
 };
 
+/* 0x705B Shutdown Option Code */
+const _objd SDO705B[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705B_00, 0, &Obj.axis[2].ShutdownOptionCode},
+};
+
+/* 0x705C Disable Operation Option Code */
+const _objd SDO705C[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705C_00, 0, &Obj.axis[2].DisableOperationOptionCode},
+};
+
 /* 0x705D Halt Option Code */
 const _objd SDO705D[] =
 {
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705D_00, 1, &Obj.axis[2].HaltOptionCode},
+};
+
+/* 0x705E Fault Reaction Option Code */
+const _objd SDO705E[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName705E_00, 0, &Obj.axis[2].FaultReactionOptionCode},
 };
 
 /* 0x7060 Modes of Operation */
@@ -4322,6 +4460,24 @@ const _objd SDO7092[] =
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7092_02, 1, &Obj.axis[2].FeedShaftRevolutions},
 };
 
+/* 0x70A8 SI Unit Position */
+const _objd SDO70A8[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName70A8_00, 11862016, &Obj.axis[2].SiUnitPosition},
+};
+
+/* 0x70A9 SI Unit Velocity */
+const _objd SDO70A9[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName70A9_00, 11814656, &Obj.axis[2].SiUnitVelocity},
+};
+
+/* 0x70AA SI Unit Acceleration */
+const _objd SDO70AA[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName70AA_00, 12583680, &Obj.axis[2].SiUnitAcceleration},
+};
+
 /* 0x70F4 Following Error Actual */
 const _objd SDO70F4[] =
 {
@@ -4364,10 +4520,28 @@ const _objd SDO785A[] =
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785A_00, 2, &Obj.axis[3].QuickStopOptionCode},
 };
 
+/* 0x785B Shutdown Option Code */
+const _objd SDO785B[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785B_00, 0, &Obj.axis[3].ShutdownOptionCode},
+};
+
+/* 0x785C Disable Operation Option Code */
+const _objd SDO785C[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785C_00, 0, &Obj.axis[3].DisableOperationOptionCode},
+};
+
 /* 0x785D Halt Option Code */
 const _objd SDO785D[] =
 {
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785D_00, 1, &Obj.axis[3].HaltOptionCode},
+};
+
+/* 0x785E Fault Reaction Option Code */
+const _objd SDO785E[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName785E_00, 0, &Obj.axis[3].FaultReactionOptionCode},
 };
 
 /* 0x7860 Modes of Operation */
@@ -4492,6 +4666,24 @@ const _objd SDO7892[] =
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7892_02, 1, &Obj.axis[3].FeedShaftRevolutions},
 };
 
+/* 0x78A8 SI Unit Position */
+const _objd SDO78A8[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName78A8_00, 11862016, &Obj.axis[3].SiUnitPosition},
+};
+
+/* 0x78A9 SI Unit Velocity */
+const _objd SDO78A9[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName78A9_00, 11814656, &Obj.axis[3].SiUnitVelocity},
+};
+
+/* 0x78AA SI Unit Acceleration */
+const _objd SDO78AA[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName78AA_00, 12583680, &Obj.axis[3].SiUnitAcceleration},
+};
+
 /* 0x78F4 Following Error Actual */
 const _objd SDO78F4[] =
 {
@@ -4598,7 +4790,10 @@ const _objectlist SDOobjects[] =
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
    {0x605A, OTYPE_VAR, 0, 0, acName605A, SDO605A},
+   {0x605B, OTYPE_VAR, 0, 0, acName605B, SDO605B},
+   {0x605C, OTYPE_VAR, 0, 0, acName605C, SDO605C},
    {0x605D, OTYPE_VAR, 0, 0, acName605D, SDO605D},
+   {0x605E, OTYPE_VAR, 0, 0, acName605E, SDO605E},
    {0x6060, OTYPE_VAR, 0, 0, acName6060, SDO6060},
    {0x6061, OTYPE_VAR, 0, 0, acName6061, SDO6061},
    {0x6064, OTYPE_VAR, 0, 0, acName6064, SDO6064},
@@ -4618,6 +4813,9 @@ const _objectlist SDOobjects[] =
    {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
    {0x6091, OTYPE_RECORD, 2, 0, acName6091, SDO6091},
    {0x6092, OTYPE_RECORD, 2, 0, acName6092, SDO6092},
+   {0x60A8, OTYPE_VAR, 0, 0, acName60A8, SDO60A8},
+   {0x60A9, OTYPE_VAR, 0, 0, acName60A9, SDO60A9},
+   {0x60AA, OTYPE_VAR, 0, 0, acName60AA, SDO60AA},
    {0x60F4, OTYPE_VAR, 0, 0, acName60F4, SDO60F4},
    {0x60FF, OTYPE_VAR, 0, 0, acName60FF, SDO60FF},
    {0x6502, OTYPE_VAR, 0, 0, acName6502, SDO6502},
@@ -4625,7 +4823,10 @@ const _objectlist SDOobjects[] =
    {0x6840, OTYPE_VAR, 0, 0, acName6840, SDO6840},
    {0x6841, OTYPE_VAR, 0, 0, acName6841, SDO6841},
    {0x685A, OTYPE_VAR, 0, 0, acName685A, SDO685A},
+   {0x685B, OTYPE_VAR, 0, 0, acName685B, SDO685B},
+   {0x685C, OTYPE_VAR, 0, 0, acName685C, SDO685C},
    {0x685D, OTYPE_VAR, 0, 0, acName685D, SDO685D},
+   {0x685E, OTYPE_VAR, 0, 0, acName685E, SDO685E},
    {0x6860, OTYPE_VAR, 0, 0, acName6860, SDO6860},
    {0x6861, OTYPE_VAR, 0, 0, acName6861, SDO6861},
    {0x6864, OTYPE_VAR, 0, 0, acName6864, SDO6864},
@@ -4645,6 +4846,9 @@ const _objectlist SDOobjects[] =
    {0x688F, OTYPE_RECORD, 2, 0, acName688F, SDO688F},
    {0x6891, OTYPE_RECORD, 2, 0, acName6891, SDO6891},
    {0x6892, OTYPE_RECORD, 2, 0, acName6892, SDO6892},
+   {0x68A8, OTYPE_VAR, 0, 0, acName68A8, SDO68A8},
+   {0x68A9, OTYPE_VAR, 0, 0, acName68A9, SDO68A9},
+   {0x68AA, OTYPE_VAR, 0, 0, acName68AA, SDO68AA},
    {0x68F4, OTYPE_VAR, 0, 0, acName68F4, SDO68F4},
    {0x68FF, OTYPE_VAR, 0, 0, acName68FF, SDO68FF},
    {0x6D02, OTYPE_VAR, 0, 0, acName6D02, SDO6D02},
@@ -4652,7 +4856,10 @@ const _objectlist SDOobjects[] =
    {0x7040, OTYPE_VAR, 0, 0, acName7040, SDO7040},
    {0x7041, OTYPE_VAR, 0, 0, acName7041, SDO7041},
    {0x705A, OTYPE_VAR, 0, 0, acName705A, SDO705A},
+   {0x705B, OTYPE_VAR, 0, 0, acName705B, SDO705B},
+   {0x705C, OTYPE_VAR, 0, 0, acName705C, SDO705C},
    {0x705D, OTYPE_VAR, 0, 0, acName705D, SDO705D},
+   {0x705E, OTYPE_VAR, 0, 0, acName705E, SDO705E},
    {0x7060, OTYPE_VAR, 0, 0, acName7060, SDO7060},
    {0x7061, OTYPE_VAR, 0, 0, acName7061, SDO7061},
    {0x7064, OTYPE_VAR, 0, 0, acName7064, SDO7064},
@@ -4672,6 +4879,9 @@ const _objectlist SDOobjects[] =
    {0x708F, OTYPE_RECORD, 2, 0, acName708F, SDO708F},
    {0x7091, OTYPE_RECORD, 2, 0, acName7091, SDO7091},
    {0x7092, OTYPE_RECORD, 2, 0, acName7092, SDO7092},
+   {0x70A8, OTYPE_VAR, 0, 0, acName70A8, SDO70A8},
+   {0x70A9, OTYPE_VAR, 0, 0, acName70A9, SDO70A9},
+   {0x70AA, OTYPE_VAR, 0, 0, acName70AA, SDO70AA},
    {0x70F4, OTYPE_VAR, 0, 0, acName70F4, SDO70F4},
    {0x70FF, OTYPE_VAR, 0, 0, acName70FF, SDO70FF},
    {0x7502, OTYPE_VAR, 0, 0, acName7502, SDO7502},
@@ -4679,7 +4889,10 @@ const _objectlist SDOobjects[] =
    {0x7840, OTYPE_VAR, 0, 0, acName7840, SDO7840},
    {0x7841, OTYPE_VAR, 0, 0, acName7841, SDO7841},
    {0x785A, OTYPE_VAR, 0, 0, acName785A, SDO785A},
+   {0x785B, OTYPE_VAR, 0, 0, acName785B, SDO785B},
+   {0x785C, OTYPE_VAR, 0, 0, acName785C, SDO785C},
    {0x785D, OTYPE_VAR, 0, 0, acName785D, SDO785D},
+   {0x785E, OTYPE_VAR, 0, 0, acName785E, SDO785E},
    {0x7860, OTYPE_VAR, 0, 0, acName7860, SDO7860},
    {0x7861, OTYPE_VAR, 0, 0, acName7861, SDO7861},
    {0x7864, OTYPE_VAR, 0, 0, acName7864, SDO7864},
@@ -4699,6 +4912,9 @@ const _objectlist SDOobjects[] =
    {0x788F, OTYPE_RECORD, 2, 0, acName788F, SDO788F},
    {0x7891, OTYPE_RECORD, 2, 0, acName7891, SDO7891},
    {0x7892, OTYPE_RECORD, 2, 0, acName7892, SDO7892},
+   {0x78A8, OTYPE_VAR, 0, 0, acName78A8, SDO78A8},
+   {0x78A9, OTYPE_VAR, 0, 0, acName78A9, SDO78A9},
+   {0x78AA, OTYPE_VAR, 0, 0, acName78AA, SDO78AA},
    {0x78F4, OTYPE_VAR, 0, 0, acName78F4, SDO78F4},
    {0x78FF, OTYPE_VAR, 0, 0, acName78FF, SDO78FF},
    {0x7D02, OTYPE_VAR, 0, 0, acName7D02, SDO7D02},

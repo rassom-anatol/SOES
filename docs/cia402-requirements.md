@@ -40,7 +40,8 @@ things, and each claim brings required behaviour with it.
       halt option code; absent that object, the profile's default for the halt action
       still applies.
 
-- [ ] **The option codes define required behaviour whether or not the objects exist.**
+- [x] **The option codes define required behaviour whether or not the objects exist.**
+      *Done 17 October:* 0x605B, 0x605C and 0x605E are present, read-only, all 0: the drive switches the power stage off at once in each case, and says so. (0x605A = 2 and 0x605D = 1 were already present.)
       0x605B shutdown, 0x605C disable operation, 0x605D halt, 0x605E fault reaction.
       Omitting an object does not omit the obligation — it fixes the behaviour at the
       profile default. 0x605E is the significant one for a servo drive: it governs what
@@ -77,8 +78,9 @@ exhaustive test (cmc `docs/architecture.md`).
       stop request, not an idle value.
 - [x] **Fault reset is edge-triggered, not level.** A controlword arriving every cycle
       with bit 7 set must produce exactly one reset attempt, not one per cycle.
-- [ ] Bits 4, 5, 6 and 9 are mode-specific; bit 10 reserved; bits 11-15
+- [x] Bits 4, 5, 6 and 9 are mode-specific; bit 10 reserved; bits 11-15
       manufacturer-specific.
+      *Done:* bit 4 starts mode −1 identification, as it starts homing; bits 5, 6, 9 are unused by the cyclic modes and ignored; bits 11–15 are ignored.
 
 ### 2.2 State encoding — statusword bits 6, 5, 3, 2, 1, 0
 
@@ -99,22 +101,25 @@ manufacturer-specific.
 
 ### 2.3 Transitions
 
-- [ ] **0 and 1 are automatic** — power-on/reset, then initialisation complete.
-- [ ] **2 through 12 are command-driven**, per the table in §2.1.
-- [ ] **13 is reachable from every state** and is the only transition not driven by the
+- [x] **0 and 1 are automatic** — power-on/reset, then initialisation complete.
+- [x] **2 through 12 are command-driven**, per the table in §2.1.
+- [x] **13 is reachable from every state** and is the only transition not driven by the
       master: any state → Fault reaction active on fault detection.
-- [ ] **14 is automatic** once the fault reaction completes: Fault reaction active → Fault.
-- [ ] **15 requires the fault to have cleared.** Fault → Switch on disabled on a rising
+- [x] **14 is automatic** once the fault reaction completes: Fault reaction active → Fault.
+- [x] **15 requires the fault to have cleared.** Fault → Switch on disabled on a rising
       edge of controlword bit 7, *and only if the fault condition is gone*. A reset
       request with the fault still present must be refused, leaving the drive in Fault.
-- [ ] **16 exists only when 0x605A is 5-8** (Quick stop active → Operation enabled).
+- [x] **16 exists only when 0x605A is 5-8** (Quick stop active → Operation enabled).
       With 0x605A = 2 this transition must not be reachable.
+      *Done:* transitions 1–16 each have a test in cmc `test/test_cia402_sm.cpp`.
 
 Two properties worth asserting in the unit test beyond reproducing the table:
 
-- [ ] No controlword value moves the drive out of Fault to anywhere except Switch on
+- [x] No controlword value moves the drive out of Fault to anywhere except Switch on
       disabled.
-- [ ] Every state can be driven to Fault reaction active by the fault input.
+      *Done:* `NoControlwordEscapesFaultWhileFaultPersists`, an exhaustive sweep.
+- [x] Every state can be driven to Fault reaction active by the fault input.
+      *Done:* `T13_FaultPreemptsFromEveryOperationalState`.
 
 ---
 
@@ -172,9 +177,11 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 - [x] **Torque is per-thousandth of rated torque.** 0x6071, 0x6072 and 0x6077 are all in
       units of 1/1000 of **0x6076** motor rated torque (mNm). Already correct in roadmap
       cmc `docs/architecture.md`.
-- [ ] **Position scaling** comes from 0x608F position encoder resolution, 0x6091 gear
+- [x] **Position scaling** comes from 0x608F position encoder resolution, 0x6091 gear
       ratio and 0x6092 feed constant — all present.
-- [ ] **Velocity and acceleration scaling are absent.** The factor group also defines
+      *Done 3 October:* read-only, describing the fixed 65536 counts per motor turn.
+- [x] **Velocity and acceleration scaling are absent.**
+      *Done 17 October:* 0x60A8, 0x60A9 and 0x60AA, read-only, declare increments, rpm and rpm/s in the SI unit coding of the newer profile (maxon EPOS4 firmware specification 6.2.115-6.2.117), rather than the factor group. The factor group also defines
       **0x6094** velocity encoder factor, **0x6096** velocity factor and **0x6097**
       acceleration factor. Without them the units of 0x606C and 0x60FF default to
       increments per second, and a master has to be told out of band. This needs to be a
@@ -211,7 +218,8 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 - [x] **The state machine is evaluated every cycle from that cycle's controlword.** It is
       not an event handler hung off SDO writes. This fixes where `Cia402Sm` sits
       relative to the RxPDO unpack, which cmc's EtherCAT adapter performs.
-- [ ] **One setpoint consumed per cycle, acknowledged in statusword bit 12.** A cycle in
+- [x] **One setpoint consumed per cycle, acknowledged in statusword bit 12.**
+      *Done 17 October:* bit 12 is clear in a cycle without a new RxPDO; the velocity feed-forward still rides through a single missed frame. A cycle in
       which the setpoint was not consumed — missed frame, late thread — must clear bit
       12 rather than silently reusing the previous value. This is a protocol-level
       representation of the missed-cycle condition, distinct from 0x1C32:0B and from the

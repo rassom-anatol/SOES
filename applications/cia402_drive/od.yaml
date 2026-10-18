@@ -216,6 +216,14 @@ objects:
   # Halt (controlword bit 8): decelerate on 0x6084 and hold in Operation
   # Enabled. The only code implemented.
   - {index: 0x605D, axis: true, name: "Halt Option Code",        type: i16, access: ro, var: "HaltOptionCode", value: 1}
+  # What the drive does on Shutdown, Disable Operation and a fault: 0, it
+  # switches the power stage off at once. Read-only, to state the behaviour:
+  # without these objects a master would assume the profile's defaults, which
+  # for 0x605C (1) and 0x605E (2) are to decelerate first. Coding as in maxon's
+  # EPOS4 firmware specification (6.2.88-6.2.90).
+  - {index: 0x605B, axis: true, name: "Shutdown Option Code",          type: i16, access: ro, var: "ShutdownOptionCode", value: 0}
+  - {index: 0x605C, axis: true, name: "Disable Operation Option Code", type: i16, access: ro, var: "DisableOperationOptionCode", value: 0}
+  - {index: 0x605E, axis: true, name: "Fault Reaction Option Code",    type: i16, access: ro, var: "FaultReactionOptionCode", value: 0}
   - {index: 0x6060, axis: true, name: "Modes of Operation",      type: i8,  access: rw, var: "ModesOfOperation"}
   - {index: 0x6061, axis: true, name: "Modes of Operation Display", type: i8, access: ro, var: "ModesOfOperationDisplay"}
   - {index: 0x6064, axis: true, name: "Position Actual Value",   type: i32, access: ro, var: "PositionActual"}
@@ -255,6 +263,15 @@ objects:
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
   # Bits 7, 8, 9: csp, csv, cst. Bit 16: manufacturer mode -1, identification.
   - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00010380}
+
+  # The units of position, velocity and acceleration, in the SI unit coding
+  # (prefix, numerator, denominator; maxon EPOS4 firmware specification
+  # 6.2.115-6.2.117, whose defaults these are): increments, rpm, rpm/s.
+  # Read-only: the units are fixed. Without them a master would take velocity
+  # as increments per second.
+  - {index: 0x60A8, axis: true, name: "SI Unit Position",     type: u32, access: ro, var: "SiUnitPosition", value: 0x00B50000}
+  - {index: 0x60A9, axis: true, name: "SI Unit Velocity",     type: u32, access: ro, var: "SiUnitVelocity", value: 0x00B44700}
+  - {index: 0x60AA, axis: true, name: "SI Unit Acceleration", type: u32, access: ro, var: "SiUnitAcceleration", value: 0x00C00300}
 
   # Scaling. SDO-only, but a master cannot convert increments to user units
   # without them -- TwinCAT NC in particular.

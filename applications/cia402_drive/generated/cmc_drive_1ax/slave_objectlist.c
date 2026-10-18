@@ -439,8 +439,14 @@ static const char acName6041[] = "Statusword";
 static const char acName6041_00[] = "Statusword";
 static const char acName605A[] = "Quick Stop Option Code";
 static const char acName605A_00[] = "Quick Stop Option Code";
+static const char acName605B[] = "Shutdown Option Code";
+static const char acName605B_00[] = "Shutdown Option Code";
+static const char acName605C[] = "Disable Operation Option Code";
+static const char acName605C_00[] = "Disable Operation Option Code";
 static const char acName605D[] = "Halt Option Code";
 static const char acName605D_00[] = "Halt Option Code";
+static const char acName605E[] = "Fault Reaction Option Code";
+static const char acName605E_00[] = "Fault Reaction Option Code";
 static const char acName6060[] = "Modes of Operation";
 static const char acName6060_00[] = "Modes of Operation";
 static const char acName6061[] = "Modes of Operation Display";
@@ -483,6 +489,12 @@ static const char acName6091_02[] = "Shaft Revolutions";
 static const char acName6092[] = "Feed Constant";
 static const char acName6092_01[] = "Feed";
 static const char acName6092_02[] = "Shaft Revolutions";
+static const char acName60A8[] = "SI Unit Position";
+static const char acName60A8_00[] = "SI Unit Position";
+static const char acName60A9[] = "SI Unit Velocity";
+static const char acName60A9_00[] = "SI Unit Velocity";
+static const char acName60AA[] = "SI Unit Acceleration";
+static const char acName60AA_00[] = "SI Unit Acceleration";
 static const char acName60F4[] = "Following Error Actual";
 static const char acName60F4_00[] = "Following Error Actual";
 static const char acName60FF[] = "Target Velocity";
@@ -1139,10 +1151,28 @@ const _objd SDO605A[] =
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605A_00, 2, &Obj.axis[0].QuickStopOptionCode},
 };
 
+/* 0x605B Shutdown Option Code */
+const _objd SDO605B[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605B_00, 0, &Obj.axis[0].ShutdownOptionCode},
+};
+
+/* 0x605C Disable Operation Option Code */
+const _objd SDO605C[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605C_00, 0, &Obj.axis[0].DisableOperationOptionCode},
+};
+
 /* 0x605D Halt Option Code */
 const _objd SDO605D[] =
 {
    {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605D_00, 1, &Obj.axis[0].HaltOptionCode},
+};
+
+/* 0x605E Fault Reaction Option Code */
+const _objd SDO605E[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName605E_00, 0, &Obj.axis[0].FaultReactionOptionCode},
 };
 
 /* 0x6060 Modes of Operation */
@@ -1267,6 +1297,24 @@ const _objd SDO6092[] =
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6092_02, 1, &Obj.axis[0].FeedShaftRevolutions},
 };
 
+/* 0x60A8 SI Unit Position */
+const _objd SDO60A8[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60A8_00, 11862016, &Obj.axis[0].SiUnitPosition},
+};
+
+/* 0x60A9 SI Unit Velocity */
+const _objd SDO60A9[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60A9_00, 11814656, &Obj.axis[0].SiUnitVelocity},
+};
+
+/* 0x60AA SI Unit Acceleration */
+const _objd SDO60AA[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60AA_00, 12583680, &Obj.axis[0].SiUnitAcceleration},
+};
+
 /* 0x60F4 Following Error Actual */
 const _objd SDO60F4[] =
 {
@@ -1325,7 +1373,10 @@ const _objectlist SDOobjects[] =
    {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
    {0x6041, OTYPE_VAR, 0, 0, acName6041, SDO6041},
    {0x605A, OTYPE_VAR, 0, 0, acName605A, SDO605A},
+   {0x605B, OTYPE_VAR, 0, 0, acName605B, SDO605B},
+   {0x605C, OTYPE_VAR, 0, 0, acName605C, SDO605C},
    {0x605D, OTYPE_VAR, 0, 0, acName605D, SDO605D},
+   {0x605E, OTYPE_VAR, 0, 0, acName605E, SDO605E},
    {0x6060, OTYPE_VAR, 0, 0, acName6060, SDO6060},
    {0x6061, OTYPE_VAR, 0, 0, acName6061, SDO6061},
    {0x6064, OTYPE_VAR, 0, 0, acName6064, SDO6064},
@@ -1345,6 +1396,9 @@ const _objectlist SDOobjects[] =
    {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
    {0x6091, OTYPE_RECORD, 2, 0, acName6091, SDO6091},
    {0x6092, OTYPE_RECORD, 2, 0, acName6092, SDO6092},
+   {0x60A8, OTYPE_VAR, 0, 0, acName60A8, SDO60A8},
+   {0x60A9, OTYPE_VAR, 0, 0, acName60A9, SDO60A9},
+   {0x60AA, OTYPE_VAR, 0, 0, acName60AA, SDO60AA},
    {0x60F4, OTYPE_VAR, 0, 0, acName60F4, SDO60F4},
    {0x60FF, OTYPE_VAR, 0, 0, acName60FF, SDO60FF},
    {0x6502, OTYPE_VAR, 0, 0, acName6502, SDO6502},
