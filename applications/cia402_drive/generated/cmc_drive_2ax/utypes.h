@@ -111,6 +111,7 @@ typedef struct
    uint8_t    MonitorSelectValue;
    int32_t    MonitorValue;
    int32_t    MosfetTemp_mC;
+   int16_t    MotionProfileType;
    uint32_t   MotorRatedCurrent;
    uint32_t   MotorRatedTorque;
    uint32_t   MotorRevolutions;
@@ -120,7 +121,11 @@ typedef struct
    int32_t    PositionLimitMax;
    int32_t    PositionLimitMin;
    uint16_t   PositionP;
+   uint32_t   PositionWindow;
+   uint16_t   PositionWindowTime;
+   uint32_t   ProfileAcceleration;
    uint32_t   ProfileDeceleration;
+   uint32_t   ProfileVelocity;
    uint32_t   QuickStopDeceleration;
    int16_t    QuickStopOptionCode;
    uint16_t   ShaftAngle;

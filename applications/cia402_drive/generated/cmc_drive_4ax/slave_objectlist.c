@@ -1546,6 +1546,10 @@ static const char acName6065[] = "Following Error Window";
 static const char acName6065_00[] = "Following Error Window";
 static const char acName6066[] = "Following Error Time Out";
 static const char acName6066_00[] = "Following Error Time Out";
+static const char acName6067[] = "Position Window";
+static const char acName6067_00[] = "Position Window";
+static const char acName6068[] = "Position Window Time";
+static const char acName6068_00[] = "Position Window Time";
 static const char acName606C[] = "Velocity Actual Value";
 static const char acName606C_00[] = "Velocity Actual Value";
 static const char acName6071[] = "Target Torque";
@@ -1565,10 +1569,16 @@ static const char acName607D_01[] = "Min Position Limit";
 static const char acName607D_02[] = "Max Position Limit";
 static const char acName6080[] = "Max Motor Speed";
 static const char acName6080_00[] = "Max Motor Speed";
+static const char acName6081[] = "Profile Velocity";
+static const char acName6081_00[] = "Profile Velocity";
+static const char acName6083[] = "Profile Acceleration";
+static const char acName6083_00[] = "Profile Acceleration";
 static const char acName6084[] = "Profile Deceleration";
 static const char acName6084_00[] = "Profile Deceleration";
 static const char acName6085[] = "Quick Stop Deceleration";
 static const char acName6085_00[] = "Quick Stop Deceleration";
+static const char acName6086[] = "Motion Profile Type";
+static const char acName6086_00[] = "Motion Profile Type";
 static const char acName608F[] = "Position Encoder Resolution";
 static const char acName608F_01[] = "Encoder Increments";
 static const char acName608F_02[] = "Motor Revolutions";
@@ -1616,6 +1626,10 @@ static const char acName6865[] = "Following Error Window";
 static const char acName6865_00[] = "Following Error Window";
 static const char acName6866[] = "Following Error Time Out";
 static const char acName6866_00[] = "Following Error Time Out";
+static const char acName6867[] = "Position Window";
+static const char acName6867_00[] = "Position Window";
+static const char acName6868[] = "Position Window Time";
+static const char acName6868_00[] = "Position Window Time";
 static const char acName686C[] = "Velocity Actual Value";
 static const char acName686C_00[] = "Velocity Actual Value";
 static const char acName6871[] = "Target Torque";
@@ -1635,10 +1649,16 @@ static const char acName687D_01[] = "Min Position Limit";
 static const char acName687D_02[] = "Max Position Limit";
 static const char acName6880[] = "Max Motor Speed";
 static const char acName6880_00[] = "Max Motor Speed";
+static const char acName6881[] = "Profile Velocity";
+static const char acName6881_00[] = "Profile Velocity";
+static const char acName6883[] = "Profile Acceleration";
+static const char acName6883_00[] = "Profile Acceleration";
 static const char acName6884[] = "Profile Deceleration";
 static const char acName6884_00[] = "Profile Deceleration";
 static const char acName6885[] = "Quick Stop Deceleration";
 static const char acName6885_00[] = "Quick Stop Deceleration";
+static const char acName6886[] = "Motion Profile Type";
+static const char acName6886_00[] = "Motion Profile Type";
 static const char acName688F[] = "Position Encoder Resolution";
 static const char acName688F_01[] = "Encoder Increments";
 static const char acName688F_02[] = "Motor Revolutions";
@@ -1686,6 +1706,10 @@ static const char acName7065[] = "Following Error Window";
 static const char acName7065_00[] = "Following Error Window";
 static const char acName7066[] = "Following Error Time Out";
 static const char acName7066_00[] = "Following Error Time Out";
+static const char acName7067[] = "Position Window";
+static const char acName7067_00[] = "Position Window";
+static const char acName7068[] = "Position Window Time";
+static const char acName7068_00[] = "Position Window Time";
 static const char acName706C[] = "Velocity Actual Value";
 static const char acName706C_00[] = "Velocity Actual Value";
 static const char acName7071[] = "Target Torque";
@@ -1705,10 +1729,16 @@ static const char acName707D_01[] = "Min Position Limit";
 static const char acName707D_02[] = "Max Position Limit";
 static const char acName7080[] = "Max Motor Speed";
 static const char acName7080_00[] = "Max Motor Speed";
+static const char acName7081[] = "Profile Velocity";
+static const char acName7081_00[] = "Profile Velocity";
+static const char acName7083[] = "Profile Acceleration";
+static const char acName7083_00[] = "Profile Acceleration";
 static const char acName7084[] = "Profile Deceleration";
 static const char acName7084_00[] = "Profile Deceleration";
 static const char acName7085[] = "Quick Stop Deceleration";
 static const char acName7085_00[] = "Quick Stop Deceleration";
+static const char acName7086[] = "Motion Profile Type";
+static const char acName7086_00[] = "Motion Profile Type";
 static const char acName708F[] = "Position Encoder Resolution";
 static const char acName708F_01[] = "Encoder Increments";
 static const char acName708F_02[] = "Motor Revolutions";
@@ -1756,6 +1786,10 @@ static const char acName7865[] = "Following Error Window";
 static const char acName7865_00[] = "Following Error Window";
 static const char acName7866[] = "Following Error Time Out";
 static const char acName7866_00[] = "Following Error Time Out";
+static const char acName7867[] = "Position Window";
+static const char acName7867_00[] = "Position Window";
+static const char acName7868[] = "Position Window Time";
+static const char acName7868_00[] = "Position Window Time";
 static const char acName786C[] = "Velocity Actual Value";
 static const char acName786C_00[] = "Velocity Actual Value";
 static const char acName7871[] = "Target Torque";
@@ -1775,10 +1809,16 @@ static const char acName787D_01[] = "Min Position Limit";
 static const char acName787D_02[] = "Max Position Limit";
 static const char acName7880[] = "Max Motor Speed";
 static const char acName7880_00[] = "Max Motor Speed";
+static const char acName7881[] = "Profile Velocity";
+static const char acName7881_00[] = "Profile Velocity";
+static const char acName7883[] = "Profile Acceleration";
+static const char acName7883_00[] = "Profile Acceleration";
 static const char acName7884[] = "Profile Deceleration";
 static const char acName7884_00[] = "Profile Deceleration";
 static const char acName7885[] = "Quick Stop Deceleration";
 static const char acName7885_00[] = "Quick Stop Deceleration";
+static const char acName7886[] = "Motion Profile Type";
+static const char acName7886_00[] = "Motion Profile Type";
 static const char acName788F[] = "Position Encoder Resolution";
 static const char acName788F_01[] = "Encoder Increments";
 static const char acName788F_02[] = "Motor Revolutions";
@@ -3956,6 +3996,18 @@ const _objd SDO6066[] =
    {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6066_00, 50, &Obj.axis[0].FollowingErrorTimeout},
 };
 
+/* 0x6067 Position Window */
+const _objd SDO6067[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6067_00, 100, &Obj.axis[0].PositionWindow},
+};
+
+/* 0x6068 Position Window Time */
+const _objd SDO6068[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6068_00, 10, &Obj.axis[0].PositionWindowTime},
+};
+
 /* 0x606C Velocity Actual Value */
 const _objd SDO606C[] =
 {
@@ -4012,6 +4064,18 @@ const _objd SDO6080[] =
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6080_00, 7840, &Obj.axis[0].MaxMotorSpeed},
 };
 
+/* 0x6081 Profile Velocity */
+const _objd SDO6081[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6081_00, 1000, &Obj.axis[0].ProfileVelocity},
+};
+
+/* 0x6083 Profile Acceleration */
+const _objd SDO6083[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6083_00, 10000, &Obj.axis[0].ProfileAcceleration},
+};
+
 /* 0x6084 Profile Deceleration */
 const _objd SDO6084[] =
 {
@@ -4022,6 +4086,12 @@ const _objd SDO6084[] =
 const _objd SDO6085[] =
 {
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6085_00, 10000, &Obj.axis[0].QuickStopDeceleration},
+};
+
+/* 0x6086 Motion Profile Type */
+const _objd SDO6086[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName6086_00, 0, &Obj.axis[0].MotionProfileType},
 };
 
 /* 0x608F Position Encoder Resolution */
@@ -4081,7 +4151,7 @@ const _objd SDO60FF[] =
 /* 0x6502 Supported Drive Modes */
 const _objd SDO6502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66432, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66433, NULL},
 };
 
 /* 0x683F Error Code */
@@ -4162,6 +4232,18 @@ const _objd SDO6866[] =
    {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6866_00, 50, &Obj.axis[1].FollowingErrorTimeout},
 };
 
+/* 0x6867 Position Window */
+const _objd SDO6867[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6867_00, 100, &Obj.axis[1].PositionWindow},
+};
+
+/* 0x6868 Position Window Time */
+const _objd SDO6868[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6868_00, 10, &Obj.axis[1].PositionWindowTime},
+};
+
 /* 0x686C Velocity Actual Value */
 const _objd SDO686C[] =
 {
@@ -4218,6 +4300,18 @@ const _objd SDO6880[] =
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6880_00, 7840, &Obj.axis[1].MaxMotorSpeed},
 };
 
+/* 0x6881 Profile Velocity */
+const _objd SDO6881[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6881_00, 1000, &Obj.axis[1].ProfileVelocity},
+};
+
+/* 0x6883 Profile Acceleration */
+const _objd SDO6883[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6883_00, 10000, &Obj.axis[1].ProfileAcceleration},
+};
+
 /* 0x6884 Profile Deceleration */
 const _objd SDO6884[] =
 {
@@ -4228,6 +4322,12 @@ const _objd SDO6884[] =
 const _objd SDO6885[] =
 {
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6885_00, 10000, &Obj.axis[1].QuickStopDeceleration},
+};
+
+/* 0x6886 Motion Profile Type */
+const _objd SDO6886[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName6886_00, 0, &Obj.axis[1].MotionProfileType},
 };
 
 /* 0x688F Position Encoder Resolution */
@@ -4287,7 +4387,7 @@ const _objd SDO68FF[] =
 /* 0x6D02 Supported Drive Modes */
 const _objd SDO6D02[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6D02_00, 66432, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6D02_00, 66433, NULL},
 };
 
 /* 0x703F Error Code */
@@ -4368,6 +4468,18 @@ const _objd SDO7066[] =
    {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName7066_00, 50, &Obj.axis[2].FollowingErrorTimeout},
 };
 
+/* 0x7067 Position Window */
+const _objd SDO7067[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7067_00, 100, &Obj.axis[2].PositionWindow},
+};
+
+/* 0x7068 Position Window Time */
+const _objd SDO7068[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName7068_00, 10, &Obj.axis[2].PositionWindowTime},
+};
+
 /* 0x706C Velocity Actual Value */
 const _objd SDO706C[] =
 {
@@ -4424,6 +4536,18 @@ const _objd SDO7080[] =
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7080_00, 7840, &Obj.axis[2].MaxMotorSpeed},
 };
 
+/* 0x7081 Profile Velocity */
+const _objd SDO7081[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7081_00, 1000, &Obj.axis[2].ProfileVelocity},
+};
+
+/* 0x7083 Profile Acceleration */
+const _objd SDO7083[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7083_00, 10000, &Obj.axis[2].ProfileAcceleration},
+};
+
 /* 0x7084 Profile Deceleration */
 const _objd SDO7084[] =
 {
@@ -4434,6 +4558,12 @@ const _objd SDO7084[] =
 const _objd SDO7085[] =
 {
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7085_00, 10000, &Obj.axis[2].QuickStopDeceleration},
+};
+
+/* 0x7086 Motion Profile Type */
+const _objd SDO7086[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName7086_00, 0, &Obj.axis[2].MotionProfileType},
 };
 
 /* 0x708F Position Encoder Resolution */
@@ -4493,7 +4623,7 @@ const _objd SDO70FF[] =
 /* 0x7502 Supported Drive Modes */
 const _objd SDO7502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7502_00, 66432, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7502_00, 66433, NULL},
 };
 
 /* 0x783F Error Code */
@@ -4574,6 +4704,18 @@ const _objd SDO7866[] =
    {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName7866_00, 50, &Obj.axis[3].FollowingErrorTimeout},
 };
 
+/* 0x7867 Position Window */
+const _objd SDO7867[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7867_00, 100, &Obj.axis[3].PositionWindow},
+};
+
+/* 0x7868 Position Window Time */
+const _objd SDO7868[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName7868_00, 10, &Obj.axis[3].PositionWindowTime},
+};
+
 /* 0x786C Velocity Actual Value */
 const _objd SDO786C[] =
 {
@@ -4630,6 +4772,18 @@ const _objd SDO7880[] =
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7880_00, 7840, &Obj.axis[3].MaxMotorSpeed},
 };
 
+/* 0x7881 Profile Velocity */
+const _objd SDO7881[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7881_00, 1000, &Obj.axis[3].ProfileVelocity},
+};
+
+/* 0x7883 Profile Acceleration */
+const _objd SDO7883[] =
+{
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7883_00, 10000, &Obj.axis[3].ProfileAcceleration},
+};
+
 /* 0x7884 Profile Deceleration */
 const _objd SDO7884[] =
 {
@@ -4640,6 +4794,12 @@ const _objd SDO7884[] =
 const _objd SDO7885[] =
 {
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7885_00, 10000, &Obj.axis[3].QuickStopDeceleration},
+};
+
+/* 0x7886 Motion Profile Type */
+const _objd SDO7886[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName7886_00, 0, &Obj.axis[3].MotionProfileType},
 };
 
 /* 0x788F Position Encoder Resolution */
@@ -4699,7 +4859,7 @@ const _objd SDO78FF[] =
 /* 0x7D02 Supported Drive Modes */
 const _objd SDO7D02[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7D02_00, 66432, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7D02_00, 66433, NULL},
 };
 
 /* Object list. Ascending index order is required by
@@ -4799,6 +4959,8 @@ const _objectlist SDOobjects[] =
    {0x6064, OTYPE_VAR, 0, 0, acName6064, SDO6064},
    {0x6065, OTYPE_VAR, 0, 0, acName6065, SDO6065},
    {0x6066, OTYPE_VAR, 0, 0, acName6066, SDO6066},
+   {0x6067, OTYPE_VAR, 0, 0, acName6067, SDO6067},
+   {0x6068, OTYPE_VAR, 0, 0, acName6068, SDO6068},
    {0x606C, OTYPE_VAR, 0, 0, acName606C, SDO606C},
    {0x6071, OTYPE_VAR, 0, 0, acName6071, SDO6071},
    {0x6072, OTYPE_VAR, 0, 0, acName6072, SDO6072},
@@ -4808,8 +4970,11 @@ const _objectlist SDOobjects[] =
    {0x607A, OTYPE_VAR, 0, 0, acName607A, SDO607A},
    {0x607D, OTYPE_RECORD, 2, 0, acName607D, SDO607D},
    {0x6080, OTYPE_VAR, 0, 0, acName6080, SDO6080},
+   {0x6081, OTYPE_VAR, 0, 0, acName6081, SDO6081},
+   {0x6083, OTYPE_VAR, 0, 0, acName6083, SDO6083},
    {0x6084, OTYPE_VAR, 0, 0, acName6084, SDO6084},
    {0x6085, OTYPE_VAR, 0, 0, acName6085, SDO6085},
+   {0x6086, OTYPE_VAR, 0, 0, acName6086, SDO6086},
    {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
    {0x6091, OTYPE_RECORD, 2, 0, acName6091, SDO6091},
    {0x6092, OTYPE_RECORD, 2, 0, acName6092, SDO6092},
@@ -4832,6 +4997,8 @@ const _objectlist SDOobjects[] =
    {0x6864, OTYPE_VAR, 0, 0, acName6864, SDO6864},
    {0x6865, OTYPE_VAR, 0, 0, acName6865, SDO6865},
    {0x6866, OTYPE_VAR, 0, 0, acName6866, SDO6866},
+   {0x6867, OTYPE_VAR, 0, 0, acName6867, SDO6867},
+   {0x6868, OTYPE_VAR, 0, 0, acName6868, SDO6868},
    {0x686C, OTYPE_VAR, 0, 0, acName686C, SDO686C},
    {0x6871, OTYPE_VAR, 0, 0, acName6871, SDO6871},
    {0x6872, OTYPE_VAR, 0, 0, acName6872, SDO6872},
@@ -4841,8 +5008,11 @@ const _objectlist SDOobjects[] =
    {0x687A, OTYPE_VAR, 0, 0, acName687A, SDO687A},
    {0x687D, OTYPE_RECORD, 2, 0, acName687D, SDO687D},
    {0x6880, OTYPE_VAR, 0, 0, acName6880, SDO6880},
+   {0x6881, OTYPE_VAR, 0, 0, acName6881, SDO6881},
+   {0x6883, OTYPE_VAR, 0, 0, acName6883, SDO6883},
    {0x6884, OTYPE_VAR, 0, 0, acName6884, SDO6884},
    {0x6885, OTYPE_VAR, 0, 0, acName6885, SDO6885},
+   {0x6886, OTYPE_VAR, 0, 0, acName6886, SDO6886},
    {0x688F, OTYPE_RECORD, 2, 0, acName688F, SDO688F},
    {0x6891, OTYPE_RECORD, 2, 0, acName6891, SDO6891},
    {0x6892, OTYPE_RECORD, 2, 0, acName6892, SDO6892},
@@ -4865,6 +5035,8 @@ const _objectlist SDOobjects[] =
    {0x7064, OTYPE_VAR, 0, 0, acName7064, SDO7064},
    {0x7065, OTYPE_VAR, 0, 0, acName7065, SDO7065},
    {0x7066, OTYPE_VAR, 0, 0, acName7066, SDO7066},
+   {0x7067, OTYPE_VAR, 0, 0, acName7067, SDO7067},
+   {0x7068, OTYPE_VAR, 0, 0, acName7068, SDO7068},
    {0x706C, OTYPE_VAR, 0, 0, acName706C, SDO706C},
    {0x7071, OTYPE_VAR, 0, 0, acName7071, SDO7071},
    {0x7072, OTYPE_VAR, 0, 0, acName7072, SDO7072},
@@ -4874,8 +5046,11 @@ const _objectlist SDOobjects[] =
    {0x707A, OTYPE_VAR, 0, 0, acName707A, SDO707A},
    {0x707D, OTYPE_RECORD, 2, 0, acName707D, SDO707D},
    {0x7080, OTYPE_VAR, 0, 0, acName7080, SDO7080},
+   {0x7081, OTYPE_VAR, 0, 0, acName7081, SDO7081},
+   {0x7083, OTYPE_VAR, 0, 0, acName7083, SDO7083},
    {0x7084, OTYPE_VAR, 0, 0, acName7084, SDO7084},
    {0x7085, OTYPE_VAR, 0, 0, acName7085, SDO7085},
+   {0x7086, OTYPE_VAR, 0, 0, acName7086, SDO7086},
    {0x708F, OTYPE_RECORD, 2, 0, acName708F, SDO708F},
    {0x7091, OTYPE_RECORD, 2, 0, acName7091, SDO7091},
    {0x7092, OTYPE_RECORD, 2, 0, acName7092, SDO7092},
@@ -4898,6 +5073,8 @@ const _objectlist SDOobjects[] =
    {0x7864, OTYPE_VAR, 0, 0, acName7864, SDO7864},
    {0x7865, OTYPE_VAR, 0, 0, acName7865, SDO7865},
    {0x7866, OTYPE_VAR, 0, 0, acName7866, SDO7866},
+   {0x7867, OTYPE_VAR, 0, 0, acName7867, SDO7867},
+   {0x7868, OTYPE_VAR, 0, 0, acName7868, SDO7868},
    {0x786C, OTYPE_VAR, 0, 0, acName786C, SDO786C},
    {0x7871, OTYPE_VAR, 0, 0, acName7871, SDO7871},
    {0x7872, OTYPE_VAR, 0, 0, acName7872, SDO7872},
@@ -4907,8 +5084,11 @@ const _objectlist SDOobjects[] =
    {0x787A, OTYPE_VAR, 0, 0, acName787A, SDO787A},
    {0x787D, OTYPE_RECORD, 2, 0, acName787D, SDO787D},
    {0x7880, OTYPE_VAR, 0, 0, acName7880, SDO7880},
+   {0x7881, OTYPE_VAR, 0, 0, acName7881, SDO7881},
+   {0x7883, OTYPE_VAR, 0, 0, acName7883, SDO7883},
    {0x7884, OTYPE_VAR, 0, 0, acName7884, SDO7884},
    {0x7885, OTYPE_VAR, 0, 0, acName7885, SDO7885},
+   {0x7886, OTYPE_VAR, 0, 0, acName7886, SDO7886},
    {0x788F, OTYPE_RECORD, 2, 0, acName788F, SDO788F},
    {0x7891, OTYPE_RECORD, 2, 0, acName7891, SDO7891},
    {0x7892, OTYPE_RECORD, 2, 0, acName7892, SDO7892},
