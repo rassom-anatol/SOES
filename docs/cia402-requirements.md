@@ -137,6 +137,7 @@ Two properties worth asserting in the unit test beyond reproducing the table:
 
 | Mode | Required | Status |
 |---|---|---|
+| pp | 0x607A target position, 0x6064 position actual value, 0x6081 profile velocity, 0x6083 profile acceleration, 0x6084 profile deceleration | present (October 2026) |
 | csp | 0x607A target position, 0x6064 position actual value | present |
 | csv | 0x60FF target velocity, 0x606C velocity actual value | present |
 | cst | 0x6071 target torque, 0x6077 torque actual value, 0x6072 max torque, 0x6076 motor rated torque | present |
@@ -165,6 +166,16 @@ Two properties worth asserting in the unit test beyond reproducing the table:
       not a trip condition. **Until 0x6065/0x6066 exist, bit 13 must read 0** rather
       than being driven from an ad-hoc threshold.
 - [x] Bit 13 is reserved in csv and cst.
+- [x] **Profile position (pp):** bit 12 is the set-point acknowledge (set when a
+      set-point is taken on controlword bit 4's rising edge; cleared once bit 4 has
+      dropped and none waits), bit 10 target reached (the profile has arrived and the
+      position stayed within 0x6067 for 0x6068), bit 13 following error against the
+      profile's setpoint. Controlword bit 5 (change set immediately) and bit 6
+      (relative, to the previous set-point) are implemented; one set-point may wait.
+      **Departures, flagged:** bit 9 (change on set-point) is not implemented and
+      reads as 0; a set-point that arrives during a Halt is not taken; releasing a
+      Halt continues to the same target. 0x6086 reads 0 (linear ramp), the only
+      profile type.
 - [x] Bit 10 (target reached) is not used in the cyclic modes.
 - [x] Bit 11 (internal limit active) should reflect torque, current or position limiting
       — it is the standard channel for "the drive is clamping your setpoint", and
@@ -240,8 +251,7 @@ expect from a "normal" servo drive:
 - 0x607E Polarity — direction inversion. Commonly needed at commissioning.
 - ~~0x607D Software position limit.~~ Implemented 3 October 2026.
 - ~~0x6065 / 0x6066 Following error window and timeout.~~ Implemented 3 October 2026.
-- 0x6083 Profile acceleration — only for the profiled modes. (0x6084 Profile
-  deceleration is implemented, for Halt.)
+- ~~0x6083 Profile acceleration.~~ Implemented with profile position, October 2026.
 - ~~0x6085 Quick stop deceleration.~~ Implemented 3 October 2026, with the ramp.
 - **Emergency messages (EMCY over CoE).** SOES has none. Decided absent for v1: no
   master in use needs them, and 0x603F, 0x1001 and statusword bit 3 report every
