@@ -3595,6 +3595,8 @@ static const char acName6091_02[] = "Shaft Revolutions";
 static const char acName6092[] = "Feed Constant";
 static const char acName6092_01[] = "Feed";
 static const char acName6092_02[] = "Shaft Revolutions";
+static const char acName60A4[] = "Profile Jerk";
+static const char acName60A4_01[] = "Profile Jerk 1";
 static const char acName60A8[] = "SI Unit Position";
 static const char acName60A8_00[] = "SI Unit Position";
 static const char acName60A9[] = "SI Unit Velocity";
@@ -3675,6 +3677,8 @@ static const char acName6891_02[] = "Shaft Revolutions";
 static const char acName6892[] = "Feed Constant";
 static const char acName6892_01[] = "Feed";
 static const char acName6892_02[] = "Shaft Revolutions";
+static const char acName68A4[] = "Profile Jerk";
+static const char acName68A4_01[] = "Profile Jerk 1";
 static const char acName68A8[] = "SI Unit Position";
 static const char acName68A8_00[] = "SI Unit Position";
 static const char acName68A9[] = "SI Unit Velocity";
@@ -3755,6 +3759,8 @@ static const char acName7091_02[] = "Shaft Revolutions";
 static const char acName7092[] = "Feed Constant";
 static const char acName7092_01[] = "Feed";
 static const char acName7092_02[] = "Shaft Revolutions";
+static const char acName70A4[] = "Profile Jerk";
+static const char acName70A4_01[] = "Profile Jerk 1";
 static const char acName70A8[] = "SI Unit Position";
 static const char acName70A8_00[] = "SI Unit Position";
 static const char acName70A9[] = "SI Unit Velocity";
@@ -3835,6 +3841,8 @@ static const char acName7891_02[] = "Shaft Revolutions";
 static const char acName7892[] = "Feed Constant";
 static const char acName7892_01[] = "Feed";
 static const char acName7892_02[] = "Shaft Revolutions";
+static const char acName78A4[] = "Profile Jerk";
+static const char acName78A4_01[] = "Profile Jerk 1";
 static const char acName78A8[] = "SI Unit Position";
 static const char acName78A8_00[] = "SI Unit Position";
 static const char acName78A9[] = "SI Unit Velocity";
@@ -8270,7 +8278,7 @@ const _objd SDO6085[] =
 /* 0x6086 Motion Profile Type */
 const _objd SDO6086[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName6086_00, 0, &Obj.axis[0].MotionProfileType},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName6086_00, 0, &Obj.axis[0].MotionProfileType},
 };
 
 /* 0x608F Position Encoder Resolution */
@@ -8295,6 +8303,13 @@ const _objd SDO6092[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6092, 2, NULL},
    {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6092_01, 65536, &Obj.axis[0].Feed},
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6092_02, 1, &Obj.axis[0].FeedShaftRevolutions},
+};
+
+/* 0x60A4 Profile Jerk */
+const _objd SDO60A4[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName60A4, 1, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName60A4_01, 1000000, &Obj.axis[0].ProfileJerk},
 };
 
 /* 0x60A8 SI Unit Position */
@@ -8506,7 +8521,7 @@ const _objd SDO6885[] =
 /* 0x6886 Motion Profile Type */
 const _objd SDO6886[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName6886_00, 0, &Obj.axis[1].MotionProfileType},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName6886_00, 0, &Obj.axis[1].MotionProfileType},
 };
 
 /* 0x688F Position Encoder Resolution */
@@ -8531,6 +8546,13 @@ const _objd SDO6892[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6892, 2, NULL},
    {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6892_01, 65536, &Obj.axis[1].Feed},
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6892_02, 1, &Obj.axis[1].FeedShaftRevolutions},
+};
+
+/* 0x68A4 Profile Jerk */
+const _objd SDO68A4[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName68A4, 1, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName68A4_01, 1000000, &Obj.axis[1].ProfileJerk},
 };
 
 /* 0x68A8 SI Unit Position */
@@ -8742,7 +8764,7 @@ const _objd SDO7085[] =
 /* 0x7086 Motion Profile Type */
 const _objd SDO7086[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName7086_00, 0, &Obj.axis[2].MotionProfileType},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName7086_00, 0, &Obj.axis[2].MotionProfileType},
 };
 
 /* 0x708F Position Encoder Resolution */
@@ -8767,6 +8789,13 @@ const _objd SDO7092[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7092, 2, NULL},
    {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7092_01, 65536, &Obj.axis[2].Feed},
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7092_02, 1, &Obj.axis[2].FeedShaftRevolutions},
+};
+
+/* 0x70A4 Profile Jerk */
+const _objd SDO70A4[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName70A4, 1, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName70A4_01, 1000000, &Obj.axis[2].ProfileJerk},
 };
 
 /* 0x70A8 SI Unit Position */
@@ -8978,7 +9007,7 @@ const _objd SDO7885[] =
 /* 0x7886 Motion Profile Type */
 const _objd SDO7886[] =
 {
-   {0x00, DTYPE_INTEGER16, 16, ATYPE_RO, acName7886_00, 0, &Obj.axis[3].MotionProfileType},
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName7886_00, 0, &Obj.axis[3].MotionProfileType},
 };
 
 /* 0x788F Position Encoder Resolution */
@@ -9003,6 +9032,13 @@ const _objd SDO7892[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7892, 2, NULL},
    {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7892_01, 65536, &Obj.axis[3].Feed},
    {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7892_02, 1, &Obj.axis[3].FeedShaftRevolutions},
+};
+
+/* 0x78A4 Profile Jerk */
+const _objd SDO78A4[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName78A4, 1, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName78A4_01, 1000000, &Obj.axis[3].ProfileJerk},
 };
 
 /* 0x78A8 SI Unit Position */
@@ -9190,6 +9226,7 @@ const _objectlist SDOobjects[] =
    {0x608F, OTYPE_RECORD, 2, 0, acName608F, SDO608F},
    {0x6091, OTYPE_RECORD, 2, 0, acName6091, SDO6091},
    {0x6092, OTYPE_RECORD, 2, 0, acName6092, SDO6092},
+   {0x60A4, OTYPE_ARRAY, 1, 0, acName60A4, SDO60A4},
    {0x60A8, OTYPE_VAR, 0, 0, acName60A8, SDO60A8},
    {0x60A9, OTYPE_VAR, 0, 0, acName60A9, SDO60A9},
    {0x60AA, OTYPE_VAR, 0, 0, acName60AA, SDO60AA},
@@ -9228,6 +9265,7 @@ const _objectlist SDOobjects[] =
    {0x688F, OTYPE_RECORD, 2, 0, acName688F, SDO688F},
    {0x6891, OTYPE_RECORD, 2, 0, acName6891, SDO6891},
    {0x6892, OTYPE_RECORD, 2, 0, acName6892, SDO6892},
+   {0x68A4, OTYPE_ARRAY, 1, 0, acName68A4, SDO68A4},
    {0x68A8, OTYPE_VAR, 0, 0, acName68A8, SDO68A8},
    {0x68A9, OTYPE_VAR, 0, 0, acName68A9, SDO68A9},
    {0x68AA, OTYPE_VAR, 0, 0, acName68AA, SDO68AA},
@@ -9266,6 +9304,7 @@ const _objectlist SDOobjects[] =
    {0x708F, OTYPE_RECORD, 2, 0, acName708F, SDO708F},
    {0x7091, OTYPE_RECORD, 2, 0, acName7091, SDO7091},
    {0x7092, OTYPE_RECORD, 2, 0, acName7092, SDO7092},
+   {0x70A4, OTYPE_ARRAY, 1, 0, acName70A4, SDO70A4},
    {0x70A8, OTYPE_VAR, 0, 0, acName70A8, SDO70A8},
    {0x70A9, OTYPE_VAR, 0, 0, acName70A9, SDO70A9},
    {0x70AA, OTYPE_VAR, 0, 0, acName70AA, SDO70AA},
@@ -9304,6 +9343,7 @@ const _objectlist SDOobjects[] =
    {0x788F, OTYPE_RECORD, 2, 0, acName788F, SDO788F},
    {0x7891, OTYPE_RECORD, 2, 0, acName7891, SDO7891},
    {0x7892, OTYPE_RECORD, 2, 0, acName7892, SDO7892},
+   {0x78A4, OTYPE_ARRAY, 1, 0, acName78A4, SDO78A4},
    {0x78A8, OTYPE_VAR, 0, 0, acName78A8, SDO78A8},
    {0x78A9, OTYPE_VAR, 0, 0, acName78A9, SDO78A9},
    {0x78AA, OTYPE_VAR, 0, 0, acName78AA, SDO78AA},

@@ -221,6 +221,9 @@ class Object:
             "array_size": int(spec["size"]) if t == "domain" else None,
             "length_var": spec.get("length_var"),
             "disabled_only": bool(spec.get("disabled_only", disabled_only_default)),
+            # `allowed: [0, 3]`: the only values a write may carry; others
+            # are refused with 0x06090030. Integers only.
+            "allowed": [int(x) for x in spec["allowed"]] if "allowed" in spec else None,
         }
 
     @property
@@ -877,6 +880,9 @@ struct Entry
    const char * name;
    /** A Domain's present length in bytes; null for every other type. */
    const uint32_t * length;
+   /** The values a write may carry (YAML `allowed`), or null for any. */
+   const int64_t * allowed = nullptr;
+   uint8_t      allowed_count = 0;
 };
 
 extern const Entry       kEntries[];
@@ -1014,11 +1020,12 @@ def cxx_entries(cfg, objs, rx, tx):
     rows = []
 
     def add(index, sub, name, type_, access, bits, storage, constant, text,
-            store=False, disabled_only=False, length="nullptr"):
+            store=False, disabled_only=False, length="nullptr", allowed=None):
         rows.append({"index": index, "sub": sub, "name": name, "type": type_,
                      "access": access, "bits": bits, "storage": storage,
                      "constant": constant, "text": text, "store": store,
-                     "disabled_only": disabled_only, "length": length})
+                     "disabled_only": disabled_only, "length": length,
+                     "allowed": allowed})
 
     for o in objs:
         if o.is_record:
@@ -1043,7 +1050,7 @@ def cxx_entries(cfg, objs, rx, tx):
                 length = f"&Obj.{s['length_var']}"
             add(o.index, s["sub"], s["name"], s["type"], s["access_name"],
                 s["bits"], storage, constant, text, s["store"], s["disabled_only"],
-                length)
+                length, s["allowed"])
 
     for pdo in rx + tx:
         entries = pdo["entries"]
@@ -1098,15 +1105,25 @@ def emit_cxx_table_cpp(cfg, objs, rx, tx, src):
     out.append("namespace od")
     out.append("{")
     out.append("")
+    for r in rows:
+        if r["allowed"]:
+            if r["type"] not in ("bool", "u8", "i8", "u16", "i16", "u32", "i32"):
+                die("0x%04X:%02X: `allowed` needs an integer type" % (r["index"], r["sub"]))
+            out.append("static const int64_t kAllowed%04X_%02X[] = {%s};"
+                       % (r["index"], r["sub"], ", ".join(str(v) for v in r["allowed"])))
+    out.append("")
     out.append("const Entry kEntries[] =")
     out.append("{")
     for r in rows:
-        out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\", %s},"
+        allowed = ""
+        if r["allowed"]:
+            allowed = ", kAllowed%04X_%02X, %d" % (r["index"], r["sub"], len(r["allowed"]))
+        out.append("   {0x%04X, 0x%02X, Type::%s, %s, %d, %s, %d, %s, \"%s\", %s%s},"
                    % (r["index"], r["sub"], CXX_TYPES[r["type"]],
                       CXX_ACCESS[r["access"]] + (" | kStore" if r["store"] else "")
                       + (" | kDisabledOnly" if r["disabled_only"] else ""),
                       r["bits"], r["storage"],
-                      r["constant"], r["text"], r["name"], r["length"]))
+                      r["constant"], r["text"], r["name"], r["length"], allowed))
     out.append("};")
     out.append("")
     out.append("const std::size_t kEntryCount = "

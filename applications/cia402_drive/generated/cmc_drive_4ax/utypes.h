@@ -155,6 +155,7 @@ typedef struct
    uint16_t   PositionWindowTime;
    uint32_t   ProfileAcceleration;
    uint32_t   ProfileDeceleration;
+   uint32_t   ProfileJerk;
    uint32_t   ProfileVelocity;
    uint32_t   QuickStopDeceleration;
    int16_t    QuickStopOptionCode;

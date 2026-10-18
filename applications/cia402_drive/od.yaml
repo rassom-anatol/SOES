@@ -281,8 +281,19 @@ objects:
   # 0x6084 serves profile position and Halt.
   - {index: 0x6084, axis: true, name: "Profile Deceleration",    type: u32, access: rw, var: "ProfileDeceleration", value: 10000, store: true}
   - {index: 0x6085, axis: true, name: "Quick Stop Deceleration", type: u32, access: rw, var: "QuickStopDeceleration", value: 10000, store: true}
-  # 0: linear ramp (trapezoidal). The only profile implemented, so read-only.
-  - {index: 0x6086, axis: true, name: "Motion Profile Type",     type: i16, access: ro, var: "MotionProfileType", value: 0}
+  # Profile position's motion profile: 0 linear ramp (trapezoid), 3
+  # jerk-limited ramp (S-curve: the acceleration ramps at no more than 0x60A4
+  # instead of stepping, planned by Ruckig). Other values are refused. Takes
+  # effect at the next move started at rest.
+  - {index: 0x6086, axis: true, name: "Motion Profile Type",     type: i16, access: rw, var: "MotionProfileType", value: 0, store: true, allowed: [0, 3]}
+  # Profile jerk for the jerk-limited ramp, rpm per second squared, for every
+  # phase (sub 1). 1,000,000 ramps 10,000 rpm/s of acceleration in 10 ms.
+  - index: 0x60A4
+    axis: true
+    name: "Profile Jerk"
+    object_code: array
+    subs:
+      - {sub: 1, name: "Profile Jerk 1", type: u32, access: rw, var: "ProfileJerk", value: 1000000, store: true}
   - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
   # Bit 0: pp. Bits 7, 8, 9: csp, csv, cst. Bit 16: manufacturer mode -1,
@@ -454,7 +465,7 @@ objects:
   # velocity meter (fixed 20 Hz filter) and the 0x2010 gains; 1 advanced PI
   # with the PWM-synchronous meter, the 0x2011 filter and gains. Only while no
   # axis is in Operation Enabled.
-  - {index: 0x2012, axis: true, name: "Loop Structure", type: u8, access: rw, var: "LoopStructure", store: true, disabled_only: true}
+  - {index: 0x2012, axis: true, name: "Loop Structure", type: u8, access: rw, var: "LoopStructure", store: true, disabled_only: true, allowed: [0, 1]}
 
   # Anti-cogging: a torque the drive adds as a function of shaft angle,
   # measured once with tools/twincat/cogging.py and held in 0x2014. The angle
@@ -468,7 +479,7 @@ objects:
     name: "Anti-Cogging"
     type: record
     subs:
-      - {sub: 1, name: "Enable",      type: u8,  access: rw, var: "CoggingEnable", store: true}
+      - {sub: 1, name: "Enable",      type: u8,  access: rw, var: "CoggingEnable", store: true, allowed: [0, 1]}
       - {sub: 2, name: "Gain",        type: u16, access: rw, var: "CoggingGain", value: 1000, store: true}
       - {sub: 3, name: "Fade Speed",  type: u16, access: rw, var: "CoggingFadeRpm", value: 300, store: true}
       - {sub: 4, name: "Status",      type: u8,  access: ro, var: "CoggingStatus"}
@@ -511,11 +522,11 @@ objects:
     name: "Feedback Settings"
     type: record
     subs:
-      - {sub: 1, name: "Encoder Direction",            type: u8,  access: rw, var: "FbEncoderDirection", store: true, disabled_only: true}
+      - {sub: 1, name: "Encoder Direction",            type: u8,  access: rw, var: "FbEncoderDirection", store: true, disabled_only: true, allowed: [0, 1]}
       - {sub: 2, name: "Encoder Counts per Revolution", type: u32, access: rw, var: "FbEncoderCounts", store: true, disabled_only: true}
       - {sub: 3, name: "Pole Pairs",                   type: u16, access: rw, var: "FbPolePairs", store: true, disabled_only: true}
-      - {sub: 4, name: "Hall Direction",               type: u8,  access: rw, var: "FbHallDirection", store: true, disabled_only: true}
-      - {sub: 5, name: "Hall Polarity",                type: u8,  access: rw, var: "FbHallPolarity", store: true, disabled_only: true}
+      - {sub: 4, name: "Hall Direction",               type: u8,  access: rw, var: "FbHallDirection", store: true, disabled_only: true, allowed: [0, 1]}
+      - {sub: 5, name: "Hall Polarity",                type: u8,  access: rw, var: "FbHallPolarity", store: true, disabled_only: true, allowed: [0, 1]}
       - {sub: 6, name: "Hall Offset",                  type: u16, access: rw, var: "FbHallOffset", store: true, disabled_only: true}
       - {sub: 7, name: "Commutation Offset",           type: i16, access: ro, var: "FbCommutationOffset"}
 
@@ -625,7 +636,7 @@ objects:
     name: "Identification"
     type: record
     subs:
-      - {sub: 1, name: "Routine",            type: u8,  access: rw, var: "IdentRoutine", value: 1}
+      - {sub: 1, name: "Routine",            type: u8,  access: rw, var: "IdentRoutine", value: 1, allowed: [1, 2, 3, 4, 5, 6]}
       - {sub: 2, name: "Test Current",       type: u16, access: rw, var: "IdentTestCurrent", value: 800, store: true}
       - {sub: 3, name: "State",              type: u8,  access: ro, var: "IdentState"}
       - {sub: 4, name: "Error",              type: u8,  access: ro, var: "IdentError"}
