@@ -552,7 +552,8 @@ objects:
   # routine refuses to start while it is narrower than half a turn or the axis
   # is outside it, and stops if the axis leaves it. State and error are
   # 0x2030:03 and :04 (8 window not usable, 9 left the window, 10 no motion at
-  # Max Torque, 11 a stroke did not finish). The model, at the motor shaft:
+  # Max Torque, 11 a stroke did not finish, 12 overspeed: above 120 % of Max
+  # Speed). The model, at the motor shaft:
   #   current = J a + B w + C (forward) or -C (backward) + constant load
   # Inertia in kg m^2 needs 0x6076 Motor Rated Torque (the torque constant is
   # 0x6076 / 0x6075); the others are in current. Constant Load is the current
