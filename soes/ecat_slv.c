@@ -604,6 +604,12 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
    {
       return;
    }
+   if (rc == 0)
+   {
+      /* A wait with no SYNC0: a pending request for OP starts its count of
+       * good sync again. */
+      ESC_op_pending_step (0, 0, timeout_ns);
+   }
 
    /* Capture once. ESCvar.ALevent is not stable across the branches below: a
     * port may refresh it on every ESC access to mimic the ET1x00, so testing
@@ -649,6 +655,8 @@ void ecat_slv_run_dc (uint64_t timeout_ns)
    {
       dc_evt_sync0++;
       ecat_slv_sync0_account (ESCvar.sm_event_seen);
+      /* The wait's bound is twice the SYNC0 period. */
+      ESC_op_pending_step (1, ESCvar.sm_event_seen, timeout_ns / 2);
       ESCvar.sm_event_seen = 0;
       DIG_process (DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_TXPDO_FLAG);
 

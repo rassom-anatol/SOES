@@ -75,6 +75,8 @@ void ESC_ALstatusgotoerror (uint8_t status, uint16_t errornumber)
    {
       ESC_stopoutput();
    }
+   /* An error ends a pending request for OP. */
+   ESCvar.op_pending = 0;
    ESC_ALerror(errornumber);
    ESC_ALstatus(status);
    an = status;
@@ -288,6 +290,7 @@ uint16_t ESC_checkDC (void)
    else
    {
       ESCvar.dcsync = 0;
+      ESCvar.op_pending = 0;
       ESCvar.synccounter = 0;
       ESCvar.smeventmissed = 0;
       ESCvar.syncerror = 0;
@@ -1133,6 +1136,17 @@ void ESC_state (void)
    /* Mask high bits ALcommand, low bits ALstatus */
    as = (uint8_t)((ac << 4) | (as & 0x0f));
 
+   /* OP waits for synchronisation (ESC_op_pending_step): the same request
+    * again leaves it waiting; any other request replaces it. */
+   if (ESCvar.op_pending)
+   {
+      if (as == SAFEOP_TO_OP)
+      {
+         return;
+      }
+      ESCvar.op_pending = 0;
+   }
+
    /* Call post state change hook case it have been configured  */
    if (ESCvar.pre_state_change_hook != NULL)
    {
@@ -1263,7 +1277,25 @@ void ESC_state (void)
       }
       case SAFEOP_TO_OP:
       {
-         an = ESC_startoutput (ac);
+         if (ESCvar.dcsync > 0)
+         {
+            /* With DC, not until the slave is synchronised: the request is
+             * held, AL status staying SAFEOP, and completed or refused by
+             * ESC_op_pending_step, as the Beckhoff Slave Stack Code does.
+             * Accepted at once, OP could begin before the master's first
+             * SYNC0, and the first SYNC0 wait in OP then fails as a fatal
+             * sync error (0x002C). */
+            ESCvar.op_pending = 1;
+            ESCvar.op_seen_sync0 = 0;
+            ESCvar.op_seen_sm = 0;
+            ESCvar.op_pending_ns = 0;
+            ESCvar.op_valid_ns = 0;
+            an = ESCsafeop;
+         }
+         else
+         {
+            an = ESC_startoutput (ac);
+         }
          break;
       }
       case OP_TO_BOOT:
@@ -1329,6 +1361,61 @@ void ESC_state (void)
    DPRINT ("state %s\n", ESC_state_to_string (an & 0xF));
 #endif
 }
+void ESC_op_pending_step (int sync0, int sm_event, uint64_t elapsed_ns)
+{
+   uint8_t as = SAFEOP_TO_OP;
+   uint8_t an = ESCop;
+   int good;
+
+   if (!ESCvar.op_pending)
+   {
+      return;
+   }
+   ESCvar.op_pending_ns += elapsed_ns;
+   if (sync0)
+   {
+      ESCvar.op_seen_sync0 = 1;
+   }
+   if (sm_event)
+   {
+      ESCvar.op_seen_sm = 1;
+   }
+
+   /* Good sync: SYNC0 arriving and the process data keeping up with it, by
+    * the sync error counter when the master set a limit (0x10F1:02), else
+    * this period's own frame. Any other period starts the count again. */
+   good = sync0 && ((ESCvar.synccounterlimit > 0)
+                       ? (ESCvar.synccounter < (int32_t)ESCvar.synccounterlimit)
+                       : (sm_event || (ESCvar.ESC_SM2_sml == 0)));
+   ESCvar.op_valid_ns = good ? ESCvar.op_valid_ns + elapsed_ns : 0;
+
+   if ((ESCvar.op_valid_ns >= ESC_OP_SYNC_VALID_NS) &&
+       (ESCvar.op_seen_sm || (ESCvar.ESC_SM2_sml == 0)))
+   {
+      ESCvar.op_pending = 0;
+      ESC_startoutput (ESCop);
+      if (ESCvar.post_state_change_hook != NULL)
+      {
+         ESCvar.post_state_change_hook (&as, &an);
+      }
+      if (!(an & ESCerror) && (ESCvar.ALerror))
+      {
+         ESC_ALerror (ALERR_NONE);
+      }
+      ESC_ALstatus (an);
+   }
+   else if (ESCvar.op_pending_ns >= ESC_OP_PENDING_TIMEOUT_NS)
+   {
+      /* Refused with what was missing, as the Slave Stack Code does: no
+       * SYNC0 at all, no process data, or the two never in step. */
+      ESCvar.op_pending = 0;
+      ESC_ALerror (!ESCvar.op_seen_sync0 ? ALERR_NOSYNCERROR
+                   : (!ESCvar.op_seen_sm && (ESCvar.ESC_SM2_sml > 0)) ? ALERR_WATCHDOG
+                                                                       : ALERR_SYNCERROR);
+      ESC_ALstatus (ESCsafeop | ESCerror);
+   }
+}
+
 /** Function copying the application configuration variable
  * data to the stack local variable.
  *

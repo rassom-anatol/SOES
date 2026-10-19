@@ -563,6 +563,14 @@ typedef struct
     * be accounted against the previous activation.
     */
    volatile uint8_t sm_event_seen;
+   /* SAFEOP to OP with DC active, held until the slave is synchronised (see
+    * ESC_op_pending_step): pending, whether SYNC0 and process data were seen
+    * while pending, the time pending, and the time sync has been good. */
+   uint8_t op_pending;
+   uint8_t op_seen_sync0;
+   uint8_t op_seen_sm;
+   uint64_t op_pending_ns;
+   uint64_t op_valid_ns;
    volatile _App App;
    uint8_t mbxdata[PREALLOC_BUFFER_SIZE];
 } _ESCvar;
@@ -784,6 +792,16 @@ void ESC_stopinput (void);
 uint8_t ESC_startoutput (uint8_t state);
 void ESC_stopoutput (void);
 void ESC_state (void);
+/** A pending SAFEOP to OP request under DC: one step, called once per SYNC0
+ * (sync0 = 1, sm_event = whether process data arrived in that period) and
+ * once per wait that saw no SYNC0 (sync0 = 0), with the time it covered. */
+void ESC_op_pending_step (int sync0, int sm_event, uint64_t elapsed_ns);
+
+/** Good sync needed before a pending OP is accepted, and how long it may stay
+ * pending: the Beckhoff Slave Stack Code's 200 ms, and its 9 s SAFEOP to OP
+ * timeout less 10 %, so the slave answers before the master gives up. */
+#define ESC_OP_SYNC_VALID_NS      200000000ull
+#define ESC_OP_PENDING_TIMEOUT_NS 8100000000ull
 void ESC_sm_act_event (void);
 
 /* From hardware file */
