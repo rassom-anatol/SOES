@@ -473,6 +473,28 @@ counter limit; it validates nothing. Once 0x1C32:05 carries an honest minimum cy
 time, comparing the master's SYNC0 period against it is a few lines and turns a class
 of silent misconfiguration into a specific diagnostic.
 
+### 5.2b SAFEOP to OP was accepted before the slave was synchronised (fixed 18 October 2026)
+
+With DC active, `ESC_state` accepted SAFEOP to OP at once. TwinCAT asks for OP within
+a cycle or two of SAFEOP, before its first SYNC0 pulse, so the first SYNC0 wait in OP
+found none and `ecat_slv_run_dc` dropped to SAFEOP + error with 0x002C (fatal sync
+error). TwinCAT retried until SYNC0 ran: two or three errors at every start-up, each
+over within about 5 ms, so a 50 ms sampled log usually missed them. A loop trace on
+cortex3 showed the sequence: SAFEOP, one empty wait, OP, one empty wait, error.
+
+Fixed as the Beckhoff Slave Stack Code does it (`ecatslv.c`, `StartOutputHandler`
+and `DC_CheckWatchdog`): with DC active the request is held, AL status staying
+SAFEOP, until SYNC0 and the process data have run together for 200 ms
+(`ESC_OP_SYNC_VALID_NS`; "together" by the sync error counter against 0x10F1:02, or
+each period's own frame without a limit), then OP. Still pending after 8.1 s (the
+SSC's 9 s timeout less 10 %, answering before the master's own) it is refused with
+what was missing: 0x002D no SYNC0, 0x001B no process data, 0x001A the two never in
+step. The same request again leaves it pending; any other request, an error, or DC
+turned off ends it. `ESC_op_pending_step` does the counting; `ecat_slv_run_dc` calls
+it once per SYNC0 and once per empty wait. A loop that does not use
+`ecat_slv_run_dc` under DC never sees SYNC0, and its OP requests are refused with
+0x002D. On the bench: six start-ups, six without an error, SAFEOP about 250 ms.
+
 ### 5.3 0x1C32 / 0x1C33 are absent
 
 Known and scheduled in §3.3. Worth recording here only because §2 shows the generator is
