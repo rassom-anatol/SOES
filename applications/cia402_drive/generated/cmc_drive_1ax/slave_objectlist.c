@@ -382,6 +382,9 @@ static const char acName2017_07[] = "Commutation Offset";
 static const char acName2018[] = "Feed-Forward";
 static const char acName2018_01[] = "Inertia A per rad/s2";
 static const char acName2018_02[] = "Acceleration Gain";
+static const char acName2019[] = "Interpolation Status";
+static const char acName2019_01[] = "Underruns";
+static const char acName2019_02[] = "Points Reached";
 static const char acName2020[] = "Recorder";
 static const char acName2020_01[] = "Command";
 static const char acName2020_02[] = "State";
@@ -1019,6 +1022,23 @@ static const char acName60A9[] = "SI Unit Velocity";
 static const char acName60A9_00[] = "SI Unit Velocity";
 static const char acName60AA[] = "SI Unit Acceleration";
 static const char acName60AA_00[] = "SI Unit Acceleration";
+static const char acName60C0[] = "Interpolation Sub Mode Select";
+static const char acName60C0_00[] = "Interpolation Sub Mode Select";
+static const char acName60C1[] = "Interpolation Data Record";
+static const char acName60C1_01[] = "Position";
+static const char acName60C1_02[] = "Velocity";
+static const char acName60C1_03[] = "Acceleration";
+static const char acName60C1_04[] = "Time us";
+static const char acName60C2[] = "Interpolation Time Period";
+static const char acName60C2_01[] = "Interpolation Time Period Value";
+static const char acName60C2_02[] = "Interpolation Time Index";
+static const char acName60C4[] = "Interpolation Data Configuration";
+static const char acName60C4_01[] = "Maximum Buffer Size";
+static const char acName60C4_02[] = "Actual Buffer Size";
+static const char acName60C4_03[] = "Buffer Organisation";
+static const char acName60C4_04[] = "Buffer Position";
+static const char acName60C4_05[] = "Size of Data Record";
+static const char acName60C4_06[] = "Buffer Clear";
 static const char acName60F4[] = "Following Error Actual";
 static const char acName60F4_00[] = "Following Error Actual";
 static const char acName60FF[] = "Target Velocity";
@@ -1591,6 +1611,14 @@ const _objd SDO2018[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2018, 2, NULL},
    {0x01, DTYPE_REAL32, 32, ATYPE_RW, acName2018_01, 0, &Obj.axis[0].FfInertia},
    {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2018_02, 1000, &Obj.axis[0].FfAccelerationGain},
+};
+
+/* 0x2019 Interpolation Status */
+const _objd SDO2019[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2019, 2, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2019_01, 0, &Obj.axis[0].IpUnderruns},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2019_02, 0, &Obj.axis[0].IpReached},
 };
 
 /* 0x2020 Recorder */
@@ -2438,6 +2466,42 @@ const _objd SDO60AA[] =
    {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60AA_00, 12583680, &Obj.axis[0].SiUnitAcceleration},
 };
 
+/* 0x60C0 Interpolation Sub Mode Select */
+const _objd SDO60C0[] =
+{
+   {0x00, DTYPE_INTEGER16, 16, ATYPE_RW, acName60C0_00, 0, &Obj.axis[0].IpSubMode},
+};
+
+/* 0x60C1 Interpolation Data Record */
+const _objd SDO60C1[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName60C1, 4, NULL},
+   {0x01, DTYPE_INTEGER32, 32, ATYPE_RW, acName60C1_01, 0, &Obj.axis[0].IpPosition},
+   {0x02, DTYPE_INTEGER32, 32, ATYPE_RW, acName60C1_02, 0, &Obj.axis[0].IpVelocity},
+   {0x03, DTYPE_INTEGER32, 32, ATYPE_RW, acName60C1_03, 0, &Obj.axis[0].IpAcceleration},
+   {0x04, DTYPE_INTEGER32, 32, ATYPE_RW, acName60C1_04, 0, &Obj.axis[0].IpTime},
+};
+
+/* 0x60C2 Interpolation Time Period */
+const _objd SDO60C2[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName60C2, 2, NULL},
+   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName60C2_01, 1, &Obj.axis[0].IpPeriodValue},
+   {0x02, DTYPE_INTEGER8, 8, ATYPE_RW, acName60C2_02, -3, &Obj.axis[0].IpPeriodIndex},
+};
+
+/* 0x60C4 Interpolation Data Configuration */
+const _objd SDO60C4[] =
+{
+   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName60C4, 6, NULL},
+   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60C4_01, 64, NULL},
+   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName60C4_02, 0, &Obj.axis[0].IpBufferCount},
+   {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName60C4_03, 0, &Obj.axis[0].IpBufferOrganisation},
+   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName60C4_04, 0, &Obj.axis[0].IpBufferPosition},
+   {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName60C4_05, 16, NULL},
+   {0x06, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName60C4_06, 0, &Obj.axis[0].IpBufferClear},
+};
+
 /* 0x60F4 Following Error Actual */
 const _objd SDO60F4[] =
 {
@@ -2453,7 +2517,7 @@ const _objd SDO60FF[] =
 /* 0x6502 Supported Drive Modes */
 const _objd SDO6502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66433, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66497, NULL},
 };
 
 /* Object list. Ascending index order is required by
@@ -2490,6 +2554,7 @@ const _objectlist SDOobjects[] =
    {0x2016, OTYPE_RECORD, 4, 0, acName2016, SDO2016},
    {0x2017, OTYPE_RECORD, 7, 0, acName2017, SDO2017},
    {0x2018, OTYPE_RECORD, 2, 0, acName2018, SDO2018},
+   {0x2019, OTYPE_RECORD, 2, 0, acName2019, SDO2019},
    {0x2020, OTYPE_RECORD, 19, 0, acName2020, SDO2020},
    {0x2021, OTYPE_VAR, 0, 0, acName2021, SDO2021},
    {0x2030, OTYPE_RECORD, 18, 0, acName2030, SDO2030},
@@ -2538,6 +2603,10 @@ const _objectlist SDOobjects[] =
    {0x60A8, OTYPE_VAR, 0, 0, acName60A8, SDO60A8},
    {0x60A9, OTYPE_VAR, 0, 0, acName60A9, SDO60A9},
    {0x60AA, OTYPE_VAR, 0, 0, acName60AA, SDO60AA},
+   {0x60C0, OTYPE_VAR, 0, 0, acName60C0, SDO60C0},
+   {0x60C1, OTYPE_ARRAY, 4, 0, acName60C1, SDO60C1},
+   {0x60C2, OTYPE_RECORD, 2, 0, acName60C2, SDO60C2},
+   {0x60C4, OTYPE_RECORD, 6, 0, acName60C4, SDO60C4},
    {0x60F4, OTYPE_VAR, 0, 0, acName60F4, SDO60F4},
    {0x60FF, OTYPE_VAR, 0, 0, acName60FF, SDO60FF},
    {0x6502, OTYPE_VAR, 0, 0, acName6502, SDO6502},

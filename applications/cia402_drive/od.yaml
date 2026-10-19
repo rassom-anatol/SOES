@@ -294,11 +294,62 @@ objects:
     object_code: array
     subs:
       - {sub: 1, name: "Profile Jerk 1", type: u32, access: rw, var: "ProfileJerk", value: 1000000, store: true}
+  # Interpolated position mode (0x6060 = 7): the axis follows a path through
+  # points from a buffer. Sub-mode 0 is CiA402's linear interpolation, one
+  # point per 0x60C2. The negative sub-modes are this drive's own, as CiA402
+  # leaves them to the manufacturer: -1 a cubic through each point's position
+  # and velocity (PVT), -2 a quintic through its position, velocity and
+  # acceleration (PVAT), each point a time after the one before. They are the
+  # segments ros2_control's joint trajectory controller fits, so a ROS 2
+  # JointTrajectory runs as it would there. Takes effect at the next start.
+  - {index: 0x60C0, axis: true, name: "Interpolation Sub Mode Select", type: i16, access: rw, var: "IpSubMode", value: 0, store: true, allowed: [0, -1, -2]}
+  # One point. Write 2 to 4 first, then 1: writing sub 1 puts the point into
+  # the buffer (the same value twice is two points), with whatever 2 to 4
+  # hold, so values that do not change need not be written again. Position
+  # in position units; velocity in position units per second and
+  # acceleration per second squared (not rpm: a path needs the finer unit);
+  # time in microseconds after the point before, above 0 for sub-modes -1
+  # and -2, unused by 0. Refused (0x08000022) while 0x60C4:06 is 0 or the
+  # buffer is full, and (0x06090030) for a time of 0 in sub-modes -1 and -2.
+  # Single writes only: not Complete Access, and not in a PDO.
+  - index: 0x60C1
+    axis: true
+    name: "Interpolation Data Record"
+    object_code: array
+    subs:
+      - {sub: 1, name: "Position",          type: i32, access: rw, var: "IpPosition"}
+      - {sub: 2, name: "Velocity",          type: i32, access: rw, var: "IpVelocity"}
+      - {sub: 3, name: "Acceleration",      type: i32, access: rw, var: "IpAcceleration"}
+      - {sub: 4, name: "Time us",           type: i32, access: rw, var: "IpTime"}
+  # Sub-mode 0's time per point: sub 1 times ten to the power of sub 2,
+  # seconds. 1 and -3 are 1 ms.
+  - index: 0x60C2
+    axis: true
+    name: "Interpolation Time Period"
+    type: record
+    subs:
+      - {sub: 1, name: "Interpolation Time Period Value", type: u8, access: rw, var: "IpPeriodValue", value: 1, store: true}
+      - {sub: 2, name: "Interpolation Time Index",        type: i8, access: rw, var: "IpPeriodIndex", value: -3, store: true}
+  # The buffer: first in, first out, 64 points. Sub 2 is the points waiting,
+  # sub 4 the entry the next goes into. Sub 6 = 1 accepts points; 0 empties
+  # the buffer, refuses points and ends a path that runs (the axis stops on
+  # 0x6084).
+  - index: 0x60C4
+    axis: true
+    name: "Interpolation Data Configuration"
+    type: record
+    subs:
+      - {sub: 1, name: "Maximum Buffer Size",  type: u32, access: ro, value: 64}
+      - {sub: 2, name: "Actual Buffer Size",   type: u32, access: ro, var: "IpBufferCount"}
+      - {sub: 3, name: "Buffer Organisation",  type: u8,  access: rw, var: "IpBufferOrganisation", value: 0, allowed: [0]}
+      - {sub: 4, name: "Buffer Position",      type: u16, access: ro, var: "IpBufferPosition"}
+      - {sub: 5, name: "Size of Data Record",  type: u8,  access: ro, value: 16}
+      - {sub: 6, name: "Buffer Clear",         type: u8,  access: rw, var: "IpBufferClear", value: 0, allowed: [0, 1]}
   - {index: 0x60F4, axis: true, name: "Following Error Actual",  type: i32, access: ro, var: "FollowingErrorActual"}
   - {index: 0x60FF, axis: true, name: "Target Velocity",         type: i32, access: rw, var: "TargetVelocity"}
-  # Bit 0: pp. Bits 7, 8, 9: csp, csv, cst. Bit 16: manufacturer mode -1,
-  # identification.
-  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x00010381}
+  # Bit 0: pp. Bit 6: ip. Bits 7, 8, 9: csp, csv, cst. Bit 16: manufacturer
+  # mode -1, identification.
+  - {index: 0x6502, axis: true, name: "Supported Drive Modes",   type: u32, access: ro, value: 0x000103C1}
 
   # The units of position, velocity and acceleration, in the SI unit coding
   # (prefix, numerator, denominator; maxon EPOS4 firmware specification
@@ -543,6 +594,17 @@ objects:
     subs:
       - {sub: 1, name: "Inertia A per rad/s2", type: real32, access: rw, var: "FfInertia", store: true}
       - {sub: 2, name: "Acceleration Gain",    type: u16,    access: rw, var: "FfAccelerationGain", value: 1000, store: true}
+
+  # Interpolated position's counters since the drive started: paths stopped
+  # because the buffer ran dry while moving (the points came too late), and
+  # points reached.
+  - index: 0x2019
+    axis: true
+    name: "Interpolation Status"
+    type: record
+    subs:
+      - {sub: 1, name: "Underruns",      type: u32, access: ro, var: "IpUnderruns"}
+      - {sub: 2, name: "Points Reached", type: u32, access: ro, var: "IpReached"}
 
   # Signals inside the drive's control, as objects so the recorder (0x2020)
   # and any client can see them.
