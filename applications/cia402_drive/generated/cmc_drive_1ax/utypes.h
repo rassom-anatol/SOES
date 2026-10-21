@@ -202,6 +202,10 @@ typedef struct
    uint16_t   VelocityI;
    uint32_t   VelocityLimit;
    uint16_t   VelocityP;
+   uint16_t   VelocityThreshold;
+   uint16_t   VelocityThresholdTime;
+   uint16_t   VelocityWindow;
+   uint16_t   VelocityWindowTime;
    int16_t    CheckCurve[200];
    int16_t    CogResult[128];
    int16_t    CogResultNeg[128];

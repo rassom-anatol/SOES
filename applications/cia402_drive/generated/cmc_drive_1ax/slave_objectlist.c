@@ -978,6 +978,14 @@ static const char acName6068[] = "Position Window Time";
 static const char acName6068_00[] = "Position Window Time";
 static const char acName606C[] = "Velocity Actual Value";
 static const char acName606C_00[] = "Velocity Actual Value";
+static const char acName606D[] = "Velocity Window";
+static const char acName606D_00[] = "Velocity Window";
+static const char acName606E[] = "Velocity Window Time";
+static const char acName606E_00[] = "Velocity Window Time";
+static const char acName606F[] = "Velocity Threshold";
+static const char acName606F_00[] = "Velocity Threshold";
+static const char acName6070[] = "Velocity Threshold Time";
+static const char acName6070_00[] = "Velocity Threshold Time";
 static const char acName6071[] = "Target Torque";
 static const char acName6071_00[] = "Target Torque";
 static const char acName6072[] = "Max Torque";
@@ -2337,6 +2345,30 @@ const _objd SDO606C[] =
    {0x00, DTYPE_INTEGER32, 32, ATYPE_RO, acName606C_00, 0, &Obj.axis[0].VelocityActual},
 };
 
+/* 0x606D Velocity Window */
+const _objd SDO606D[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName606D_00, 30, &Obj.axis[0].VelocityWindow},
+};
+
+/* 0x606E Velocity Window Time */
+const _objd SDO606E[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName606E_00, 20, &Obj.axis[0].VelocityWindowTime},
+};
+
+/* 0x606F Velocity Threshold */
+const _objd SDO606F[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName606F_00, 30, &Obj.axis[0].VelocityThreshold},
+};
+
+/* 0x6070 Velocity Threshold Time */
+const _objd SDO6070[] =
+{
+   {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName6070_00, 20, &Obj.axis[0].VelocityThresholdTime},
+};
+
 /* 0x6071 Target Torque */
 const _objd SDO6071[] =
 {
@@ -2517,7 +2549,7 @@ const _objd SDO60FF[] =
 /* 0x6502 Supported Drive Modes */
 const _objd SDO6502[] =
 {
-   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66497, NULL},
+   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502_00, 66501, NULL},
 };
 
 /* Object list. Ascending index order is required by
@@ -2583,6 +2615,10 @@ const _objectlist SDOobjects[] =
    {0x6067, OTYPE_VAR, 0, 0, acName6067, SDO6067},
    {0x6068, OTYPE_VAR, 0, 0, acName6068, SDO6068},
    {0x606C, OTYPE_VAR, 0, 0, acName606C, SDO606C},
+   {0x606D, OTYPE_VAR, 0, 0, acName606D, SDO606D},
+   {0x606E, OTYPE_VAR, 0, 0, acName606E, SDO606E},
+   {0x606F, OTYPE_VAR, 0, 0, acName606F, SDO606F},
+   {0x6070, OTYPE_VAR, 0, 0, acName6070, SDO6070},
    {0x6071, OTYPE_VAR, 0, 0, acName6071, SDO6071},
    {0x6072, OTYPE_VAR, 0, 0, acName6072, SDO6072},
    {0x6075, OTYPE_VAR, 0, 0, acName6075, SDO6075},
