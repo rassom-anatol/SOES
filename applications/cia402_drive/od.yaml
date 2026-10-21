@@ -925,8 +925,9 @@ bitfields:
     # Board digital inputs (cmc include/bsp/BSP.hpp) plus the TMC4671 status
     # bits that matter within a cycle rather than as diagnostics. Bits 4-10
     # are set while their event happened within the last second (the drive
-    # clears the chip's latching flags as it reads them). Bits 0-2 and 11 are
-    # not filled yet and read 0.
+    # clears the chip's latching flags as it reads them). Bit 12 is set while
+    # the encoder calibration of a first enable runs, during which the drive
+    # follows no set-point. Bits 0-2 and 11 are not filled yet and read 0.
     0:  drv_fault_pin     # BSP DRV_FAULT, BCM 27
     1:  ctrl_sta_pin      # BSP CTRL_STA,  BCM 26
     2:  is_ctrl_en_pin    # BSP IS_CTRL_EN, BCM 24
@@ -938,6 +939,7 @@ bitfields:
     9:  pwm_max
     10: enc_n             # encoder index seen
     11: hall_error
+    12: encoder_calibration  # running: set-points are not followed yet
 
 # ---------------------------------------------------------------------------
 # EEPROM / SII image data.
