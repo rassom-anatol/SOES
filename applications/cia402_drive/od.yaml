@@ -251,7 +251,10 @@ objects:
   - {index: 0x606F, axis: true, name: "Velocity Threshold",      type: u16, access: rw, var: "VelocityThreshold", value: 30, store: true}
   - {index: 0x6070, axis: true, name: "Velocity Threshold Time", type: u16, access: rw, var: "VelocityThresholdTime", value: 20, store: true}
   - {index: 0x6071, axis: true, name: "Target Torque",           type: i16, access: rw, var: "TargetTorque"}
-  - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000, store: true}
+  # Max Torque is not saved: it is mapped in the RxPDO, so a 0x1010 save
+  # would keep whatever the master last sent (0 left a drive without a
+  # master unable to make torque). Each start begins at 1000.
+  - {index: 0x6072, axis: true, name: "Max Torque",              type: u16, access: rw, var: "MaxTorque", value: 1000}
   # Motor Rated Current, mA. The reference for 0x6071, 0x6072 and 0x6077:
   # the drive controls current, and per mille of rated current is per mille
   # of rated torque for a constant torque constant. 0 means not commissioned,
