@@ -678,14 +678,18 @@ objects:
   # while the axis runs Quick Stops the axis before the master's command
   # applies again. Owner: 0 master, 1 tool, 2 releasing (stopping first).
   # Contention counts cycles in which the master changed its Controlword while
-  # the tool held control.
+  # the tool held control. Heartbeat Timeout is 1500 ms: the web page beats
+  # every 200 ms from its main thread, which a large view or plot can hold up
+  # for a few hundred ms, and 500 ms dropped control then. A page that closes
+  # releases control at once; the timeout only catches a page that hangs or a
+  # network that goes silent.
   - index: 0x2040
     name: "Service Control"
     type: record
     subs:
       - {sub: 1, name: "Allow",             type: u8,  access: rw, var: "SvcAllow"}
       - {sub: 2, name: "Owner",             type: u8,  access: ro, var: "SvcOwner"}
-      - {sub: 3, name: "Heartbeat Timeout", type: u16, access: rw, var: "SvcTimeoutMs", value: 500, store: true}
+      - {sub: 3, name: "Heartbeat Timeout", type: u16, access: rw, var: "SvcTimeoutMs", value: 1500, store: true}
       - {sub: 4, name: "Contention",        type: u32, access: ro, var: "SvcContention"}
       - {sub: 5, name: "Tool Request",      type: u8,  access: rw, var: "SvcRequest"}
       - {sub: 6, name: "Tool Heartbeat",    type: u32, access: rw, var: "SvcHeartbeat"}

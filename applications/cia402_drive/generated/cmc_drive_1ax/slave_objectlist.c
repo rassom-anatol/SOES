@@ -2231,7 +2231,7 @@ const _objd SDO2040[] =
    {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2040, 6, NULL},
    {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2040_01, 0, &Obj.SvcAllow},
    {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2040_02, 0, &Obj.SvcOwner},
-   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2040_03, 500, &Obj.SvcTimeoutMs},
+   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2040_03, 1500, &Obj.SvcTimeoutMs},
    {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName2040_04, 0, &Obj.SvcContention},
    {0x05, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2040_05, 0, &Obj.SvcRequest},
    {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2040_06, 0, &Obj.SvcHeartbeat},
